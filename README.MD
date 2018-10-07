@@ -20,7 +20,7 @@ The following `source` sub-directories are the only ones treated specially by Ma
 * `source/static`    - static files that should be served as-is.
 * `source/processed` - files that will be processed, as explained below.
 
-Any other files and sub-directories are ignored by Magnanimous, but may be referred to from static and processed files.
+Any other files and sub-directories are ignored by default, but may be referred to from processed files.
 
 ### Processed files
 
@@ -36,13 +36,23 @@ Processed files may use the following processor instructions:
 Markdown files (`*.md`) will be converted to HTML after Magnanimous instructions are processed, using
 [Blackfriday](https://github.com/russross/blackfriday).
 
+Files whose name starts with `_` will not be present in the output website, but may be included by other files.
+
 #### Inclusions
 
 `include` instructions must always have a file reference as an argument.
 
-An inclusion may look like this: `{{ include /static/header.html }}`. This whole expression will be replaced
-with the contents of the file at `source/static/header.html`. If the file does not exist, a warning will be emitted
+An inclusion may look like this: 
+
+```
+{{ include /static/header.html }}
+```
+
+This whole expression will be replaced with the contents of the file at `source/static/header.html`.
+If the file does not exist, a warning will be emitted
 during compilation, and the expression will appear as it is in the compiled resource.
+
+The file extension may be omitted if there is no ambiguity.
 
 #### Variables
 
@@ -69,7 +79,7 @@ The following is an example of a simple variable definition:
 Using the variable:
                                                                
 ```
-<title>{{ $active }}</title>
+<title>{{ $title }}</title>
 ```
 
 Whic should compile to:
