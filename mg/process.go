@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-type StrContent struct {
+type strContent struct {
 	text string
 }
 
@@ -42,16 +42,109 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 	builder.Grow(size)
 	ctx := make(WebFileContext)
 	processed := ProcessedFile{}
+	previousWasOpenBracket := false
+	previousWasCloseBracket := false
+	parsingInstruction := false
+	row := 1
+	col := 0
+
 	for {
 		r, _, err := reader.ReadRune()
 		if err == io.EOF {
 			break
 		}
 		ExitIfError(&err, 6)
+
+		if r == '\n' {
+			row++
+			col = 1
+			builder.WriteRune(r)
+			continue
+		}
+
+		col++
+
+		if r == '}' {
+			if previousWasCloseBracket {
+				if !parsingInstruction {
+					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
+				}
+				if builder.Len() > 0 {
+					processed.appendContent(instr(builder.String(), row, col))
+				}
+				builder.Reset()
+				parsingInstruction = false
+				previousWasCloseBracket = false
+			} else {
+				previousWasCloseBracket = true
+			}
+			continue
+		} else {
+			if previousWasCloseBracket {
+				builder.WriteRune('}')
+			}
+			previousWasCloseBracket = false
+		}
+
+		if r == '{' {
+			if previousWasOpenBracket {
+				if builder.Len() > 0 {
+					processed.appendContent(&strContent{text: builder.String()})
+					builder.Reset()
+				}
+				parsingInstruction = true
+				previousWasOpenBracket = false
+			} else {
+				previousWasOpenBracket = true
+			}
+			continue
+		} else {
+			if previousWasOpenBracket {
+				builder.WriteRune('{')
+			}
+			previousWasOpenBracket = false
+		}
+
 		builder.WriteRune(r)
 	}
-	processed.appendContent(&StrContent{text: builder.String()})
+
+	if parsingInstruction {
+		log.Fatalf("Parsing Error at position %d:%d - instruction was not properly closed with: }}", row, col)
+	} else if builder.Len() > 0 {
+		processed.appendContent(&strContent{text: builder.String()})
+	}
+
+	log.Printf("Parsed contents: %s", processed.Contents)
+
 	return &ctx, &processed
+}
+
+func instr(text string, row, col int) Content {
+	parts := strings.Fields(text)
+	switch len(parts) {
+	case 0:
+		return &strContent{text: ""}
+	case 1:
+		log.Fatalf("Instruction Error at position %d:%d - instruction missing argument: %s", row, col, parts[0])
+	default:
+		return parseInstr(parts[0], parts[1:], row, col)
+	}
+	panic("Unreachable")
+}
+
+func parseInstr(name string, args []string, row, col int) Content {
+	switch name {
+	case "include":
+		if len(args) == 1 {
+			return &strContent{text: "example"}
+		} else {
+			log.Fatalf("Instruction Error at position %d:%d - wrong number of arguments for "+
+				"include instruction, expected 1, got %d", row, col, len(args))
+		}
+	default:
+		log.Fatalf("Unknown instruction: %s", name)
+	}
+	panic("Unreachable")
 }
 
 func WriteTo(dir string, filesMap *WebFilesMap) {
@@ -71,10 +164,10 @@ func WriteTo(dir string, filesMap *WebFilesMap) {
 		ExitIfError(&err, 10)
 		defer f.Close()
 		w := bufio.NewWriter(f)
+		defer w.Flush()
 		for _, c := range wf.Processed.Contents {
 			c.Write(w)
 		}
-		w.Flush()
 	}
 }
 
@@ -85,7 +178,7 @@ func ExitIfError(err *error, code int) {
 	}
 }
 
-func (c *StrContent) Write(writer io.Writer) {
+func (c *strContent) Write(writer io.Writer) {
 	_, err := writer.Write([]byte(c.text))
 	ExitIfError(&err, 11)
 }
