@@ -18,7 +18,7 @@ type StrContent struct {
 
 func Process(files *[]string, basePath string, filesMap *WebFilesMap) {
 	for _, file := range *files {
-		wf := ParseFile(file, basePath)
+		wf := ProcessFile(file, basePath)
 		(*filesMap)[file] = *wf
 	}
 
@@ -27,17 +27,17 @@ func Process(files *[]string, basePath string, filesMap *WebFilesMap) {
 	fmt.Println(string(s))
 }
 
-func ParseFile(file, basePath string) *WebFile {
+func ProcessFile(file, basePath string) *WebFile {
 	f, err := os.Open(file)
 	ExitIfError(&err, 5)
 	reader := bufio.NewReader(f)
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
-	ctx, processed := ParseReader(reader, int(s.Size()))
+	ctx, processed := ProcessReader(reader, int(s.Size()))
 	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed}
 }
 
-func ParseReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedFile) {
+func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedFile) {
 	var builder strings.Builder
 	builder.Grow(size)
 	ctx := make(WebFileContext)
@@ -54,7 +54,7 @@ func ParseReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedFil
 	return &ctx, &processed
 }
 
-func WriteAt(dir string, filesMap *WebFilesMap) {
+func WriteTo(dir string, filesMap *WebFilesMap) {
 	err := os.MkdirAll(dir, 0770)
 	ExitIfError(&err, 9)
 	for file, wf := range *filesMap {

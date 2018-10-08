@@ -12,7 +12,7 @@ func main() {
 	webFiles := make(mg.WebFilesMap, len(procFiles)+len(staticFiles))
 	mg.Process(&procFiles, "source/processed", &webFiles)
 	mg.CopyAll(&staticFiles, "source/static", &webFiles)
-	mg.WriteAt("target", &webFiles)
+	mg.WriteTo("target", &webFiles)
 }
 
 func getFilesAt(root string) []string {

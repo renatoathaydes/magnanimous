@@ -9,7 +9,7 @@ import (
 
 func TestParseSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
-	ctx, processed := mg.ParseReader(r, 11)
+	ctx, processed := mg.ProcessReader(r, 11)
 
 	if len(*ctx) != 0 {
 		t.Errorf("Expected empty context, but len(ctx) == %d", len(*ctx))
