@@ -11,7 +11,7 @@ func main() {
 	staticFiles := getFilesAt("source/static")
 	webFiles := make(mg.WebFilesMap, len(procFiles)+len(staticFiles))
 	mg.Process(&procFiles, "source/processed", &webFiles)
-	mg.Copy(&staticFiles, "source/static", &webFiles)
+	mg.CopyAll(&staticFiles, "source/static", &webFiles)
 	mg.WriteAt("target", &webFiles)
 }
 

@@ -6,14 +6,14 @@ import (
 	"os"
 )
 
-func Copy(files *[]string, basePath string, filesMap *WebFilesMap) {
+func CopyAll(files *[]string, basePath string, filesMap *WebFilesMap) {
 	for _, file := range *files {
-		wf := cp(file, basePath)
+		wf := Copy(file, basePath)
 		(*filesMap)[file] = *wf
 	}
 }
 
-func cp(file, basePath string) *WebFile {
+func Copy(file, basePath string) *WebFile {
 	var proc = ProcessedFile{}
 	proc.appendContent(&copiedContent{file: file})
 	return &WebFile{BasePath: basePath, Processed: &proc}
