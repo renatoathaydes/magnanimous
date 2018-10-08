@@ -126,10 +126,8 @@ func instr(text string, row, col int) Content {
 		return &strContent{text: ""}
 	case 1:
 		log.Fatalf("Instruction Error at position %d:%d - instruction missing argument: %s", row, col, parts[0])
-	default:
-		return parseInstr(parts[0], parts[1:], row, col)
 	}
-	panic("Unreachable")
+	return parseInstr(parts[0], parts[1:], row, col)
 }
 
 func parseInstr(name string, args []string, row, col int) Content {
@@ -141,9 +139,9 @@ func parseInstr(name string, args []string, row, col int) Content {
 			log.Fatalf("Instruction Error at position %d:%d - wrong number of arguments for "+
 				"include instruction, expected 1, got %d", row, col, len(args))
 		}
-	default:
-		log.Fatalf("Unknown instruction: %s", name)
 	}
+
+	log.Fatalf("Unknown instruction: %s", name)
 	panic("Unreachable")
 }
 
