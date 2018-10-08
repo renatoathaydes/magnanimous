@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestParseSimple(t *testing.T) {
+func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
 	ctx, processed := mg.ProcessReader(r, 11)
 
