@@ -27,5 +27,6 @@ func (c *copiedContent) Write(writer io.Writer) {
 	f, err := os.Open(c.file)
 	ExitIfError(&err, 30)
 	defer f.Close()
-	io.Copy(writer, bufio.NewReader(f))
+	_, err = io.Copy(writer, bufio.NewReader(f))
+	ExitIfError(&err, 31)
 }
