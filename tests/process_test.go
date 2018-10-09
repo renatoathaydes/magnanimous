@@ -22,7 +22,8 @@ func TestProcessSimple(t *testing.T) {
 	}
 
 	var result strings.Builder
-	c[0].Write(&result)
+	m := mg.WebFilesMap{}
+	c[0].Write(&result, m)
 
 	if result.String() != "hello world" {
 		t.Errorf("Expected 'hello world', but was '%s'", result.String())
@@ -30,7 +31,7 @@ func TestProcessSimple(t *testing.T) {
 }
 
 func TestProcessIncludeSimple(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("hello {{ include /example.txt }}"))
+	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
 	ctx, processed := mg.ProcessReader(r, 11)
 
 	if len(*ctx) != 0 {
@@ -43,18 +44,24 @@ func TestProcessIncludeSimple(t *testing.T) {
 		t.Errorf("Expected 2 Contents, but got %v", c)
 	}
 
+	exampleFile := mg.ProcessedFile{}
+	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
+
+	m := mg.WebFilesMap{}
+	m["example.html"] = mg.WebFile{Processed: &exampleFile}
+
 	var result strings.Builder
-	c[0].Write(&result)
+	c[0].Write(&result, m)
 
 	if result.String() != "hello " {
 		t.Errorf("Expected 'hello ', but was '%s'", result.String())
 	}
 
 	result.Reset()
-	c[1].Write(&result)
+	c[1].Write(&result, m)
 
-	if result.String() != "example" {
-		t.Errorf("Expected 'example', but was '%s'", result.String())
+	if result.String() != "from another file!" {
+		t.Errorf("Expected 'from another file!', but was '%s'", result.String())
 	}
 
 }

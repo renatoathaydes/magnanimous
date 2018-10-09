@@ -12,10 +12,6 @@ import (
 	"os"
 )
 
-type strContent struct {
-	text string
-}
-
 func Process(files *[]string, basePath string, filesMap *WebFilesMap) {
 	for _, file := range *files {
 		wf := ProcessFile(file, basePath)
@@ -70,7 +66,7 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
 				}
 				if builder.Len() > 0 {
-					processed.appendContent(instr(builder.String(), row, col))
+					processed.AppendContent(instruction(builder.String(), row, col))
 				}
 				builder.Reset()
 				parsingInstruction = false
@@ -89,7 +85,7 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 		if r == '{' {
 			if previousWasOpenBracket {
 				if builder.Len() > 0 {
-					processed.appendContent(&strContent{text: builder.String()})
+					processed.AppendContent(&StringContent{Text: builder.String()})
 					builder.Reset()
 				}
 				parsingInstruction = true
@@ -111,7 +107,7 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 	if parsingInstruction {
 		log.Fatalf("Parsing Error at position %d:%d - instruction was not properly closed with: }}", row, col)
 	} else if builder.Len() > 0 {
-		processed.appendContent(&strContent{text: builder.String()})
+		processed.AppendContent(&StringContent{Text: builder.String()})
 	}
 
 	log.Printf("Parsed contents: %s", processed.Contents)
@@ -119,22 +115,22 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 	return &ctx, &processed
 }
 
-func instr(text string, row, col int) Content {
+func instruction(text string, row, col int) Content {
 	parts := strings.Fields(text)
 	switch len(parts) {
 	case 0:
-		return &strContent{text: ""}
+		return &StringContent{Text: ""}
 	case 1:
 		log.Fatalf("Instruction Error at position %d:%d - instruction missing argument: %s", row, col, parts[0])
 	}
-	return parseInstr(parts[0], parts[1:], row, col)
+	return validateInstruction(parts[0], parts[1:], row, col)
 }
 
-func parseInstr(name string, args []string, row, col int) Content {
+func validateInstruction(name string, args []string, row, col int) Content {
 	switch name {
 	case "include":
 		if len(args) == 1 {
-			return &strContent{text: "example"}
+			return &IncludeInstruction{Name: name, Path: args[0]}
 		} else {
 			log.Fatalf("Instruction Error at position %d:%d - wrong number of arguments for "+
 				"include instruction, expected 1, got %d", row, col, len(args))
@@ -145,27 +141,31 @@ func parseInstr(name string, args []string, row, col int) Content {
 	panic("Unreachable")
 }
 
-func WriteTo(dir string, filesMap *WebFilesMap) {
+func WriteTo(dir string, filesMap WebFilesMap) {
 	err := os.MkdirAll(dir, 0770)
 	ExitIfError(&err, 9)
-	for file, wf := range *filesMap {
+	for file, wf := range filesMap {
 		targetPath, err := filepath.Rel(wf.BasePath, file)
 		if err != nil {
 			log.Printf("Unable to relativize path %s", file)
 			targetPath = file
 		}
 		targetFile := filepath.Join(dir, targetPath)
-		log.Printf("Creating file %s from %s", targetFile, file)
-		err = os.MkdirAll(filepath.Dir(targetFile), 0770)
-		ExitIfError(&err, 10)
-		f, err := os.Create(targetFile)
-		ExitIfError(&err, 10)
-		defer f.Close()
-		w := bufio.NewWriter(f)
-		defer w.Flush()
-		for _, c := range wf.Processed.Contents {
-			c.Write(w)
-		}
+		writeFile(targetFile, file, wf, filesMap)
+	}
+}
+
+func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) {
+	log.Printf("Creating file %s from %s", targetFile, file)
+	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
+	ExitIfError(&err, 10)
+	f, err := os.Create(targetFile)
+	ExitIfError(&err, 10)
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	defer w.Flush()
+	for _, c := range wf.Processed.Contents {
+		c.Write(w, filesMap)
 	}
 }
 
@@ -176,7 +176,24 @@ func ExitIfError(err *error, code int) {
 	}
 }
 
-func (c *strContent) Write(writer io.Writer) {
-	_, err := writer.Write([]byte(c.text))
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap) {
+	_, err := writer.Write([]byte(c.Text))
 	ExitIfError(&err, 11)
+}
+
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) {
+	webFile, ok := files[c.Path]
+	if !ok {
+		log.Printf("WARNING: include non-existent resource: %s", c.Path)
+		_, err := writer.Write([]byte(fmt.Sprintf("{{ %s %s }}", c.Name, c.Path)))
+		ExitIfError(&err, 11)
+	} else {
+		webFile.Write(writer, files)
+	}
+}
+
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) {
+	for _, c := range wf.Processed.Contents {
+		c.Write(writer, files)
+	}
 }

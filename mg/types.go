@@ -13,13 +13,22 @@ type WebFile struct {
 }
 
 type Content interface {
-	Write(writer io.Writer)
+	Write(writer io.Writer, files WebFilesMap)
+}
+
+type StringContent struct {
+	Text string
+}
+
+type IncludeInstruction struct {
+	Name string
+	Path string
 }
 
 type ProcessedFile struct {
 	Contents []Content
 }
 
-func (f *ProcessedFile) appendContent(content Content) {
+func (f *ProcessedFile) AppendContent(content Content) {
 	f.Contents = append(f.Contents, content)
 }
