@@ -1,4 +1,4 @@
-{{ include /processed/_header }}
+{{ include /processed/_header.html }}
 
 # Home
 
@@ -10,4 +10,4 @@ These are my latest posts:
 ### {{ $post.title }}
 {{ end }}
 
-{{ include /footer }}
+{{ include /footer.html }}

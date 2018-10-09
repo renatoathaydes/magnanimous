@@ -1,1 +1,1 @@
-{{ include /processed/sections/home }}
+{{ include /processed/sections/home.md }}

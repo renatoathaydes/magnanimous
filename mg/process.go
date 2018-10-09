@@ -41,10 +41,10 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 	previousWasOpenBracket := false
 	previousWasCloseBracket := false
 	parsingInstruction := false
-	row := 1
-	col := 0
-	var instrFirstRow int
-	var instrFirstCol int
+	var row uint32 = 0
+	var col uint32 = 0
+	var instrFirstRow uint32
+	var instrFirstCol uint32
 
 	for {
 		r, _, err := reader.ReadRune()
@@ -68,7 +68,7 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
 				}
 				if builder.Len() > 0 {
-					processed.AppendContent(instruction(builder.String(), file, instrFirstRow, instrFirstCol))
+					processed.AppendContent(instruction(builder.String(), Location{Origin: file, Row: instrFirstRow, Col: instrFirstCol}))
 				}
 				builder.Reset()
 				parsingInstruction = false
@@ -117,7 +117,7 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 	return &ctx, &processed
 }
 
-func instruction(text, file string, row, col int) Content {
+func instruction(text string, location Location) Content {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
@@ -125,16 +125,17 @@ func instruction(text, file string, row, col int) Content {
 	case 1:
 		return &StringContent{Text: fmt.Sprintf("{{ %s }}", text)}
 	}
-	return validateInstruction(parts[0], parts[1], file, row, col)
+	return validateInstruction(parts[0], parts[1], location)
 }
 
-func validateInstruction(name, arg, file string, row, col int) Content {
+func validateInstruction(name, arg string, location Location) Content {
 	switch name {
 	case "include":
-		return &IncludeInstruction{Name: name, Path: arg}
+		path := ResolveFile(arg, "source", location.Origin)
+		return &IncludeInstruction{Name: name, Path: path, Origin: location}
 	}
 
-	log.Printf("WARNING: (%s:%d:%d) Instruction not implemented yet: %s", file, row, col, name)
+	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
 	return &StringContent{Text: fmt.Sprintf("{{ %s %s }}", name, arg)}
 }
 
@@ -181,7 +182,7 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap) {
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) {
 	webFile, ok := files[c.Path]
 	if !ok {
-		log.Printf("WARNING: include non-existent resource: %s", c.Path)
+		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
 		_, err := writer.Write([]byte(fmt.Sprintf("{{ %s %s }}", c.Name, c.Path)))
 		ExitIfError(&err, 11)
 	} else {

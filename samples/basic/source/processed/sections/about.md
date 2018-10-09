@@ -9,4 +9,4 @@ These are my latest posts:
 ### {{ $post.title }}
 {{ end }}
 
-{{ include /footer }}
+{{ include /footer.html }}
