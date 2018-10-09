@@ -29,11 +29,11 @@ func ProcessFile(file, basePath string) *WebFile {
 	reader := bufio.NewReader(f)
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
-	ctx, processed := ProcessReader(reader, int(s.Size()))
+	ctx, processed := ProcessReader(reader, file, int(s.Size()))
 	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed}
 }
 
-func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedFile) {
+func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext, *ProcessedFile) {
 	var builder strings.Builder
 	builder.Grow(size)
 	ctx := make(WebFileContext)
@@ -43,6 +43,8 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 	parsingInstruction := false
 	row := 1
 	col := 0
+	var instrFirstRow int
+	var instrFirstCol int
 
 	for {
 		r, _, err := reader.ReadRune()
@@ -66,7 +68,7 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
 				}
 				if builder.Len() > 0 {
-					processed.AppendContent(instruction(builder.String(), row, col))
+					processed.AppendContent(instruction(builder.String(), file, instrFirstRow, instrFirstCol))
 				}
 				builder.Reset()
 				parsingInstruction = false
@@ -88,6 +90,8 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 					processed.AppendContent(&StringContent{Text: builder.String()})
 					builder.Reset()
 				}
+				instrFirstRow = row + 1
+				instrFirstCol = col + 1
 				parsingInstruction = true
 				previousWasOpenBracket = false
 			} else {
@@ -110,35 +114,28 @@ func ProcessReader(reader *bufio.Reader, size int) (*WebFileContext, *ProcessedF
 		processed.AppendContent(&StringContent{Text: builder.String()})
 	}
 
-	log.Printf("Parsed contents: %s", processed.Contents)
-
 	return &ctx, &processed
 }
 
-func instruction(text string, row, col int) Content {
-	parts := strings.Fields(text)
+func instruction(text, file string, row, col int) Content {
+	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
-		return &StringContent{Text: ""}
+		fallthrough
 	case 1:
-		log.Fatalf("Instruction Error at position %d:%d - instruction missing argument: %s", row, col, parts[0])
+		return &StringContent{Text: fmt.Sprintf("{{ %s }}", text)}
 	}
-	return validateInstruction(parts[0], parts[1:], row, col)
+	return validateInstruction(parts[0], parts[1], file, row, col)
 }
 
-func validateInstruction(name string, args []string, row, col int) Content {
+func validateInstruction(name, arg, file string, row, col int) Content {
 	switch name {
 	case "include":
-		if len(args) == 1 {
-			return &IncludeInstruction{Name: name, Path: args[0]}
-		} else {
-			log.Fatalf("Instruction Error at position %d:%d - wrong number of arguments for "+
-				"include instruction, expected 1, got %d", row, col, len(args))
-		}
+		return &IncludeInstruction{Name: name, Path: arg}
 	}
 
-	log.Fatalf("Unknown instruction: %s", name)
-	panic("Unreachable")
+	log.Printf("WARNING: (%s:%d:%d) Instruction not implemented yet: %s", file, row, col, name)
+	return &StringContent{Text: fmt.Sprintf("{{ %s %s }}", name, arg)}
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) {
@@ -151,7 +148,7 @@ func WriteTo(dir string, filesMap WebFilesMap) {
 			targetPath = file
 		}
 		targetFile := filepath.Join(dir, targetPath)
-		writeFile(targetFile, file, wf, filesMap)
+		writeFile(file, targetFile, wf, filesMap)
 	}
 }
 
