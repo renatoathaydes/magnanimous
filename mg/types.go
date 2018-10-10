@@ -10,9 +10,10 @@ type WebFilesMap map[string]WebFile
 type WebFileContext map[string]interface{}
 
 type WebFile struct {
-	BasePath  string
-	Context   *WebFileContext
-	Processed *ProcessedFile
+	BasePath    string
+	Context     *WebFileContext
+	Processed   *ProcessedFile
+	NonWritable bool
 }
 
 type Location struct {

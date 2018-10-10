@@ -12,10 +12,10 @@ import (
 	"os"
 )
 
-func Process(files *[]string, basePath string, filesMap *WebFilesMap) {
+func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf := ProcessFile(file, basePath)
-		(*filesMap)[file] = *wf
+		filesMap[file] = *wf
 	}
 
 	s := blackfriday.Run([]byte("# This is magnanimous!\n```go\nfunc main () { }\n```\n"))
@@ -30,7 +30,8 @@ func ProcessFile(file, basePath string) *WebFile {
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
 	ctx, processed := ProcessReader(reader, file, int(s.Size()))
-	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed}
+	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
+	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}
 }
 
 func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext, *ProcessedFile) {
@@ -143,17 +144,20 @@ func WriteTo(dir string, filesMap WebFilesMap) {
 	err := os.MkdirAll(dir, 0770)
 	ExitIfError(&err, 9)
 	for file, wf := range filesMap {
+		if wf.NonWritable {
+			continue
+		}
 		targetPath, err := filepath.Rel(wf.BasePath, file)
 		if err != nil {
 			log.Printf("Unable to relativize path %s", file)
 			targetPath = file
 		}
 		targetFile := filepath.Join(dir, targetPath)
-		writeFile(file, targetFile, wf, filesMap)
+		writeFile(file, targetFile, &wf, filesMap)
 	}
 }
 
-func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) {
+func writeFile(file, targetFile string, wf *WebFile, filesMap WebFilesMap) {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	ExitIfError(&err, 10)
