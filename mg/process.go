@@ -12,6 +12,10 @@ import (
 	"os"
 )
 
+type markdown struct {
+	file *ProcessedFile
+}
+
 func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf := ProcessFile(file, basePath)
@@ -30,6 +34,9 @@ func ProcessFile(file, basePath string) *WebFile {
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
 	ctx, processed := ProcessReader(reader, file, int(s.Size()))
+	if strings.ToLower(filepath.Ext(file)) == ".md" {
+		processed = MarkdownToHtml(processed)
+	}
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
 	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}
 }
@@ -140,6 +147,11 @@ func validateInstruction(name, arg string, location Location) Content {
 	return &StringContent{Text: fmt.Sprintf("{{ %s %s }}", name, arg)}
 }
 
+func MarkdownToHtml(file *ProcessedFile) *ProcessedFile {
+	convertedContent := []Content{&markdown{file: file}}
+	return &ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
+}
+
 func WriteTo(dir string, filesMap WebFilesMap) {
 	err := os.MkdirAll(dir, 0770)
 	ExitIfError(&err, 9)
@@ -153,6 +165,10 @@ func WriteTo(dir string, filesMap WebFilesMap) {
 			targetPath = file
 		}
 		targetFile := filepath.Join(dir, targetPath)
+		if wf.Processed.NewExtension != "" {
+			ext := filepath.Ext(targetFile)
+			targetFile = targetFile[0:len(targetFile)-len(ext)] + wf.Processed.NewExtension
+		}
 		writeFile(file, targetFile, &wf, filesMap)
 	}
 }
@@ -198,4 +214,8 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) {
 	for _, c := range wf.Processed.Contents {
 		c.Write(writer, files)
 	}
+}
+
+func (f *markdown) Write(writer io.Writer, files WebFilesMap) {
+	writer.Write(blackfriday.Run(f.file.Bytes(files)))
 }

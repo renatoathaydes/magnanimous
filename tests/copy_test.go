@@ -21,7 +21,7 @@ func TestCopy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	result := mg.Copy(f.Name(), "b")
+	result := mg.Copy(f.Name(), "b", true)
 
 	if result.BasePath != "b" {
 		t.Errorf("Expected basePath 'b' but was '%s'", result.BasePath)

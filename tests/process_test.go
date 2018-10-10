@@ -48,7 +48,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
 	m := mg.WebFilesMap{}
-	m["example.html"] = mg.WebFile{Processed: &exampleFile}
+	m["source/example.html"] = mg.WebFile{Processed: &exampleFile}
 
 	var result strings.Builder
 	c[0].Write(&result, m)
@@ -64,4 +64,20 @@ func TestProcessIncludeSimple(t *testing.T) {
 		t.Errorf("Expected 'from another file!', but was '%s'", result.String())
 	}
 
+}
+
+func TestMarkdownToHtml(t *testing.T) {
+	file := mg.ProcessedFile{}
+	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
+	file.AppendContent(&mg.StringContent{Text: "## Mag"})
+
+	html := mg.MarkdownToHtml(&file)
+
+	m := mg.WebFilesMap{}
+	result := string(html.Bytes(m))
+
+	expectedHtml := "<h1>Hello</h1>\n\n<h2>Mag</h2>\n"
+	if result != expectedHtml {
+		t.Errorf("Expected '%s', but was '%s'", expectedHtml, result)
+	}
 }

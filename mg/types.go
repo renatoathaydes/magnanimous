@@ -1,6 +1,7 @@
 package mg
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 )
@@ -37,11 +38,22 @@ type IncludeInstruction struct {
 }
 
 type ProcessedFile struct {
-	Contents []Content
+	Contents     []Content
+	NewExtension string
 }
 
 func (f *ProcessedFile) AppendContent(content Content) {
 	f.Contents = append(f.Contents, content)
+}
+
+func (f *ProcessedFile) Bytes(files WebFilesMap) []byte {
+	var b bytes.Buffer
+	b.Grow(1024)
+	for _, c := range f.Contents {
+		c.Write(&b, files)
+	}
+
+	return b.Bytes()
 }
 
 func (l *Location) String() string {
