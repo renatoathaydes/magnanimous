@@ -25,16 +25,19 @@ type Location struct {
 
 type Content interface {
 	Write(writer io.Writer, files WebFilesMap)
+	IsMarkDown() bool
 }
 
 type StringContent struct {
-	Text string
+	Text     string
+	MarkDown bool
 }
 
 type IncludeInstruction struct {
-	Name   string
-	Path   string
-	Origin Location
+	Name     string
+	Path     string
+	Origin   Location
+	MarkDown bool
 }
 
 type ProcessedFile struct {
@@ -48,11 +51,12 @@ func (f *ProcessedFile) AppendContent(content Content) {
 
 func (f *ProcessedFile) Bytes(files WebFilesMap) []byte {
 	var b bytes.Buffer
-	b.Grow(1024)
+	b.Grow(512)
 	for _, c := range f.Contents {
-		c.Write(&b, files)
+		if c != nil {
+			c.Write(&b, files)
+		}
 	}
-
 	return b.Bytes()
 }
 

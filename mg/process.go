@@ -2,6 +2,7 @@ package mg
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/russross/blackfriday"
 	"io"
@@ -12,8 +13,12 @@ import (
 	"os"
 )
 
-type markdown struct {
-	file *ProcessedFile
+type htmlFromMarkdown struct {
+	Content Content
+}
+
+func isMd(file string) bool {
+	return strings.ToLower(filepath.Ext(file)) == ".md"
 }
 
 func Process(files *[]string, basePath string, filesMap WebFilesMap) {
@@ -34,7 +39,7 @@ func ProcessFile(file, basePath string) *WebFile {
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
 	ctx, processed := ProcessReader(reader, file, int(s.Size()))
-	if strings.ToLower(filepath.Ext(file)) == ".md" {
+	if isMd(file) {
 		processed = MarkdownToHtml(processed)
 	}
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
@@ -42,6 +47,7 @@ func ProcessFile(file, basePath string) *WebFile {
 }
 
 func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext, *ProcessedFile) {
+	isMarkDown := isMd(file)
 	var builder strings.Builder
 	builder.Grow(size)
 	ctx := make(WebFileContext)
@@ -76,7 +82,9 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
 				}
 				if builder.Len() > 0 {
-					processed.AppendContent(instruction(builder.String(), Location{Origin: file, Row: instrFirstRow, Col: instrFirstCol}))
+					processed.AppendContent(instruction(builder.String(),
+						isMarkDown,
+						Location{Origin: file, Row: instrFirstRow, Col: instrFirstCol}))
 				}
 				builder.Reset()
 				parsingInstruction = false
@@ -95,7 +103,7 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 		if r == '{' {
 			if previousWasOpenBracket {
 				if builder.Len() > 0 {
-					processed.AppendContent(&StringContent{Text: builder.String()})
+					processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 					builder.Reset()
 				}
 				instrFirstRow = row + 1
@@ -119,28 +127,28 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 	if parsingInstruction {
 		log.Fatalf("Parsing Error at position %d:%d - instruction was not properly closed with: }}", row, col)
 	} else if builder.Len() > 0 {
-		processed.AppendContent(&StringContent{Text: builder.String()})
+		processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 	}
 
 	return &ctx, &processed
 }
 
-func instruction(text string, location Location) Content {
+func instruction(text string, isMarkDown bool, location Location) Content {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
 		fallthrough
 	case 1:
-		return &StringContent{Text: fmt.Sprintf("{{ %s }}", text)}
+		return &StringContent{Text: fmt.Sprintf("{{ %s }}", text), MarkDown: isMarkDown}
 	}
-	return validateInstruction(parts[0], parts[1], location)
+	return createInstruction(parts[0], parts[1], location)
 }
 
-func validateInstruction(name, arg string, location Location) Content {
+func createInstruction(name, arg string, location Location) Content {
 	switch name {
 	case "include":
 		path := ResolveFile(arg, "source", location.Origin)
-		return &IncludeInstruction{Name: name, Path: path, Origin: location}
+		return &IncludeInstruction{Name: name, Path: path, Origin: location, MarkDown: isMd(path)}
 	}
 
 	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
@@ -148,7 +156,14 @@ func validateInstruction(name, arg string, location Location) Content {
 }
 
 func MarkdownToHtml(file *ProcessedFile) *ProcessedFile {
-	convertedContent := []Content{&markdown{file: file}}
+	convertedContent := make([]Content, len(file.Contents))
+	for _, c := range file.Contents {
+		if c.IsMarkDown() {
+			convertedContent = append(convertedContent, &htmlFromMarkdown{Content: c})
+		} else {
+			convertedContent = append(convertedContent, c)
+		}
+	}
 	return &ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
 }
 
@@ -199,6 +214,10 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap) {
 	ExitIfError(&err, 11)
 }
 
+func (c *StringContent) IsMarkDown() bool {
+	return c.MarkDown
+}
+
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) {
 	webFile, ok := files[c.Path]
 	if !ok {
@@ -210,12 +229,27 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) {
 	}
 }
 
+func (c *IncludeInstruction) IsMarkDown() bool {
+	return c.MarkDown
+}
+
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) {
 	for _, c := range wf.Processed.Contents {
 		c.Write(writer, files)
 	}
 }
 
-func (f *markdown) Write(writer io.Writer, files WebFilesMap) {
-	writer.Write(blackfriday.Run(f.file.Bytes(files)))
+func (f *htmlFromMarkdown) Write(writer io.Writer, files WebFilesMap) {
+	writer.Write(blackfriday.Run(readBytes(&f.Content, files)))
+}
+
+func (_ *htmlFromMarkdown) IsMarkDown() bool {
+	return false
+}
+
+func readBytes(c *Content, files WebFilesMap) []byte {
+	var b bytes.Buffer
+	b.Grow(1024)
+	(*c).Write(&b, files)
+	return b.Bytes()
 }

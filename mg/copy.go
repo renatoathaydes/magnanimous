@@ -37,3 +37,7 @@ func (c *copiedContent) Write(writer io.Writer, files WebFilesMap) {
 	_, err = io.Copy(writer, bufio.NewReader(f))
 	ExitIfError(&err, 31)
 }
+
+func (c *copiedContent) IsMarkDown() bool {
+	return false
+}

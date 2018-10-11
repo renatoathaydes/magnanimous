@@ -68,15 +68,17 @@ func TestProcessIncludeSimple(t *testing.T) {
 
 func TestMarkdownToHtml(t *testing.T) {
 	file := mg.ProcessedFile{}
-	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
-	file.AppendContent(&mg.StringContent{Text: "## Mag"})
+	file.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">"})
+	file.AppendContent(&mg.StringContent{Text: "# Hello\n", MarkDown: true})
+	file.AppendContent(&mg.StringContent{Text: "## Mag", MarkDown: true})
+	file.AppendContent(&mg.StringContent{Text: "</body></html>"})
 
 	html := mg.MarkdownToHtml(&file)
 
 	m := mg.WebFilesMap{}
 	result := string(html.Bytes(m))
 
-	expectedHtml := "<h1>Hello</h1>\n\n<h2>Mag</h2>\n"
+	expectedHtml := "<html><body class=\"hello\"><h1>Hello</h1>\n<h2>Mag</h2>\n</body></html>"
 	if result != expectedHtml {
 		t.Errorf("Expected '%s', but was '%s'", expectedHtml, result)
 	}
