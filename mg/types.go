@@ -33,6 +33,10 @@ type StringContent struct {
 	MarkDown bool
 }
 
+type HtmlFromMarkdownContent struct {
+	MarkDownContent Content
+}
+
 type IncludeInstruction struct {
 	Name     string
 	Path     string

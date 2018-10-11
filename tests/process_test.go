@@ -83,3 +83,41 @@ func TestMarkdownToHtml(t *testing.T) {
 		t.Errorf("Expected '%s', but was '%s'", expectedHtml, result)
 	}
 }
+
+func TestProcessIncludeMarkDown(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md }}"))
+	ctx, processed := mg.ProcessReader(r, "source/processed/hi.md", 11)
+
+	if len(ctx) != 0 {
+		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
+	}
+
+	c := processed.Contents
+
+	if len(c) != 2 {
+		t.Errorf("Expected 2 Contents, but got %v", c)
+	}
+
+	exampleFile := mg.ProcessedFile{}
+	exampleFile.AppendContent(&mg.HtmlFromMarkdownContent{
+		MarkDownContent: &mg.StringContent{Text: "# header", MarkDown: true},
+	})
+
+	m := mg.WebFilesMap{}
+	m["source/example.md"] = mg.WebFile{Processed: exampleFile}
+
+	var result strings.Builder
+	c[0].Write(&result, m)
+
+	if result.String() != "<h2>hello</h2>\n" {
+		t.Errorf("Expected '<h2>hello</h2>', but was '%s'", result.String())
+	}
+
+	result.Reset()
+	c[1].Write(&result, m)
+
+	if result.String() != "<h1>header</h1>\n" {
+		t.Errorf("Expected '<h1>header</h1>', but was '%s'", result.String())
+	}
+
+}

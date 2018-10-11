@@ -13,10 +13,6 @@ import (
 	"os"
 )
 
-type htmlFromMarkdown struct {
-	Content Content
-}
-
 func isMd(file string) bool {
 	return strings.ToLower(filepath.Ext(file)) == ".md"
 }
@@ -39,9 +35,6 @@ func ProcessFile(file, basePath string) *WebFile {
 	s, err := f.Stat()
 	ExitIfError(&err, 5)
 	ctx, processed := ProcessReader(reader, file, int(s.Size()))
-	if isMd(file) {
-		processed = MarkdownToHtml(processed)
-	}
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
 	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}
 }
@@ -129,7 +122,9 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 	} else if builder.Len() > 0 {
 		processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 	}
-
+	if isMd(file) {
+		processed = MarkdownToHtml(processed)
+	}
 	return ctx, processed
 }
 
@@ -159,7 +154,7 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	convertedContent := make([]Content, 0, len(file.Contents))
 	for _, c := range file.Contents {
 		if c.IsMarkDown() {
-			convertedContent = append(convertedContent, &htmlFromMarkdown{Content: c})
+			convertedContent = append(convertedContent, &HtmlFromMarkdownContent{MarkDownContent: c})
 		} else {
 			convertedContent = append(convertedContent, c)
 		}
@@ -239,11 +234,11 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) {
 	}
 }
 
-func (f *htmlFromMarkdown) Write(writer io.Writer, files WebFilesMap) {
-	writer.Write(blackfriday.Run(readBytes(&f.Content, files)))
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap) {
+	writer.Write(blackfriday.Run(readBytes(&f.MarkDownContent, files)))
 }
 
-func (_ *htmlFromMarkdown) IsMarkDown() bool {
+func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
