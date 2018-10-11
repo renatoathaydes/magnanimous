@@ -11,8 +11,8 @@ func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
 	ctx, processed := mg.ProcessReader(r, "", 11)
 
-	if len(*ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(*ctx))
+	if len(ctx) != 0 {
+		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
 	}
 
 	c := processed.Contents
@@ -34,8 +34,8 @@ func TestProcessIncludeSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
 	ctx, processed := mg.ProcessReader(r, "", 11)
 
-	if len(*ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(*ctx))
+	if len(ctx) != 0 {
+		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
 	}
 
 	c := processed.Contents
@@ -48,7 +48,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
 	m := mg.WebFilesMap{}
-	m["source/example.html"] = mg.WebFile{Processed: &exampleFile}
+	m["source/example.html"] = mg.WebFile{Processed: exampleFile}
 
 	var result strings.Builder
 	c[0].Write(&result, m)
@@ -73,7 +73,7 @@ func TestMarkdownToHtml(t *testing.T) {
 	file.AppendContent(&mg.StringContent{Text: "## Mag", MarkDown: true})
 	file.AppendContent(&mg.StringContent{Text: "</body></html>"})
 
-	html := mg.MarkdownToHtml(&file)
+	html := mg.MarkdownToHtml(file)
 
 	m := mg.WebFilesMap{}
 	result := string(html.Bytes(m))

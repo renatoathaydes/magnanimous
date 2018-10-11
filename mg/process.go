@@ -46,7 +46,7 @@ func ProcessFile(file, basePath string) *WebFile {
 	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}
 }
 
-func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext, *ProcessedFile) {
+func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext, ProcessedFile) {
 	isMarkDown := isMd(file)
 	var builder strings.Builder
 	builder.Grow(size)
@@ -130,7 +130,7 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (*WebFileContext
 		processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 	}
 
-	return &ctx, &processed
+	return ctx, processed
 }
 
 func instruction(text string, isMarkDown bool, location Location) Content {
@@ -155,8 +155,8 @@ func createInstruction(name, arg string, location Location) Content {
 	return &StringContent{Text: fmt.Sprintf("{{ %s %s }}", name, arg)}
 }
 
-func MarkdownToHtml(file *ProcessedFile) *ProcessedFile {
-	convertedContent := make([]Content, len(file.Contents))
+func MarkdownToHtml(file ProcessedFile) ProcessedFile {
+	convertedContent := make([]Content, 0, len(file.Contents))
 	for _, c := range file.Contents {
 		if c.IsMarkDown() {
 			convertedContent = append(convertedContent, &htmlFromMarkdown{Content: c})
@@ -164,7 +164,7 @@ func MarkdownToHtml(file *ProcessedFile) *ProcessedFile {
 			convertedContent = append(convertedContent, c)
 		}
 	}
-	return &ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
+	return ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) {
@@ -184,11 +184,11 @@ func WriteTo(dir string, filesMap WebFilesMap) {
 			ext := filepath.Ext(targetFile)
 			targetFile = targetFile[0:len(targetFile)-len(ext)] + wf.Processed.NewExtension
 		}
-		writeFile(file, targetFile, &wf, filesMap)
+		writeFile(file, targetFile, wf, filesMap)
 	}
 }
 
-func writeFile(file, targetFile string, wf *WebFile, filesMap WebFilesMap) {
+func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	ExitIfError(&err, 10)

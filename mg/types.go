@@ -12,8 +12,8 @@ type WebFileContext map[string]interface{}
 
 type WebFile struct {
 	BasePath    string
-	Context     *WebFileContext
-	Processed   *ProcessedFile
+	Context     WebFileContext
+	Processed   ProcessedFile
 	NonWritable bool
 }
 
