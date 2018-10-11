@@ -148,7 +148,7 @@ func createInstruction(name, arg string, location Location) Content {
 	switch name {
 	case "include":
 		path := ResolveFile(arg, "source", location.Origin)
-		return &IncludeInstruction{Name: name, Path: path, Origin: location, MarkDown: isMd(path)}
+		return &IncludeInstruction{Name: name, Path: path, Origin: location}
 	}
 
 	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
