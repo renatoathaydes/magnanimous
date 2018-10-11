@@ -11,7 +11,7 @@ func main() {
 	procFiles := getFilesAt("source/processed")
 	staticFiles := getFilesAt("source/static")
 	otherFiles := getFilesAt("source", "source/processed/", "source/static/")
-	webFiles := make(mg.WebFilesMap, len(procFiles)+len(staticFiles))
+	webFiles := make(mg.WebFilesMap, len(procFiles)+len(staticFiles)+len(otherFiles))
 	mg.Process(&procFiles, "source/processed", webFiles)
 	mg.CopyAll(&staticFiles, "source/static", webFiles)
 	mg.AddNonWritables(&otherFiles, "source", webFiles)
