@@ -11,23 +11,30 @@ import (
 
 type filesCollector func() ([]string, error)
 
+const (
+	ProcessedDir = "source/processed/"
+	StaticDir    = "source/static/"
+	SourceDir    = "source/"
+	TargetDir    = "target/"
+)
+
 func main() {
 	start := time.Now()
 
 	c1, c2, c3 := make(chan []string), make(chan []string), make(chan []string)
-	go async(func() ([]string, error) { return getFilesAt("source/processed") }, c1)
-	go async(func() ([]string, error) { return getFilesAt("source/static") }, c2)
+	go async(func() ([]string, error) { return getFilesAt(ProcessedDir) }, c1)
+	go async(func() ([]string, error) { return getFilesAt(StaticDir) }, c2)
 	go async(func() ([]string, error) {
-		return getFilesAt("source", "source/processed/", "source/static/")
+		return getFilesAt(SourceDir, ProcessedDir, StaticDir)
 	}, c3)
 
 	procFiles, staticFiles, otherFiles := <-c1, <-c2, <-c3
 
 	webFiles := make(mg.WebFilesMap, len(procFiles)+len(staticFiles)+len(otherFiles))
-	mg.Process(&procFiles, "source/processed", webFiles)
-	mg.CopyAll(&staticFiles, "source/static", webFiles)
-	mg.AddNonWritables(&otherFiles, "source", webFiles)
-	err := mg.WriteTo("target", webFiles)
+	mg.Process(&procFiles, ProcessedDir, webFiles)
+	mg.CopyAll(&staticFiles, StaticDir, webFiles)
+	mg.AddNonWritables(&otherFiles, SourceDir, webFiles)
+	err := mg.WriteTo(TargetDir, webFiles)
 	if err != nil {
 		panic(err)
 	}
