@@ -30,12 +30,17 @@ type copiedContent struct {
 	file string
 }
 
-func (c *copiedContent) Write(writer io.Writer, files WebFilesMap) {
+func (c *copiedContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
 	f, err := os.Open(c.file)
-	ExitIfError(&err, 30)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
 	defer f.Close()
 	_, err = io.Copy(writer, bufio.NewReader(f))
-	ExitIfError(&err, 31)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	return nil
 }
 
 func (c *copiedContent) IsMarkDown() bool {

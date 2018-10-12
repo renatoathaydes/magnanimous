@@ -24,7 +24,7 @@ type Location struct {
 }
 
 type Content interface {
-	Write(writer io.Writer, files WebFilesMap)
+	Write(writer io.Writer, files WebFilesMap) *MagnanimousError
 	IsMarkDown() bool
 }
 

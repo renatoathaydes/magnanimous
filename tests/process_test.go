@@ -9,7 +9,11 @@ import (
 
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
-	ctx, processed := mg.ProcessReader(r, "", 11)
+	ctx, processed, err := mg.ProcessReader(r, "", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(ctx) != 0 {
 		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
@@ -32,7 +36,11 @@ func TestProcessSimple(t *testing.T) {
 
 func TestProcessIncludeSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
-	ctx, processed := mg.ProcessReader(r, "", 11)
+	ctx, processed, err := mg.ProcessReader(r, "", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(ctx) != 0 {
 		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
@@ -86,7 +94,11 @@ func TestMarkdownToHtml(t *testing.T) {
 
 func TestProcessIncludeMarkDown(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md }}"))
-	ctx, processed := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	ctx, processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(ctx) != 0 {
 		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))

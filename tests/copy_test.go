@@ -39,7 +39,11 @@ func TestCopy(t *testing.T) {
 
 	w := strings.Builder{}
 	m := mg.WebFilesMap{}
-	contents[0].Write(&w, m)
+	me := contents[0].Write(&w, m)
+
+	if me != nil {
+		t.Fatal(me)
+	}
 
 	if w.String() != text {
 		t.Errorf("Expected copied contents to be '%s', but was '%s'", text, w.String())

@@ -19,23 +19,33 @@ func isMd(file string) bool {
 
 func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
-		wf := ProcessFile(file, basePath)
+		wf, err := ProcessFile(file, basePath)
+		if err != nil {
+			panic(err)
+		}
 		filesMap[file] = *wf
 	}
 }
 
-func ProcessFile(file, basePath string) *WebFile {
+func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 	f, err := os.Open(file)
-	ExitIfError(&err, 5)
+	if err != nil {
+		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+	}
 	reader := bufio.NewReader(f)
 	s, err := f.Stat()
-	ExitIfError(&err, 5)
-	ctx, processed := ProcessReader(reader, file, int(s.Size()))
+	if err != nil {
+		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+	}
+	ctx, processed, magErr := ProcessReader(reader, file, int(s.Size()))
+	if magErr != nil {
+		return nil, magErr
+	}
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
-	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}
+	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
 }
 
-func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext, ProcessedFile) {
+func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext, ProcessedFile, *MagnanimousError) {
 	isMarkDown := isMd(file)
 	var builder strings.Builder
 	builder.Grow(size)
@@ -54,7 +64,9 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 		if err == io.EOF {
 			break
 		}
-		ExitIfError(&err, 6)
+		if err != nil {
+			return ctx, processed, &MagnanimousError{message: err.Error(), Code: IOError}
+		}
 
 		if r == '\n' {
 			row++
@@ -68,7 +80,9 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 		if r == '}' {
 			if previousWasCloseBracket {
 				if !parsingInstruction {
-					log.Fatalf("Parsing Error at position %d:%d - Unexpected characters: }}", row, col)
+					return ctx, processed, NewParseError(
+						Location{Origin: file, Row: row, Col: col},
+						"Unexpected characters: '}}'")
 				}
 				if builder.Len() > 0 {
 					processed.AppendContent(instruction(builder.String(),
@@ -114,14 +128,16 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 	}
 
 	if parsingInstruction {
-		log.Fatalf("Parsing Error at position %d:%d - instruction was not properly closed with: }}", row, col)
+		return ctx, processed, NewParseError(
+			Location{Origin: file, Row: row, Col: col},
+			"instruction was not properly closed with: }}")
 	} else if builder.Len() > 0 {
 		processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 	}
 	if isMd(file) {
 		processed = MarkdownToHtml(processed)
 	}
-	return ctx, processed
+	return ctx, processed, nil
 }
 
 func instruction(text string, isMarkDown bool, location Location) Content {
@@ -158,9 +174,11 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
 }
 
-func WriteTo(dir string, filesMap WebFilesMap) {
+func WriteTo(dir string, filesMap WebFilesMap) *MagnanimousError {
 	err := os.MkdirAll(dir, 0770)
-	ExitIfError(&err, 9)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
 	for file, wf := range filesMap {
 		if wf.NonWritable {
 			continue
@@ -175,72 +193,101 @@ func WriteTo(dir string, filesMap WebFilesMap) {
 			ext := filepath.Ext(targetFile)
 			targetFile = targetFile[0:len(targetFile)-len(ext)] + wf.Processed.NewExtension
 		}
-		writeFile(file, targetFile, wf, filesMap)
+		magErr := writeFile(file, targetFile, wf, filesMap)
+		if magErr != nil {
+			return magErr
+		}
 	}
+	return nil
 }
 
-func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) {
+func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *MagnanimousError {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
-	ExitIfError(&err, 10)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
 	f, err := os.Create(targetFile)
-	ExitIfError(&err, 10)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	for _, c := range wf.Processed.Contents {
-		c.Write(w, filesMap)
+		err := c.Write(w, filesMap)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func ExitIfError(err *error, code int) {
-	if *err != nil {
-		log.Fatal(*err)
-		os.Exit(code)
-	}
-}
-
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap) {
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
 	_, err := writer.Write([]byte(c.Text))
-	ExitIfError(&err, 11)
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	return nil
+}
+
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+	webFile, ok := files[c.Path]
+	if !ok {
+		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
+		_, err := writer.Write([]byte(fmt.Sprintf("{{ %s %s }}", c.Name, c.Path)))
+		if err != nil {
+			return &MagnanimousError{Code: IOError, message: err.Error()}
+		}
+	} else {
+		err := webFile.Write(writer, files)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (c *StringContent) IsMarkDown() bool {
 	return c.MarkDown
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) {
-	webFile, ok := files[c.Path]
-	if !ok {
-		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
-		_, err := writer.Write([]byte(fmt.Sprintf("{{ %s %s }}", c.Name, c.Path)))
-		ExitIfError(&err, 11)
-	} else {
-		webFile.Write(writer, files)
-	}
-}
-
 func (c *IncludeInstruction) IsMarkDown() bool {
 	return c.MarkDown
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) {
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
 	for _, c := range wf.Processed.Contents {
-		c.Write(writer, files)
+		err := c.Write(writer, files)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap) {
-	writer.Write(blackfriday.Run(readBytes(&f.MarkDownContent, files)))
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+	content, magErr := readBytes(&f.MarkDownContent, files)
+	if magErr != nil {
+		return magErr
+	}
+	_, err := writer.Write(blackfriday.Run(content))
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	return nil
 }
 
 func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
-func readBytes(c *Content, files WebFilesMap) []byte {
+func readBytes(c *Content, files WebFilesMap) ([]byte, *MagnanimousError) {
 	var b bytes.Buffer
 	b.Grow(1024)
-	(*c).Write(&b, files)
-	return b.Bytes()
+	err := (*c).Write(&b, files)
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
 }
