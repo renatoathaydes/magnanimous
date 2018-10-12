@@ -22,10 +22,6 @@ func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 		wf := ProcessFile(file, basePath)
 		filesMap[file] = *wf
 	}
-
-	s := blackfriday.Run([]byte("# This is magnanimous!\n```go\nfunc main () { }\n```\n"))
-
-	fmt.Println(string(s))
 }
 
 func ProcessFile(file, basePath string) *WebFile {
