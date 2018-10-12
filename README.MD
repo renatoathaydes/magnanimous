@@ -28,8 +28,9 @@ Files meant to be processed by Magnanimous are placed inside the `source/process
 
 Processed files may use the following processor instructions:
 
-* `{{ include <file> }}` - include the contents of another file into the current file.
-* `{{ define <varible_name> <variable_value> }}` - define a variable.
+* `{{ include <path> }}` - include the contents of the file in the given path into the current file.
+* `{{ define <varible_name> <expression> }}` - define a variable.
+* `{{ eval <expression> }}` - evaluates an expression.
 * `{{ if <expression> }}` (conditional content) `{{ end }}`.
 * `{{ for <item> <iterable> }}` (repeated content for each item) `{{ end }}`.
 
@@ -40,7 +41,7 @@ Files whose name starts with `_` will not be present in the output website, but 
 
 #### Inclusions
 
-`include` instructions must always have a file reference as an argument.
+`include` instructions must always have a path to a file as an argument.
 
 An inclusion may look like this: 
 
@@ -52,46 +53,42 @@ This whole expression will be replaced with the contents of the file at `source/
 If the file does not exist, a warning will be emitted
 during compilation, and the expression will appear as it is in the compiled resource.
 
-The file extension may be omitted if there is no ambiguity.
-
 #### Variables
 
-Variables can be resolved in any processed file by using the syntax: `{{ $file.variable_name }}`.
-
-If no `file` is given, the variable will be resolved as follows, in this order:
-
-* a variable definition in the file which included this file, if any.
-* a variable definition in the current file.
-
-This allows inclusions to "override" local variables.
-
-If the variable cannot be found, a warning will be emitted during compilation, and the expression will appear as it is
-in the compiled resource.
-
-The following is an example of a simple variable definition:
+Variables can be defined with the `define` instruction.
+ 
+For example:
 
 ```
 {{ define title "My Website" }}
 ```
 
+The above instructions defines a variable called `title` with the value `My Website`.
+
+To evaluate the value of a variable, the `eval` instruction is used:
+
+```
+{{ eval title }}
+```
+
+A variable may also be referred to from a different file. For example, to evaluate the `description` variable
+from the `/processed/example.md` file, write this:
+
+```
+{{ eval /processed/example.md:description }}
+```
+
+If no file is given, the variable must be either defined in the same file, or in a file which includes the file.
+
+If the variable cannot be found, a warning will be emitted during compilation, and the expression will appear as it is
+in the compiled resource.
+
 > The value of a variable is evaluated as a [govaluate](https://github.com/Knetic/govaluate) expression.
 
-Using the variable:
-                                                               
-```
-<title>{{ $title }}</title>
-```
-
-Whic should compile to:
+It's possible to write more advanced expressions with variables as in the following example:
 
 ```
-<title>My Website</title>
-```
-
-it's also possible to write more advanced expressions with variables as in the following example:
-
-```
-< div class="header {{ $pageName == "Home" ? "highlight" : "" }}">Home</div>
+< div class="header {{ eval pageName == "Home" ? "highlight" : "" }}">Home</div>
 ```
 
 #### Conditional content
