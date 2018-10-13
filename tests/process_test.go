@@ -3,9 +3,13 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
+	"reflect"
 	"strings"
 	"testing"
 )
+
+var emptyContext = make(mg.WebFileContext, 0)
+var emptyFilesMap = mg.WebFilesMap{}
 
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
@@ -15,23 +19,7 @@ func TestProcessSimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
-	}
-
-	c := processed.Contents
-
-	if len(c) != 1 {
-		t.Errorf("Expected 1 Content, but len(Contents) == %d", len(c))
-	}
-
-	var result strings.Builder
-	m := mg.WebFilesMap{}
-	c[0].Write(&result, m)
-
-	if result.String() != "hello world" {
-		t.Errorf("Expected 'hello world', but was '%s'", result.String())
-	}
+	checkParsing(t, ctx, emptyFilesMap, processed, emptyContext, []string{"hello world"})
 }
 
 func TestProcessIncludeSimple(t *testing.T) {
@@ -42,36 +30,13 @@ func TestProcessIncludeSimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
-	}
-
-	c := processed.Contents
-
-	if len(c) != 2 {
-		t.Errorf("Expected 2 Contents, but got %v", c)
-	}
-
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
 	m := mg.WebFilesMap{}
 	m["source/example.html"] = mg.WebFile{Processed: exampleFile}
 
-	var result strings.Builder
-	c[0].Write(&result, m)
-
-	if result.String() != "hello " {
-		t.Errorf("Expected 'hello ', but was '%s'", result.String())
-	}
-
-	result.Reset()
-	c[1].Write(&result, m)
-
-	if result.String() != "from another file!" {
-		t.Errorf("Expected 'from another file!', but was '%s'", result.String())
-	}
-
+	checkParsing(t, ctx, m, processed, emptyContext, []string{"hello ", "from another file!"})
 }
 
 func TestMarkdownToHtml(t *testing.T) {
@@ -100,16 +65,6 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
-	}
-
-	c := processed.Contents
-
-	if len(c) != 2 {
-		t.Errorf("Expected 2 Contents, but got %v", c)
-	}
-
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.HtmlFromMarkdownContent{
 		MarkDownContent: &mg.StringContent{Text: "# header", MarkDown: true},
@@ -118,20 +73,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	m := mg.WebFilesMap{}
 	m["source/example.md"] = mg.WebFile{Processed: exampleFile}
 
-	var result strings.Builder
-	c[0].Write(&result, m)
-
-	if result.String() != "<h2>hello</h2>\n" {
-		t.Errorf("Expected '<h2>hello</h2>', but was '%s'", result.String())
-	}
-
-	result.Reset()
-	c[1].Write(&result, m)
-
-	if result.String() != "<h1>header</h1>\n" {
-		t.Errorf("Expected '<h1>header</h1>', but was '%s'", result.String())
-	}
-
+	checkParsing(t, ctx, m, processed, emptyContext, []string{"<h2>hello</h2>\n", "<h1>header</h1>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
@@ -142,64 +84,46 @@ func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
-	}
-
-	c := processed.Contents
-
-	if len(c) != 1 {
-		t.Errorf("Expected 1 Content, but got %v", c)
-	}
-
-	m := mg.WebFilesMap{}
-	var result strings.Builder
-	c[0].Write(&result, m)
-
-	if result.String() != "hello {{ include example.html }}" {
-		t.Errorf("Expected escaped '{' to be treated as text, but got unexpected result: '%s'", result.String())
-	}
-
+	checkParsing(t, ctx, emptyFilesMap, processed, emptyContext, []string{"hello {{ include example.html }}"})
 }
 
 func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("Hello {{\n  eval \"contains \\}} ignored\"\n}}. How are you?"))
+	r := bufio.NewReader(strings.NewReader("Hello {{\n  bad-instruction \"contains \\}} ignored\"\n}}. How are you?"))
 	ctx, processed, err := mg.ProcessReader(r, "", 11)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(ctx) != 0 {
-		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
+	checkParsing(t, ctx, emptyFilesMap, processed, emptyContext, []string{
+		"Hello ",
+		"{{\n  bad-instruction \"contains }} ignored\"\n}}",
+		". How are you?",
+	})
+}
+
+func checkParsing(t *testing.T,
+	ctx mg.WebFileContext, m mg.WebFilesMap, pf mg.ProcessedFile,
+	expectedCtx mg.WebFileContext, expectedContents []string) {
+
+	if !reflect.DeepEqual(ctx, expectedCtx) {
+		t.Errorf(
+			"Expected Context: %v\n"+
+				"Actual Context: %v", expectedCtx, ctx)
 	}
 
-	c := processed.Contents
-
-	if len(c) != 3 {
-		t.Fatalf("Expected 3 Contents, but got %v", c)
+	if len(pf.Contents) != len(expectedContents) {
+		t.Fatalf("Expected %d content parts but got %d: %v",
+			len(expectedContents), len(pf.Contents), pf.Contents)
 	}
 
-	m := mg.WebFilesMap{}
-	var result strings.Builder
-	c[0].Write(&result, m)
+	for i, c := range pf.Contents {
+		var result strings.Builder
+		c.Write(&result, m)
 
-	if result.String() != "Hello " {
-		t.Errorf("Expected 'Hello ' but got '%s'", result.String())
+		if result.String() != expectedContents[i] {
+			t.Errorf("Unexpected Content[%d]\nExpected: '%s'\nActual  : '%s'",
+				i, expectedContents[i], result.String())
+		}
 	}
-
-	result.Reset()
-	c[1].Write(&result, m)
-
-	if result.String() != "{{\n  eval \"contains }} ignored\"\n}}" {
-		t.Errorf("Expected escaped '}' to be treated as text, but got unexpected result: '%s'", result.String())
-	}
-
-	result.Reset()
-	c[2].Write(&result, m)
-
-	if result.String() != ". How are you?" {
-		t.Errorf("Expected '. How are you?' but got '%s'", result.String())
-	}
-
 }
