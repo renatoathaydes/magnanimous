@@ -54,7 +54,7 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 	previousWasOpenBracket := false
 	previousWasCloseBracket := false
 	parsingInstruction := false
-	var row uint32 = 0
+	var row uint32 = 1
 	var col uint32 = 0
 	var instrFirstRow uint32
 	var instrFirstCol uint32
@@ -109,8 +109,8 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 					processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 					builder.Reset()
 				}
-				instrFirstRow = row + 1
-				instrFirstCol = col + 1
+				instrFirstRow = row
+				instrFirstCol = col - 1
 				parsingInstruction = true
 				previousWasOpenBracket = false
 			} else {
@@ -130,7 +130,8 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext,
 	if parsingInstruction {
 		return ctx, processed, NewParseError(
 			Location{Origin: file, Row: row, Col: col},
-			"instruction was not properly closed with: }}")
+			fmt.Sprintf("instruction started at (%d:%d) was not properly closed with '}}'",
+				instrFirstRow, instrFirstCol))
 	} else if builder.Len() > 0 {
 		processed.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
 	}

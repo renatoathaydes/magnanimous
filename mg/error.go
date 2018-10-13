@@ -19,7 +19,7 @@ func (e *MagnanimousError) Error() string {
 }
 
 func (e ErrorCode) String() string {
-	names := [3]string{"IOError", "ParseError"}
+	names := [2]string{"IOError", "ParseError"}
 	return names[e]
 }
 
