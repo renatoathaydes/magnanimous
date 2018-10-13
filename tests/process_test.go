@@ -133,3 +133,73 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	}
 
 }
+
+func TestProcessIgnoreEscapedBrackets(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("hello \\{{ include example.html }}"))
+	ctx, processed, err := mg.ProcessReader(r, "", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(ctx) != 0 {
+		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
+	}
+
+	c := processed.Contents
+
+	if len(c) != 1 {
+		t.Errorf("Expected 1 Content, but got %v", c)
+	}
+
+	m := mg.WebFilesMap{}
+	var result strings.Builder
+	c[0].Write(&result, m)
+
+	if result.String() != "hello {{ include example.html }}" {
+		t.Errorf("Expected escaped '{' to be treated as text, but got unexpected result: '%s'", result.String())
+	}
+
+}
+
+func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Hello {{\n  eval \"contains \\}} ignored\"\n}}. How are you?"))
+	ctx, processed, err := mg.ProcessReader(r, "", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(ctx) != 0 {
+		t.Errorf("Expected empty context, but len(ctx) == %d", len(ctx))
+	}
+
+	c := processed.Contents
+
+	if len(c) != 3 {
+		t.Fatalf("Expected 3 Contents, but got %v", c)
+	}
+
+	m := mg.WebFilesMap{}
+	var result strings.Builder
+	c[0].Write(&result, m)
+
+	if result.String() != "Hello " {
+		t.Errorf("Expected 'Hello ' but got '%s'", result.String())
+	}
+
+	result.Reset()
+	c[1].Write(&result, m)
+
+	if result.String() != "{{\n  eval \"contains }} ignored\"\n}}" {
+		t.Errorf("Expected escaped '}' to be treated as text, but got unexpected result: '%s'", result.String())
+	}
+
+	result.Reset()
+	c[2].Write(&result, m)
+
+	if result.String() != ". How are you?" {
+		t.Errorf("Expected '. How are you?' but got '%s'", result.String())
+	}
+
+}
