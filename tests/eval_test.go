@@ -51,5 +51,5 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	expectedCtx := mg.WebFileContext{}
 	expectedCtx["a"] = float64(3)
 
-	checkParsing(t, ctx, emptyFilesMap, processed, expectedCtx, []string{"6"})
+	checkParsing(t, ctx, emptyFilesMap, processed, expectedCtx, []string{"<p>6</p>\n"})
 }

@@ -24,10 +24,6 @@ type parserState struct {
 	builder *strings.Builder
 }
 
-func isMd(file string) bool {
-	return strings.ToLower(filepath.Ext(file)) == ".md"
-}
-
 func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf, err := ProcessFile(file, basePath)
@@ -57,13 +53,12 @@ func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 }
 
 func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext, ProcessedFile, *MagnanimousError) {
-	isMarkDown := isMd(file)
 	var builder strings.Builder
 	builder.Grow(size)
 	ctx := make(WebFileContext)
 	processed := ProcessedFile{}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, ctx: &ctx, pf: &processed}
-	magErr := parseText(&state, isMarkDown)
+	magErr := parseText(&state, isMd(file))
 	if magErr != nil {
 		return ctx, processed, magErr
 	}
@@ -220,10 +215,11 @@ func instructionContent(text string, isMarkDown bool, ctx *WebFileContext, locat
 	case 1:
 		return &StringContent{Text: fmt.Sprintf("{{%s}}", text), MarkDown: isMarkDown}
 	}
-	return createInstruction(parts[0], parts[1], ctx, location, text)
+	return createInstruction(parts[0], parts[1], isMarkDown, ctx, location, text)
 }
 
-func createInstruction(name, arg string, ctx *WebFileContext, location Location, original string) Content {
+func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
+	location Location, original string) Content {
 	switch name {
 	case "include":
 		path := ResolveFile(arg, "source", location.Origin)
@@ -259,12 +255,13 @@ func createInstruction(name, arg string, ctx *WebFileContext, location Location,
 			log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
 			goto returnUnevaluated
 		}
-		return &StringContent{Text: fmt.Sprintf("%v", r)}
+		return &StringContent{Text: fmt.Sprintf("%v", r), MarkDown: isMarkDown}
 	}
 
 	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
 
 returnUnevaluated:
+	// do not set MarkDown flag as unevaluated content cannot be markdown
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
 }
 

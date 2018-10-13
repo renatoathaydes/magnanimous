@@ -23,3 +23,7 @@ func ResolveFile(file, basePath, currentLocation string) string {
 	}
 	return p
 }
+
+func isMd(file string) bool {
+	return strings.ToLower(filepath.Ext(file)) == ".md"
+}
