@@ -18,7 +18,7 @@ func TestProcessIncludeMissingCloseBrackets(t *testing.T) {
 func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("# Doc\n" +
 		"## Section 1\n\n" +
-		"hello {{ eval name }}\n" +
+		"hello {{ abc name }}\n" +
 		"something {{ include abc\n" +
 		"footer\n"))
 	_, _, err := mg.ProcessReader(r, "source/processed/hi.md", 11)

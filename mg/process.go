@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/Knetic/govaluate"
 	"github.com/russross/blackfriday"
 	"io"
 	"log"
@@ -178,9 +179,13 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			}
 			if previousWasCloseBracket {
 				if builder.Len() > 0 {
-					state.pf.AppendContent(instructionContent(builder.String(),
+					content := instructionContent(builder.String(),
 						isMarkDown,
-						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol}))
+						state.ctx,
+						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol})
+					if content != nil {
+						state.pf.AppendContent(content)
+					}
 				}
 				builder.Reset()
 				return nil
@@ -207,25 +212,59 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			instrFirstRow, instrFirstCol))
 }
 
-func instructionContent(text string, isMarkDown bool, location Location) Content {
+func instructionContent(text string, isMarkDown bool, ctx *WebFileContext, location Location) Content {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
 		fallthrough
 	case 1:
-		return &StringContent{Text: fmt.Sprintf("{{ %s }}", text), MarkDown: isMarkDown}
+		return &StringContent{Text: fmt.Sprintf("{{%s}}", text), MarkDown: isMarkDown}
 	}
-	return createInstruction(parts[0], parts[1], location, text)
+	return createInstruction(parts[0], parts[1], ctx, location, text)
 }
 
-func createInstruction(name, arg string, location Location, original string) Content {
+func createInstruction(name, arg string, ctx *WebFileContext, location Location, original string) Content {
 	switch name {
 	case "include":
 		path := ResolveFile(arg, "source", location.Origin)
 		return &IncludeInstruction{Name: name, Path: path, Origin: location}
+	case "define":
+		parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
+		if len(parts) == 2 {
+			variable, rawExpr := parts[0], parts[1]
+			expr, err := govaluate.NewEvaluableExpression(rawExpr)
+			if err != nil {
+				log.Printf("WARNING: (%s) Unable to eval (defining %s): %s (%s)",
+					location.String(), variable, rawExpr, err.Error())
+				goto returnUnevaluated
+			}
+			v, err := expr.Evaluate(*ctx)
+			if err != nil {
+				log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
+				goto returnUnevaluated
+			}
+			(*ctx)[variable] = v
+			return nil
+		}
+		log.Printf("WARNING: (%s) malformed define expression: %s", location.String(), arg)
+		goto returnUnevaluated
+	case "eval":
+		expr, err := govaluate.NewEvaluableExpression(arg)
+		if err != nil {
+			log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
+			goto returnUnevaluated
+		}
+		r, err := expr.Evaluate(*ctx)
+		if err != nil {
+			log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
+			goto returnUnevaluated
+		}
+		return &StringContent{Text: fmt.Sprintf("%v", r)}
 	}
 
 	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
+
+returnUnevaluated:
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
 }
 
