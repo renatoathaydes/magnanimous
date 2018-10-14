@@ -63,6 +63,32 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 		"comes back into itself via [source/processed/hi.txt:1:5 -> source/processed/other.txt:1:1]")
 }
 
+func TestInclusionSelfCycleError(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("A = {{ include hi.txt }}"))
+	_, processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	files := mg.WebFilesMap{}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed, Context: emptyContext}
+
+	dir, dirErr := ioutil.TempDir("", "TestInclusionSelfCycleError")
+
+	if dirErr != nil {
+		t.Fatal(dirErr)
+	}
+
+	defer os.RemoveAll(dir)
+
+	magErr := mg.WriteTo(dir, files)
+
+	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
+		"source/processed/hi.txt at source/processed/hi.txt:1:5 "+
+		"comes back into itself via [source/processed/hi.txt:1:5]")
+}
+
 func shouldHaveError(t *testing.T, err *mg.MagnanimousError, code mg.ErrorCode, message string) {
 	if err == nil {
 		t.Fatal("No error occurred!")
