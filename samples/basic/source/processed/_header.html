@@ -12,9 +12,9 @@
 
         <div class="" id="navbarNavAltMarkup">
             <div class="">
-                {{ range section "/processed/sections" }}
-                <a class="{{ if $section.PATH == "/" }}active{{ end }}" href="{{ $section.PATH }}">{{ $section.name }}</a>
-                {{ end }}
+                {{ for section "/processed/sections" sortBy index }}
+                <a class="{{ if section.path == "/" }}active{{ end if }}" href="{{ section.path }}">{{ section.name }}</a>
+                {{ end for }}
             </div>
         </div>
     </nav>
