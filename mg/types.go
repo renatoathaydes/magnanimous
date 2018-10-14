@@ -3,6 +3,7 @@ package mg
 import (
 	"bytes"
 	"fmt"
+	"github.com/Knetic/govaluate"
 	"io"
 )
 
@@ -31,6 +32,13 @@ type Content interface {
 type StringContent struct {
 	Text     string
 	MarkDown bool
+}
+
+type ExpressionContent struct {
+	Expression *govaluate.EvaluableExpression
+	MarkDown   bool
+	Text       string
+	Location   Location
 }
 
 type HtmlFromMarkdownContent struct {

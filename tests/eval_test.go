@@ -31,7 +31,7 @@ func TestEvalArithmetic(t *testing.T) {
 
 func TestEvalNonExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval 2 * a }}"))
-	ctx, processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	ctx, processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11)
 
 	if err != nil {
 		t.Fatal(err)
@@ -51,5 +51,8 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	expectedCtx := mg.WebFileContext{}
 	expectedCtx["a"] = float64(3)
 
-	checkParsing(t, ctx, emptyFilesMap, processed, expectedCtx, []string{"<p>6</p>\n"})
+	files := mg.WebFilesMap{}
+	files["source/processed/hi.md"] = mg.WebFile{Context: ctx, Processed: processed}
+
+	checkParsing(t, ctx, files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }

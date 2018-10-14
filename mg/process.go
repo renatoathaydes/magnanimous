@@ -250,12 +250,7 @@ func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
 			log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
 			goto returnUnevaluated
 		}
-		r, err := expr.Evaluate(*ctx)
-		if err != nil {
-			log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
-			goto returnUnevaluated
-		}
-		return &StringContent{Text: fmt.Sprintf("%v", r), MarkDown: isMarkDown}
+		return &ExpressionContent{Expression: expr, MarkDown: isMarkDown, Location: location, Text: original}
 	}
 
 	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
@@ -334,6 +329,17 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousE
 	return nil
 }
 
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+	r, err := e.Expression.Eval(magParams{webFiles: files, originFile: e.Location.Origin})
+	if err == nil {
+		writer.Write([]byte(fmt.Sprintf("%v", r)))
+	} else {
+		log.Printf("WARNING: (%s) eval failure: %s", e.Location.String(), err.Error())
+		writer.Write([]byte(fmt.Sprintf("{{%s}}", e.Text)))
+	}
+	return nil
+}
+
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
 	webFile, ok := files[c.Path]
 	if !ok {
@@ -353,6 +359,10 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) *Magnani
 
 func (c *StringContent) IsMarkDown() bool {
 	return c.MarkDown
+}
+
+func (e *ExpressionContent) IsMarkDown() bool {
+	return e.MarkDown
 }
 
 func (c *IncludeInstruction) IsMarkDown() bool {
