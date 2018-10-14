@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-func ResolveFile(file, basePath, currentLocation string) string {
+func ResolveFile(file, basePath, origin string) string {
 	if strings.HasPrefix(file, "/") {
 		// absolute path
 		return filepath.Join(basePath, file)
 	}
 
 	// relative path
-	p := filepath.Join(currentLocation, file)
+	p := filepath.Join(filepath.Dir(origin), file)
 
 	// must not go up higher than basePath
 	for strings.HasPrefix(p, "../") {

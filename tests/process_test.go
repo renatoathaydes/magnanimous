@@ -24,7 +24,7 @@ func TestProcessSimple(t *testing.T) {
 
 func TestProcessIncludeSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
-	ctx, processed, err := mg.ProcessReader(r, "", 11)
+	ctx, processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11)
 
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
 	m := mg.WebFilesMap{}
-	m["source/example.html"] = mg.WebFile{Processed: exampleFile}
+	m["source/processed/example.html"] = mg.WebFile{Processed: exampleFile}
 
 	checkParsing(t, ctx, m, processed, emptyContext, []string{"hello ", "from another file!"})
 }
