@@ -202,7 +202,7 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 		}
 	}
 
-	return NewParseError(Location{Origin: state.file, Row: state.row, Col: state.col},
+	return NewError(Location{Origin: state.file, Row: state.row, Col: state.col}, ParseError,
 		fmt.Sprintf("instruction started at (%d:%d) was not properly closed with '}}'",
 			instrFirstRow, instrFirstCol))
 }
@@ -321,7 +321,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *Magna
 	return nil
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	_, err := writer.Write([]byte(c.Text))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -329,10 +329,10 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 	return nil
 }
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	r, err := e.Expression.Eval(magParams{
 		webFiles:       files,
-		originFile:     e.Location.Origin,
+		origin:         e.Location,
 		inclusionChain: inclusionChain,
 	})
 	if err == nil {
@@ -344,7 +344,7 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusion
 	return nil
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	webFile, ok := files[c.Path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
@@ -353,8 +353,18 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		inclusionChain = append(inclusionChain, c.Origin.Origin)
-		fmt.Printf("File %s included %s, chain=%v\n", c.Origin.Origin, c.Path, inclusionChain)
+		inclusionChain = append(inclusionChain, c.Origin)
+		for _, f := range inclusionChain {
+			if f.Origin == c.Path {
+				chain := inclusionChainToString(inclusionChain)
+				return &MagnanimousError{
+					Code: InclusionCycleError,
+					message: fmt.Sprintf(
+						"Cycle detected! Inclusion of %s at %s comes back into itself via %s",
+						c.Path, c.Origin.String(), chain),
+				}
+			}
+		}
 		err := webFile.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
@@ -387,7 +397,7 @@ func (c *IncludeInstruction) String() string {
 	return fmt.Sprintf("IncludeInstruction{%s}", c.Path)
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	for _, c := range wf.Processed.Contents {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
@@ -397,7 +407,7 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []s
 	return nil
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
 		return magErr
@@ -413,7 +423,7 @@ func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
-func readBytes(c *Content, files WebFilesMap, inclusionChain []string) ([]byte, *MagnanimousError) {
+func readBytes(c *Content, files WebFilesMap, inclusionChain []Location) ([]byte, *MagnanimousError) {
 	var b bytes.Buffer
 	b.Grow(1024)
 	err := (*c).Write(&b, files, inclusionChain)
@@ -421,4 +431,18 @@ func readBytes(c *Content, files WebFilesMap, inclusionChain []string) ([]byte, 
 		return nil, err
 	}
 	return b.Bytes(), nil
+}
+
+func inclusionChainToString(locations []Location) string {
+	var b strings.Builder
+	b.WriteRune('[')
+	last := len(locations) - 1
+	for i, loc := range locations {
+		b.WriteString(loc.String())
+		if i != last {
+			b.WriteString(" -> ")
+		}
+	}
+	b.WriteRune(']')
+	return b.String()
 }

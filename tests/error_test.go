@@ -3,6 +3,8 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
+	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -25,6 +27,40 @@ func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 
 	shouldHaveError(t, err, mg.ParseError,
 		"(source/processed/hi.md:7:1) instruction started at (5:11) was not properly closed with '}}'")
+}
+
+func TestInclusionIndirectCycleError(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("A = {{ include /processed/other.txt }}"))
+	_, processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r = bufio.NewReader(strings.NewReader("{{ include /processed/hi.txt }}"))
+	otherCtx, otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11)
+
+	if otherErr != nil {
+		t.Fatal(otherErr)
+	}
+
+	files := mg.WebFilesMap{}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed, Context: emptyContext}
+	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed, Context: otherCtx}
+
+	dir, dirErr := ioutil.TempDir("", "TestInclusionIndirectCycleError")
+
+	if dirErr != nil {
+		t.Fatal(dirErr)
+	}
+
+	defer os.RemoveAll(dir)
+
+	magErr := mg.WriteTo(dir, files)
+
+	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
+		"source/processed/hi.txt at source/processed/other.txt:1:1 "+
+		"comes back into itself via [source/processed/hi.txt:1:5 -> source/processed/other.txt:1:1]")
 }
 
 func shouldHaveError(t *testing.T, err *mg.MagnanimousError, code mg.ErrorCode, message string) {

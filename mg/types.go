@@ -25,7 +25,7 @@ type Location struct {
 }
 
 type Content interface {
-	Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError
+	Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError
 	IsMarkDown() bool
 }
 
@@ -60,7 +60,7 @@ func (f *ProcessedFile) AppendContent(content Content) {
 	f.Contents = append(f.Contents, content)
 }
 
-func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []string) []byte {
+func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) []byte {
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range f.Contents {

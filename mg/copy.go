@@ -30,7 +30,7 @@ type copiedContent struct {
 	file string
 }
 
-func (c *copiedContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+func (c *copiedContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	f, err := os.Open(c.file)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}

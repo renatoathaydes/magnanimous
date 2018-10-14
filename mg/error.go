@@ -7,6 +7,7 @@ type ErrorCode int
 const (
 	IOError ErrorCode = 0
 	ParseError
+	InclusionCycleError
 )
 
 type MagnanimousError struct {
@@ -27,9 +28,9 @@ func (e *MagnanimousError) String() string {
 	return fmt.Sprintf("%s: %s", e.Code.String(), e.message)
 }
 
-func NewParseError(location Location, message string) *MagnanimousError {
+func NewError(location Location, code ErrorCode, message string) *MagnanimousError {
 	return &MagnanimousError{
 		message: fmt.Sprintf("(%s) %s", location.String(), message),
-		Code:    ParseError,
+		Code:    code,
 	}
 }
