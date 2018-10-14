@@ -39,7 +39,7 @@ func TestCopy(t *testing.T) {
 
 	w := strings.Builder{}
 	m := mg.WebFilesMap{}
-	me := contents[0].Write(&w, m)
+	me := contents[0].Write(&w, m, nil)
 
 	if me != nil {
 		t.Fatal(me)

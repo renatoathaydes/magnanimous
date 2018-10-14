@@ -223,7 +223,7 @@ func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
 	switch name {
 	case "include":
 		path := ResolveFile(arg, "source", location.Origin)
-		return &IncludeInstruction{Name: name, Path: path, Origin: location}
+		return &IncludeInstruction{Path: path, Origin: location}
 	case "define":
 		parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 		if len(parts) == 2 {
@@ -313,7 +313,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *Magna
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	for _, c := range wf.Processed.Contents {
-		err := c.Write(w, filesMap)
+		err := c.Write(w, filesMap, nil)
 		if err != nil {
 			return err
 		}
@@ -321,7 +321,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *Magna
 	return nil
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
 	_, err := writer.Write([]byte(c.Text))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -329,8 +329,12 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousE
 	return nil
 }
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
-	r, err := e.Expression.Eval(magParams{webFiles: files, originFile: e.Location.Origin})
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+	r, err := e.Expression.Eval(magParams{
+		webFiles:       files,
+		originFile:     e.Location.Origin,
+		inclusionChain: inclusionChain,
+	})
 	if err == nil {
 		writer.Write([]byte(fmt.Sprintf("%v", r)))
 	} else {
@@ -340,16 +344,18 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap) *Magnanim
 	return nil
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
 	webFile, ok := files[c.Path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
-		_, err := writer.Write([]byte(fmt.Sprintf("{{ %s %s }}", c.Name, c.Path)))
+		_, err := writer.Write([]byte(fmt.Sprintf("{{ include %s }}", c.Path)))
 		if err != nil {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		err := webFile.Write(writer, files)
+		inclusionChain = append(inclusionChain, c.Origin.Origin)
+		fmt.Printf("File %s included %s, chain=%v\n", c.Origin.Origin, c.Path, inclusionChain)
+		err := webFile.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
 		}
@@ -369,9 +375,21 @@ func (c *IncludeInstruction) IsMarkDown() bool {
 	return c.MarkDown
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
+func (c *StringContent) String() string {
+	return fmt.Sprintf("StringContent{%s}", c.Text)
+}
+
+func (e *ExpressionContent) String() string {
+	return fmt.Sprintf("ExpressionContent{%s}", e.Text)
+}
+
+func (c *IncludeInstruction) String() string {
+	return fmt.Sprintf("IncludeInstruction{%s}", c.Path)
+}
+
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
 	for _, c := range wf.Processed.Contents {
-		err := c.Write(writer, files)
+		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
 		}
@@ -379,8 +397,8 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap) *MagnanimousError 
 	return nil
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap) *MagnanimousError {
-	content, magErr := readBytes(&f.MarkDownContent, files)
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError {
+	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
 		return magErr
 	}
@@ -395,10 +413,10 @@ func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
-func readBytes(c *Content, files WebFilesMap) ([]byte, *MagnanimousError) {
+func readBytes(c *Content, files WebFilesMap, inclusionChain []string) ([]byte, *MagnanimousError) {
 	var b bytes.Buffer
 	b.Grow(1024)
-	err := (*c).Write(&b, files)
+	err := (*c).Write(&b, files, inclusionChain)
 	if err != nil {
 		return nil, err
 	}

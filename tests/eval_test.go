@@ -56,3 +56,31 @@ func TestEvalWithExistingParameter(t *testing.T) {
 
 	checkParsing(t, ctx, files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
+
+func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("A = {{ eval 2 * hello }}"))
+	_, processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r = bufio.NewReader(strings.NewReader("OUTER\n{{ define hello 7 }}{{ include /processed/hi.txt }}\nEND"))
+	otherCtx, otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11)
+
+	if otherErr != nil {
+		t.Fatal(otherErr)
+	}
+
+	files := mg.WebFilesMap{}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed, Context: emptyContext}
+	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed, Context: otherCtx}
+
+	expectedCtx := mg.WebFileContext{}
+	expectedCtx["hello"] = float64(7)
+
+	checkParsing(t, otherCtx, files, otherProcessed, expectedCtx, []string{
+		"OUTER\n",
+		"A = 14",
+		"\nEND"})
+}

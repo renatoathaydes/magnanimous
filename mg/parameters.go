@@ -6,15 +6,21 @@ import (
 )
 
 type magParams struct {
-	originFile string
-	webFiles   WebFilesMap
+	originFile     string
+	inclusionChain []string
+	webFiles       WebFilesMap
 }
 
 func (m magParams) Get(name string) (interface{}, error) {
-	f, ok := m.webFiles[m.originFile]
-	if ok {
-		if v, y := f.Context[name]; y {
-			return v, nil
+	files := make([]string, 1, len(m.inclusionChain)+1)
+	files[0] = m.originFile
+	files = append(files, m.inclusionChain...)
+	for _, file := range files {
+		f, ok := m.webFiles[file]
+		if ok {
+			if v, y := f.Context[name]; y {
+				return v, nil
+			}
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("Parameter '%s' cannot be resolved", name))

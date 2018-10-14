@@ -49,7 +49,7 @@ func TestMarkdownToHtml(t *testing.T) {
 	html := mg.MarkdownToHtml(file)
 
 	m := mg.WebFilesMap{}
-	result := string(html.Bytes(m))
+	result := string(html.Bytes(m, nil))
 
 	expectedHtml := "<html><body class=\"hello\"><h1>Hello</h1>\n<h2>Mag</h2>\n</body></html>"
 	if result != expectedHtml {
@@ -119,7 +119,7 @@ func checkParsing(t *testing.T,
 
 	for i, c := range pf.Contents {
 		var result strings.Builder
-		c.Write(&result, m)
+		c.Write(&result, m, nil)
 
 		if result.String() != expectedContents[i] {
 			t.Errorf("Unexpected Content[%d]\nExpected: '%s'\nActual  : '%s'",

@@ -71,14 +71,8 @@ To evaluate the value of a variable, the `eval` instruction is used:
 {{ eval title }}
 ```
 
-A variable may also be referred to from a different file. For example, to evaluate the `description` variable
-from the `/processed/example.md` file, write this:
-
-```
-{{ eval /processed/example.md:description }}
-```
-
-If no file is given, the variable must be either defined in the same file, or in a file which includes the file.
+The variable may be either defined in the same file as the evaluation is happening,
+or in a file which includes that file.
 
 If the variable cannot be found, a warning will be emitted during compilation, and the expression will appear as it is
 in the compiled resource.

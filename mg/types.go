@@ -25,7 +25,7 @@ type Location struct {
 }
 
 type Content interface {
-	Write(writer io.Writer, files WebFilesMap) *MagnanimousError
+	Write(writer io.Writer, files WebFilesMap, inclusionChain []string) *MagnanimousError
 	IsMarkDown() bool
 }
 
@@ -46,7 +46,6 @@ type HtmlFromMarkdownContent struct {
 }
 
 type IncludeInstruction struct {
-	Name     string
 	Path     string
 	Origin   Location
 	MarkDown bool
@@ -61,12 +60,12 @@ func (f *ProcessedFile) AppendContent(content Content) {
 	f.Contents = append(f.Contents, content)
 }
 
-func (f *ProcessedFile) Bytes(files WebFilesMap) []byte {
+func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []string) []byte {
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range f.Contents {
 		if c != nil {
-			c.Write(&b, files)
+			c.Write(&b, files, inclusionChain)
 		}
 	}
 	return b.Bytes()
