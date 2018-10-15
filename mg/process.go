@@ -4,14 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/Knetic/govaluate"
 	"github.com/russross/blackfriday"
 	"io"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
-
-	"os"
 )
 
 type parserState struct {
@@ -213,7 +211,8 @@ func instructionContent(text string, isMarkDown bool, ctx *WebFileContext, locat
 	case 0:
 		fallthrough
 	case 1:
-		return &StringContent{Text: fmt.Sprintf("{{%s}}", text), MarkDown: isMarkDown}
+		log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
+		return unevaluatedExpression(text)
 	}
 	return createInstruction(parts[0], parts[1], isMarkDown, ctx, location, text)
 }
@@ -224,37 +223,13 @@ func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
 	case "include":
 		return NewIncludeInstruction(arg, location)
 	case "define":
-		parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
-		if len(parts) == 2 {
-			variable, rawExpr := parts[0], parts[1]
-			expr, err := govaluate.NewEvaluableExpression(rawExpr)
-			if err != nil {
-				log.Printf("WARNING: (%s) Unable to eval (defining %s): %s (%s)",
-					location.String(), variable, rawExpr, err.Error())
-				goto returnUnevaluated
-			}
-			v, err := expr.Evaluate(*ctx)
-			if err != nil {
-				log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
-				goto returnUnevaluated
-			}
-			(*ctx)[variable] = v
-			return nil
-		}
-		log.Printf("WARNING: (%s) malformed define expression: %s", location.String(), arg)
-		goto returnUnevaluated
+		return NewVariable(arg, location, original, ctx)
 	case "eval":
-		expr, err := govaluate.NewEvaluableExpression(arg)
-		if err != nil {
-			log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
-			goto returnUnevaluated
-		}
-		return &ExpressionContent{Expression: expr, MarkDown: isMarkDown, Location: location, Text: original}
+		return NewExpression(arg, location, isMarkDown, original)
 	}
 
-	log.Printf("WARNING: (%s) Instruction not implemented yet: %s", location.String(), name)
+	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)
 
-returnUnevaluated:
 	// do not set MarkDown flag as unevaluated content cannot be markdown
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
 }
@@ -328,35 +303,12 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 	return nil
 }
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
-	r, err := e.Expression.Eval(magParams{
-		webFiles:       files,
-		origin:         e.Location,
-		inclusionChain: inclusionChain,
-	})
-	if err == nil {
-		writer.Write([]byte(fmt.Sprintf("%v", r)))
-	} else {
-		log.Printf("WARNING: (%s) eval failure: %s", e.Location.String(), err.Error())
-		writer.Write([]byte(fmt.Sprintf("{{%s}}", e.Text)))
-	}
-	return nil
-}
-
 func (c *StringContent) IsMarkDown() bool {
 	return c.MarkDown
 }
 
-func (e *ExpressionContent) IsMarkDown() bool {
-	return e.MarkDown
-}
-
 func (c *StringContent) String() string {
 	return fmt.Sprintf("StringContent{%s}", c.Text)
-}
-
-func (e *ExpressionContent) String() string {
-	return fmt.Sprintf("ExpressionContent{%s}", e.Text)
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
