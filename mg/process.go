@@ -222,8 +222,7 @@ func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
 	location Location, original string) Content {
 	switch name {
 	case "include":
-		path := ResolveFile(arg, "source", location.Origin)
-		return &IncludeInstruction{Path: path, Origin: location}
+		return NewIncludeInstruction(arg, location)
 	case "define":
 		parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 		if len(parts) == 2 {
@@ -344,35 +343,6 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusion
 	return nil
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
-	webFile, ok := files[c.Path]
-	if !ok {
-		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
-		_, err := writer.Write([]byte(fmt.Sprintf("{{ include %s }}", c.Path)))
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-	} else {
-		inclusionChain = append(inclusionChain, c.Origin)
-		for _, f := range inclusionChain {
-			if f.Origin == c.Path {
-				chain := inclusionChainToString(inclusionChain)
-				return &MagnanimousError{
-					Code: InclusionCycleError,
-					message: fmt.Sprintf(
-						"Cycle detected! Inclusion of %s at %s comes back into itself via %s",
-						c.Path, c.Origin.String(), chain),
-				}
-			}
-		}
-		err := webFile.Write(writer, files, inclusionChain)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (c *StringContent) IsMarkDown() bool {
 	return c.MarkDown
 }
@@ -381,20 +351,12 @@ func (e *ExpressionContent) IsMarkDown() bool {
 	return e.MarkDown
 }
 
-func (c *IncludeInstruction) IsMarkDown() bool {
-	return c.MarkDown
-}
-
 func (c *StringContent) String() string {
 	return fmt.Sprintf("StringContent{%s}", c.Text)
 }
 
 func (e *ExpressionContent) String() string {
 	return fmt.Sprintf("ExpressionContent{%s}", e.Text)
-}
-
-func (c *IncludeInstruction) String() string {
-	return fmt.Sprintf("IncludeInstruction{%s}", c.Path)
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {

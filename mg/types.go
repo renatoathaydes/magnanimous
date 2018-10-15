@@ -45,12 +45,6 @@ type HtmlFromMarkdownContent struct {
 	MarkDownContent Content
 }
 
-type IncludeInstruction struct {
-	Path     string
-	Origin   Location
-	MarkDown bool
-}
-
 type ProcessedFile struct {
 	Contents     []Content
 	NewExtension string
