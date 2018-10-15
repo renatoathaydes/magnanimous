@@ -172,13 +172,8 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			}
 			if previousWasCloseBracket {
 				if builder.Len() > 0 {
-					content := instructionContent(builder.String(),
-						isMarkDown,
-						state.ctx,
+					appendContent(state.pf, builder.String(), isMarkDown, state.ctx,
 						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol})
-					if content != nil {
-						state.pf.AppendContent(content)
-					}
 				}
 				builder.Reset()
 				return nil
@@ -205,16 +200,28 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			instrFirstRow, instrFirstCol))
 }
 
-func instructionContent(text string, isMarkDown bool, ctx *WebFileContext, location Location) Content {
+func appendContent(pf *ProcessedFile, text string, isMarkDown bool, ctx *WebFileContext, location Location) {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
-		fallthrough
+		// nothing to do
 	case 1:
-		log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
-		return unevaluatedExpression(text)
+		if parts[0] == "end" {
+			err := pf.EndNestedContent()
+			if err != nil {
+				log.Printf("WARNING: (%s) %s", location.String(), err.Error())
+				pf.AppendContent(unevaluatedExpression(text))
+			}
+		} else {
+			log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
+			pf.AppendContent(unevaluatedExpression(text))
+		}
+	case 2:
+		content := createInstruction(parts[0], parts[1], isMarkDown, ctx, location, text)
+		if content != nil {
+			pf.AppendContent(content)
+		}
 	}
-	return createInstruction(parts[0], parts[1], isMarkDown, ctx, location, text)
 }
 
 func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
@@ -226,12 +233,12 @@ func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
 		return NewVariable(arg, location, original, ctx)
 	case "eval":
 		return NewExpression(arg, location, isMarkDown, original)
+	case "for":
+		return NewForInstruction(arg, location, isMarkDown, original)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)
-
-	// do not set MarkDown flag as unevaluated content cannot be markdown
-	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
+	return unevaluatedExpression(original)
 }
 
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {

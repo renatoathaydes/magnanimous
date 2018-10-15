@@ -18,7 +18,10 @@ func (m magParams) Get(name string) (interface{}, error) {
 	for _, file := range files {
 		f, ok := m.webFiles[file.Origin]
 		if ok {
-			if v, y := f.Context[name]; y {
+			if v, found := f.Processed.getFromNestedContent(name); found {
+				return v, nil
+			}
+			if v, found := f.Context[name]; found {
 				return v, nil
 			}
 		}
