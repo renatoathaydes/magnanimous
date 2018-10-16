@@ -9,12 +9,9 @@ import (
 
 type WebFilesMap map[string]WebFile
 
-type WebFileContext map[string]interface{}
-
 type WebFile struct {
 	BasePath    string
-	Context     WebFileContext
-	Processed   ProcessedFile
+	Processed   *ProcessedFile
 	NonWritable bool
 }
 
@@ -29,11 +26,6 @@ type Content interface {
 	IsMarkDown() bool
 }
 
-type HasContent interface {
-	AppendContent(content Content)
-	Context() WebFileContext
-}
-
 type StringContent struct {
 	Text     string
 	MarkDown bool
@@ -43,44 +35,82 @@ type HtmlFromMarkdownContent struct {
 	MarkDownContent Content
 }
 
+type Scope interface {
+	AppendContent(content Content)
+	Context() map[string]interface{}
+	Parent() Scope
+	setParent(scope Scope)
+}
+
+type ScopeSensitive interface {
+	setScope(scope Scope)
+}
+
 type ProcessedFile struct {
 	Contents     []Content
-	nestedStack  []HasContent
+	scopeStack   []Scope
+	context      map[string]interface{}
 	NewExtension string
 }
 
-func (f *ProcessedFile) AppendContent(content Content) {
-	s := len(f.nestedStack)
+var _ Scope = (*ProcessedFile)(nil)
+
+// currentScope returns the current scope during parsing.
+func (f *ProcessedFile) currentScope() Scope {
+	s := len(f.scopeStack)
 	if s > 0 {
-		f.nestedStack[s-1].AppendContent(content)
+		return f.scopeStack[s-1]
+	}
+	return f
+}
+
+func (f *ProcessedFile) Context() map[string]interface{} {
+	if f.context == nil {
+		f.context = make(map[string]interface{})
+	}
+	return f.context
+}
+
+func (f *ProcessedFile) Parent() Scope {
+	return nil
+}
+
+func (f *ProcessedFile) setParent(content Scope) {
+	panic("Cannot set parent on ProcessedFile as it's the root content scope")
+}
+
+func (f *ProcessedFile) AppendContent(content Content) {
+	s := len(f.scopeStack)
+	var topScope Scope
+	if s > 0 {
+		topScope = f.scopeStack[s-1]
+		topScope.AppendContent(content)
+		h, ok := content.(ScopeSensitive)
+		if ok {
+			h.setScope(topScope)
+		}
 	} else {
 		f.Contents = append(f.Contents, content)
-	}
-	n, ok := content.(HasContent)
-	if ok {
-		f.nestedStack = append(f.nestedStack, n)
-	}
-}
-
-func (f *ProcessedFile) EndNestedContent() error {
-	s := len(f.nestedStack)
-	if s > 0 {
-		f.nestedStack = f.nestedStack[0 : s-1]
-		return nil
-	} else {
-		return errors.New("end does not match any previous instruction")
-	}
-}
-
-func (f *ProcessedFile) getFromNestedContent(name string) (interface{}, bool) {
-	i := len(f.nestedStack) - 1
-	for i > 0 {
-		ctx := f.nestedStack[i].Context()
-		if v, found := ctx[name]; found {
-			return v, true
+		h, ok := content.(ScopeSensitive)
+		if ok {
+			h.setScope(f)
 		}
 	}
-	return nil, false
+	newScope, ok := content.(Scope)
+	if ok {
+		newScope.setParent(topScope)
+		f.scopeStack = append(f.scopeStack, newScope)
+	}
+}
+
+func (f *ProcessedFile) EndScope() error {
+	s := len(f.scopeStack)
+	if s > 0 {
+		f.scopeStack = f.scopeStack[0 : s-1]
+		return nil
+	} else {
+		return errors.New("'end' does not match any previous instruction")
+	}
 }
 
 func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) []byte {

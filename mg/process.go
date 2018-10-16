@@ -17,7 +17,6 @@ type parserState struct {
 	reader  *bufio.Reader
 	row     uint32
 	col     uint32
-	ctx     *WebFileContext
 	pf      *ProcessedFile
 	builder *strings.Builder
 }
@@ -42,28 +41,27 @@ func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 	if err != nil {
 		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 	}
-	ctx, processed, magErr := ProcessReader(reader, file, int(s.Size()))
+	processed, magErr := ProcessReader(reader, file, int(s.Size()))
 	if magErr != nil {
 		return nil, magErr
 	}
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
-	return &WebFile{Context: ctx, BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
+	return &WebFile{BasePath: basePath, Processed: &processed, NonWritable: nonWritable}, nil
 }
 
-func ProcessReader(reader *bufio.Reader, file string, size int) (WebFileContext, ProcessedFile, *MagnanimousError) {
+func ProcessReader(reader *bufio.Reader, file string, size int) (ProcessedFile, *MagnanimousError) {
 	var builder strings.Builder
 	builder.Grow(size)
-	ctx := make(WebFileContext)
 	processed := ProcessedFile{}
-	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, ctx: &ctx, pf: &processed}
+	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
 	magErr := parseText(&state, isMd(file))
 	if magErr != nil {
-		return ctx, processed, magErr
+		return processed, magErr
 	}
 	if isMd(file) {
 		processed = MarkdownToHtml(processed)
 	}
-	return ctx, processed, nil
+	return processed, nil
 }
 
 func parseText(state *parserState, isMarkDown bool) *MagnanimousError {
@@ -172,7 +170,7 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			}
 			if previousWasCloseBracket {
 				if builder.Len() > 0 {
-					appendContent(state.pf, builder.String(), isMarkDown, state.ctx,
+					appendContent(state.pf, builder.String(), isMarkDown,
 						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol})
 				}
 				builder.Reset()
@@ -200,14 +198,14 @@ func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
 			instrFirstRow, instrFirstCol))
 }
 
-func appendContent(pf *ProcessedFile, text string, isMarkDown bool, ctx *WebFileContext, location Location) {
+func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Location) {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
 		// nothing to do
 	case 1:
 		if parts[0] == "end" {
-			err := pf.EndNestedContent()
+			err := pf.EndScope()
 			if err != nil {
 				log.Printf("WARNING: (%s) %s", location.String(), err.Error())
 				pf.AppendContent(unevaluatedExpression(text))
@@ -217,20 +215,20 @@ func appendContent(pf *ProcessedFile, text string, isMarkDown bool, ctx *WebFile
 			pf.AppendContent(unevaluatedExpression(text))
 		}
 	case 2:
-		content := createInstruction(parts[0], parts[1], isMarkDown, ctx, location, text)
+		content := createInstruction(parts[0], parts[1], isMarkDown, pf.currentScope(), location, text)
 		if content != nil {
 			pf.AppendContent(content)
 		}
 	}
 }
 
-func createInstruction(name, arg string, isMarkDown bool, ctx *WebFileContext,
+func createInstruction(name, arg string, isMarkDown bool, scope Scope,
 	location Location, original string) Content {
 	switch name {
 	case "include":
 		return NewIncludeInstruction(arg, location)
 	case "define":
-		return NewVariable(arg, location, original, ctx)
+		return NewVariable(arg, location, original, scope)
 	case "eval":
 		return NewExpression(arg, location, isMarkDown, original)
 	case "for":

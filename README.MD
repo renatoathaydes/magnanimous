@@ -117,19 +117,17 @@ Two kinds of objects are iterable:
 Example iterating over an array:
 
 ```
-{{ for (1, 2, 3, 4, 5) n }}
-<div>{{ $n }}</div>
-{{ end }}
+{{ for title ("Home", "About", "FAQ") }}
+<div>{{ eval title }}</div>
+{{ end for }}
 ```
 
 The above, after processing, should look like this:
 
 ```html
-<div>1</div>
-<div>2</div>
-<div>3</div>
-<div>4</div>
-<div>5</div>
+<div>Home</div>
+<div>About</div>
+<div>FAQ</div>
 ```
 
 See the section on iterables for details on how to work with iterables.

@@ -14,7 +14,8 @@ type ForLoop struct {
 	Text     string
 	Location Location
 	Contents []Content
-	ctx      WebFileContext
+	context  map[string]interface{}
+	parent   Scope
 }
 
 func NewForInstruction(arg string, location Location, isMarkDown bool, original string) Content {
@@ -35,22 +36,52 @@ func NewForInstruction(arg string, location Location, isMarkDown bool, original 
 	return &ForLoop{Variable: parts[0], iter: iter, MarkDown: isMarkDown, Text: original, Location: location}
 }
 
-// assert implementation of HasContent
-var _ HasContent = (*ForLoop)(nil)
+var _ Content = (*ForLoop)(nil)
+var _ Scope = (*ForLoop)(nil)
 
 func (f *ForLoop) AppendContent(content Content) {
 	f.Contents = append(f.Contents, content)
 }
 
-func (f *ForLoop) Context() WebFileContext {
-	return f.ctx
+func (f *ForLoop) Context() map[string]interface{} {
+	return f.context
 }
 
-// assert implementation of Content
-var _ Content = (*ForLoop)(nil)
+func (f *ForLoop) Parent() Scope {
+	return f.parent
+}
+
+func (f *ForLoop) setParent(scope Scope) {
+	f.parent = scope
+}
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
-	// TODO
+	err := f.iter.forEach(magParams{
+		webFiles:       files,
+		inclusionChain: inclusionChain,
+		scope:          f.parent,
+	}, func(file string) error {
+		// use the file's context as the value of the bound variable
+		f.context[f.Variable] = files[file].Processed.Context()
+		return writeContents(f, writer, files, inclusionChain)
+	}, func(item interface{}) error {
+		// use whatever was evaluated from the array as the bound variable
+		f.Context()[f.Variable] = item
+		return writeContents(f, writer, files, inclusionChain)
+	})
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	return nil
+}
+
+func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+	for _, c := range f.Contents {
+		err := c.Write(writer, files, inclusionChain)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

@@ -11,7 +11,7 @@ import (
 
 func TestProcessIncludeMissingCloseBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md "))
-	_, _, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	_, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
 
 	shouldHaveError(t, err, mg.ParseError,
 		"(source/processed/hi.md:1:33) instruction started at (1:10) was not properly closed with '}}'")
@@ -23,7 +23,7 @@ func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 		"hello {{ abc name }}\n" +
 		"something {{ include abc\n" +
 		"footer\n"))
-	_, _, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	_, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
 
 	shouldHaveError(t, err, mg.ParseError,
 		"(source/processed/hi.md:7:1) instruction started at (5:11) was not properly closed with '}}'")
@@ -31,22 +31,22 @@ func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 
 func TestInclusionIndirectCycleError(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("A = {{ include /processed/other.txt }}"))
-	_, processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("{{ include /processed/hi.txt }}"))
-	otherCtx, otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11)
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
 	}
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed, Context: emptyContext}
-	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed, Context: otherCtx}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: &processed}
+	files["source/processed/other.txt"] = mg.WebFile{Processed: &otherProcessed}
 
 	dir, dirErr := ioutil.TempDir("", "TestInclusionIndirectCycleError")
 
@@ -65,14 +65,14 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 
 func TestInclusionSelfCycleError(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("A = {{ include hi.txt }}"))
-	_, processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed, Context: emptyContext}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: &processed}
 
 	dir, dirErr := ioutil.TempDir("", "TestInclusionSelfCycleError")
 

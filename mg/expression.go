@@ -14,6 +14,7 @@ type ExpressionContent struct {
 	MarkDown bool
 	Text     string
 	Location Location
+	scope    Scope
 }
 
 type iterableExpression struct {
@@ -38,7 +39,7 @@ func NewExpression(arg string, location Location, isMarkDown bool, original stri
 	return &ExpressionContent{expr: expr, MarkDown: isMarkDown, Location: location, Text: original}
 }
 
-func NewVariable(arg string, location Location, original string, ctx *WebFileContext) Content {
+func NewVariable(arg string, location Location, original string, scope Scope) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 2 {
 		variable, rawExpr := parts[0], parts[1]
@@ -48,12 +49,12 @@ func NewVariable(arg string, location Location, original string, ctx *WebFileCon
 				location.String(), variable, rawExpr, err.Error())
 			return unevaluatedExpression(original)
 		}
-		v, err := expr.Evaluate(*ctx)
+		v, err := expr.Evaluate(scope.Context())
 		if err != nil {
 			log.Printf("WARNING: (%s) eval failure: %s", location.String(), err.Error())
 			return unevaluatedExpression(original)
 		}
-		(*ctx)[variable] = v
+		scope.Context()[variable] = v
 		return nil
 	}
 	log.Printf("WARNING: (%s) malformed define expression: %s", location.String(), arg)
@@ -105,17 +106,27 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 	return nil
 }
 
+var _ ScopeSensitive = (*ExpressionContent)(nil)
+var _ Content = (*ExpressionContent)(nil)
+
+func (e *ExpressionContent) setScope(holder Scope) {
+	e.scope = holder
+}
+
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
 	r, err := e.expr.Eval(magParams{
 		webFiles:       files,
-		origin:         e.Location,
+		scope:          e.scope,
 		inclusionChain: inclusionChain,
 	})
 	if err == nil {
-		writer.Write([]byte(fmt.Sprintf("%v", r)))
+		_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
 	} else {
 		log.Printf("WARNING: (%s) eval failure: %s", e.Location.String(), err.Error())
-		writer.Write([]byte(fmt.Sprintf("{{%s}}", e.Text)))
+		_, err = writer.Write([]byte(fmt.Sprintf("{{%s}}", e.Text)))
+	}
+	if err != nil {
+		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
 	return nil
 }

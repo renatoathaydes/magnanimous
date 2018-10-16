@@ -27,8 +27,8 @@ func TestCopy(t *testing.T) {
 		t.Errorf("Expected basePath 'b' but was '%s'", result.BasePath)
 	}
 
-	if result.Context != nil {
-		t.Errorf("Expected nil context but was %v", result.Context)
+	if len(result.Processed.Context()) != 0 {
+		t.Errorf("Expected empty context but was %v", result.Processed.Context())
 	}
 
 	contents := result.Processed.Contents
