@@ -1,13 +1,9 @@
-{{ define name "Home" }}
+{{ define name "About" }}
 {{ define index 2 }}
-# Home
+# About
 
-These are my latest posts:
+This is a sample website.
 
-{{ 
-    for post posts/ sortBy date limit 10 reverse true
-}}
-### {{ eval post.title }}
-{{ end for }}
+> Here's a note
 
 {{ include /footer.html }}

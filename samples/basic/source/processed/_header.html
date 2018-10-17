@@ -13,8 +13,8 @@
         <div class="" id="navbarNavAltMarkup">
             <div class="">
                 {{ for section "/processed/sections" sortBy index }}
-                <a class="{{ if section.path == "/" }}active{{ end if }}" href="{{ section.path }}">{{ section.name }}</a>
-                {{ end for }}
+                <a class="{{ if section.path == "/" }}active{{ end }}" href="{{ section.path }}">{{ section.name }}</a>
+                {{ end }}
             </div>
         </div>
     </nav>

@@ -9,7 +9,7 @@ These are my latest posts:
 {{ 
     for post /processed/posts/ sortBy date limit 10 reverse true
 }}
-### {{ $post.title }}
-{{ end for }}
+### {{ eval post.title }}
+{{ end }}
 
 {{ include /footer.html }}
