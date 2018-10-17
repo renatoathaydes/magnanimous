@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,10 +36,11 @@ func main() {
 	mg.AddNonWritables(&otherFiles, SourceDir, webFiles)
 	err := mg.WriteTo(TargetDir, webFiles)
 	if err != nil {
-		panic(err)
+		log.Printf("ERROR: (%s) %s", err.Code, err.Error())
+		panic(*err)
 	}
 
-	fmt.Printf("Magnanimous generated website in %s\n", time.Since(start))
+	log.Printf("Magnanimous generated website in %s\n", time.Since(start))
 }
 
 func async(fc filesCollector, c chan []string) {

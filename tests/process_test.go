@@ -106,7 +106,12 @@ func checkParsing(t *testing.T,
 	ctx map[string]interface{}, m mg.WebFilesMap, pf mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
-	if !reflect.DeepEqual(ctx, expectedCtx) {
+	if len(expectedCtx) == 0 {
+		if len(ctx) != 0 {
+			t.Errorf("Expected empty context.\n"+
+				"Actual Context: %v", ctx)
+		}
+	} else if !reflect.DeepEqual(ctx, expectedCtx) {
 		t.Errorf(
 			"Expected Context: %v\n"+
 				"Actual Context: %v", expectedCtx, ctx)

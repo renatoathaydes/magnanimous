@@ -1,6 +1,7 @@
 package mg
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Knetic/govaluate"
 	"io"
@@ -73,7 +74,9 @@ func asIterable(arg string) (iterable, error) {
 		}
 		return &iterableExpression{array: expr}, nil
 	}
-	return &iterableExpression{path: arg}, nil
+	// FIXME for paths
+	//return &iterableExpression{path: arg}, nil
+	return nil, errors.New("for instruction error: paths not supported yet")
 }
 
 func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic itemConsumer) error {

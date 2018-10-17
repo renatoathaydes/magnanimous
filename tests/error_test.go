@@ -59,8 +59,11 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 	magErr := mg.WriteTo(dir, files)
 
 	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
-		"source/processed/hi.txt at source/processed/other.txt:1:1 "+
-		"comes back into itself via [source/processed/hi.txt:1:5 -> source/processed/other.txt:1:1]")
+		"source/processed/other.txt at source/processed/hi.txt:1:5 "+
+		"comes back into itself via [source/processed/other.txt:1:1 -> source/processed/hi.txt:1:5]",
+		"Cycle detected! Inclusion of "+
+			"source/processed/hi.txt at source/processed/other.txt:1:1 "+
+			"comes back into itself via [source/processed/hi.txt:1:5 -> source/processed/other.txt:1:1]")
 }
 
 func TestInclusionSelfCycleError(t *testing.T) {
@@ -89,14 +92,22 @@ func TestInclusionSelfCycleError(t *testing.T) {
 		"comes back into itself via [source/processed/hi.txt:1:5]")
 }
 
-func shouldHaveError(t *testing.T, err *mg.MagnanimousError, code mg.ErrorCode, message string) {
+func shouldHaveError(t *testing.T, err *mg.MagnanimousError, code mg.ErrorCode, messageAlternatives ...string) {
 	if err == nil {
 		t.Fatal("No error occurred!")
 	}
 	if err.Code != code {
 		t.Errorf("Expected %s but got %s\n", code, err.Code)
 	}
-	if err.Error() != message {
-		t.Errorf("Unexpected error message.\nExpected: %s\nActual  : %s", message, err.Error())
+	matchFound := false
+	for _, expectedMessage := range messageAlternatives {
+		if err.Error() == expectedMessage {
+			matchFound = true
+			break
+		}
+	}
+	if !matchFound {
+		t.Errorf("Unexpected error message. Expected one of:\n" +
+			strings.Join(messageAlternatives, "\n    OR\n") + "\n    BUT got:\n" + err.Error())
 	}
 }

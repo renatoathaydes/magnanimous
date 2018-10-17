@@ -65,9 +65,6 @@ func (f *ProcessedFile) currentScope() Scope {
 }
 
 func (f *ProcessedFile) Context() map[string]interface{} {
-	if f.context == nil {
-		f.context = make(map[string]interface{})
-	}
 	return f.context
 }
 

@@ -25,7 +25,8 @@ func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf, err := ProcessFile(file, basePath)
 		if err != nil {
-			panic(err)
+			log.Printf("ERROR: (%s) %s", err.Code, err.Error())
+			panic(*err)
 		}
 		filesMap[file] = *wf
 	}
@@ -45,6 +46,7 @@ func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 	if magErr != nil {
 		return nil, magErr
 	}
+	processed.scopeStack = nil // the stack is no longer required
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
 	return &WebFile{BasePath: basePath, Processed: &processed, NonWritable: nonWritable}, nil
 }
@@ -52,13 +54,14 @@ func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 func ProcessReader(reader *bufio.Reader, file string, size int) (ProcessedFile, *MagnanimousError) {
 	var builder strings.Builder
 	builder.Grow(size)
-	processed := ProcessedFile{}
+	isMarkDown := isMd(file)
+	processed := ProcessedFile{context: make(map[string]interface{}, 4)}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
-	magErr := parseText(&state, isMd(file))
+	magErr := parseText(&state, isMarkDown)
 	if magErr != nil {
 		return processed, magErr
 	}
-	if isMd(file) {
+	if isMarkDown {
 		processed = MarkdownToHtml(processed)
 	}
 	return processed, nil
@@ -248,7 +251,7 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 			convertedContent = append(convertedContent, c)
 		}
 	}
-	return ProcessedFile{Contents: convertedContent, NewExtension: ".html"}
+	return ProcessedFile{Contents: convertedContent, context: file.context, NewExtension: ".html"}
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) *MagnanimousError {
