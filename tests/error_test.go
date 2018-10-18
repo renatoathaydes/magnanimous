@@ -45,8 +45,8 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 	}
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: &processed}
-	files["source/processed/other.txt"] = mg.WebFile{Processed: &otherProcessed}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed}
+	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
 
 	dir, dirErr := ioutil.TempDir("", "TestInclusionIndirectCycleError")
 
@@ -75,7 +75,7 @@ func TestInclusionSelfCycleError(t *testing.T) {
 	}
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: &processed}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed}
 
 	dir, dirErr := ioutil.TempDir("", "TestInclusionSelfCycleError")
 
@@ -92,12 +92,16 @@ func TestInclusionSelfCycleError(t *testing.T) {
 		"comes back into itself via [source/processed/hi.txt:1:5]")
 }
 
-func shouldHaveError(t *testing.T, err *mg.MagnanimousError, code mg.ErrorCode, messageAlternatives ...string) {
+func shouldHaveError(t *testing.T, err error, code mg.ErrorCode, messageAlternatives ...string) {
 	if err == nil {
 		t.Fatal("No error occurred!")
 	}
-	if err.Code != code {
-		t.Errorf("Expected %s but got %s\n", code, err.Code)
+	merr, ok := err.(*mg.MagnanimousError)
+	if !ok {
+		t.Fatalf("Expected error of type MagnanimousError, but found other type: %v", merr)
+	}
+	if merr.Code != code {
+		t.Errorf("Expected %s but got %s\n", code, merr.Code)
 	}
 	matchFound := false
 	for _, expectedMessage := range messageAlternatives {

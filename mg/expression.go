@@ -86,7 +86,7 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 			return err
 		}
 		for _, item := range v.([]interface{}) {
-			err = ic(item)
+			err := ic(item)
 			if err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 		}
 		for _, item := range f {
 			if !item.IsDir() {
-				err = fc(item.Name())
+				err := fc(item.Name())
 				if err != nil {
 					return err
 				}
@@ -116,7 +116,7 @@ func (e *ExpressionContent) setScope(holder Scope) {
 	e.scope = holder
 }
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	r, err := e.expr.Eval(magParams{
 		webFiles:       files,
 		scope:          e.scope,

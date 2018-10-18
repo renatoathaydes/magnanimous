@@ -28,7 +28,7 @@ func (e *MagnanimousError) String() string {
 	return fmt.Sprintf("%s: %s", e.Code.String(), e.message)
 }
 
-func NewError(location Location, code ErrorCode, message string) *MagnanimousError {
+func NewError(location Location, code ErrorCode, message string) error {
 	return &MagnanimousError{
 		message: fmt.Sprintf("(%s) %s", location.String(), message),
 		Code:    code,

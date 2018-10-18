@@ -25,7 +25,7 @@ func (c *IncludeInstruction) String() string {
 	return fmt.Sprintf("IncludeInstruction{%s}", c.Path)
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	webFile, ok := files[c.Path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)

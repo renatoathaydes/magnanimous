@@ -49,10 +49,14 @@ func TestMarkdownToHtml(t *testing.T) {
 	html := mg.MarkdownToHtml(file)
 
 	m := mg.WebFilesMap{}
-	result := string(html.Bytes(m, nil))
+	result, err := html.Bytes(m, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expectedHtml := "<html><body class=\"hello\"><h1>Hello</h1>\n<h2>Mag</h2>\n</body></html>"
-	if result != expectedHtml {
+	if string(result) != expectedHtml {
 		t.Errorf("Expected '%s', but was '%s'", expectedHtml, result)
 	}
 }
@@ -103,7 +107,7 @@ func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 }
 
 func checkParsing(t *testing.T,
-	ctx map[string]interface{}, m mg.WebFilesMap, pf mg.ProcessedFile,
+	ctx map[string]interface{}, m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
 	if len(expectedCtx) == 0 {
@@ -131,4 +135,20 @@ func checkParsing(t *testing.T,
 				i, expectedContents[i], result.String())
 		}
 	}
+}
+
+func checkContents(t *testing.T,
+	m mg.WebFilesMap, pf *mg.ProcessedFile,
+	expectedContent string) {
+
+	content, err := pf.Bytes(m, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if string(content) != expectedContent {
+		t.Errorf("Unexpected content. Expected:\n%s\nActual:\n%s", expectedContent, content)
+	}
+
 }

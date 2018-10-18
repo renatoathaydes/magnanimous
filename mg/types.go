@@ -22,7 +22,7 @@ type Location struct {
 }
 
 type Content interface {
-	Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError
+	Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error
 	IsMarkDown() bool
 }
 
@@ -110,15 +110,18 @@ func (f *ProcessedFile) EndScope() error {
 	}
 }
 
-func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) []byte {
+func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range f.Contents {
 		if c != nil {
-			c.Write(&b, files, inclusionChain)
+			err := c.Write(&b, files, inclusionChain)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
 func (l *Location) String() string {

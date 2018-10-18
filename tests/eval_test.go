@@ -52,7 +52,7 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	expectedCtx["a"] = float64(3)
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.md"] = mg.WebFile{Processed: &processed}
+	files["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
 	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
@@ -73,8 +73,8 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	}
 
 	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: &processed}
-	files["source/processed/other.txt"] = mg.WebFile{Processed: &otherProcessed}
+	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed}
+	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
 
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)

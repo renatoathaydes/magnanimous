@@ -25,14 +25,14 @@ func Process(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf, err := ProcessFile(file, basePath)
 		if err != nil {
-			log.Printf("ERROR: (%s) %s", err.Code, err.Error())
-			panic(*err)
+			log.Printf("ERROR: %s", err)
+			panic(err)
 		}
 		filesMap[file] = *wf
 	}
 }
 
-func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
+func ProcessFile(file, basePath string) (*WebFile, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
@@ -48,10 +48,10 @@ func ProcessFile(file, basePath string) (*WebFile, *MagnanimousError) {
 	}
 	processed.scopeStack = nil // the stack is no longer required
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
-	return &WebFile{BasePath: basePath, Processed: &processed, NonWritable: nonWritable}, nil
+	return &WebFile{BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
 }
 
-func ProcessReader(reader *bufio.Reader, file string, size int) (ProcessedFile, *MagnanimousError) {
+func ProcessReader(reader *bufio.Reader, file string, size int) (*ProcessedFile, error) {
 	var builder strings.Builder
 	builder.Grow(size)
 	isMarkDown := isMd(file)
@@ -59,15 +59,15 @@ func ProcessReader(reader *bufio.Reader, file string, size int) (ProcessedFile, 
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
 	magErr := parseText(&state, isMarkDown)
 	if magErr != nil {
-		return processed, magErr
+		return &processed, magErr
 	}
 	if isMarkDown {
 		processed = MarkdownToHtml(processed)
 	}
-	return processed, nil
+	return &processed, nil
 }
 
-func parseText(state *parserState, isMarkDown bool) *MagnanimousError {
+func parseText(state *parserState, isMarkDown bool) error {
 	previousWasOpenBracket := false
 	previousWasEscape := false
 	reader := state.reader
@@ -139,7 +139,7 @@ func parseText(state *parserState, isMarkDown bool) *MagnanimousError {
 	return nil
 }
 
-func parseInstruction(state *parserState, isMarkDown bool) *MagnanimousError {
+func parseInstruction(state *parserState, isMarkDown bool) error {
 	previousWasCloseBracket := false
 	previousWasEscape := false
 	instrFirstRow := state.row
@@ -254,7 +254,7 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{Contents: convertedContent, context: file.context, NewExtension: ".html"}
 }
 
-func WriteTo(dir string, filesMap WebFilesMap) *MagnanimousError {
+func WriteTo(dir string, filesMap WebFilesMap) error {
 	err := os.MkdirAll(dir, 0770)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -281,7 +281,7 @@ func WriteTo(dir string, filesMap WebFilesMap) *MagnanimousError {
 	return nil
 }
 
-func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *MagnanimousError {
+func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	if err != nil {
@@ -303,7 +303,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) *Magna
 	return nil
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	_, err := writer.Write([]byte(c.Text))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -319,7 +319,7 @@ func (c *StringContent) String() string {
 	return fmt.Sprintf("StringContent{%s}", c.Text)
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	for _, c := range wf.Processed.Contents {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
@@ -329,7 +329,7 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []L
 	return nil
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
 		return magErr
@@ -345,7 +345,7 @@ func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
-func readBytes(c *Content, files WebFilesMap, inclusionChain []Location) ([]byte, *MagnanimousError) {
+func readBytes(c *Content, files WebFilesMap, inclusionChain []Location) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(1024)
 	err := (*c).Write(&b, files, inclusionChain)
