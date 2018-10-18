@@ -25,3 +25,22 @@ func TestForArray(t *testing.T) {
 			"Number 3\n\n"+
 			"Number 42\n")
 }
+
+func TestForArrayInMarkDown(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader(
+		"{{ for section (\"Home\", \"About\") }}\n" +
+			"## {{ eval section }}\nSomething something{{ end }}\n" +
+			"END"))
+	processed, err := mg.ProcessReader(r, "source/processed/array.md", 11)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"<h2>Home</h2>\n\n"+
+			"<p>Something something</p>\n\n"+
+			"<h2>About</h2>\n\n"+
+			"<p>Something something</p>\n"+
+			"<p>END</p>\n")
+}
