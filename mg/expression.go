@@ -1,12 +1,11 @@
 package mg
 
 import (
-	"errors"
 	"fmt"
 	"github.com/Knetic/govaluate"
 	"io"
-	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,17 +65,15 @@ func unevaluatedExpression(original string) Content {
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
 }
 
-func asIterable(arg string) (iterable, error) {
+func asIterable(arg string, location Location) (iterable, error) {
 	if strings.HasPrefix(arg, "(") && strings.HasSuffix(arg, ")") {
 		expr, err := govaluate.NewEvaluableExpression(arg)
 		if err != nil {
 			return nil, err
 		}
-		return &iterableExpression{array: expr}, nil
+		return &iterableExpression{array: expr, location: location}, nil
 	}
-	// FIXME for paths
-	//return &iterableExpression{path: arg}, nil
-	return nil, errors.New("for instruction error: paths not supported yet")
+	return &iterableExpression{path: arg, location: location}, nil
 }
 
 func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic itemConsumer) error {
@@ -92,14 +89,14 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 			}
 		}
 	} else {
-		dir := ResolveFile(e.path, "source", e.location.Origin)
-		f, err := ioutil.ReadDir(dir)
+		dir, f, err := DefaultFileResolver.FilesIn(e.path, e.location)
 		if err != nil {
 			return err
 		}
 		for _, item := range f {
 			if !item.IsDir() {
-				err := fc(item.Name())
+				path := filepath.Join(dir, item.Name())
+				err := fc(path)
 				if err != nil {
 					return err
 				}

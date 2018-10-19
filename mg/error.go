@@ -25,7 +25,7 @@ func (e ErrorCode) String() string {
 }
 
 func (e *MagnanimousError) String() string {
-	return fmt.Sprintf("%s: %s", e.Code.String(), e.message)
+	return fmt.Sprintf("(%s) %s", e.Code.String(), e.message)
 }
 
 func NewError(location Location, code ErrorCode, message string) error {

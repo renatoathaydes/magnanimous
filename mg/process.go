@@ -51,9 +51,9 @@ func ProcessFile(file, basePath string) (*WebFile, error) {
 	return &WebFile{BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
 }
 
-func ProcessReader(reader *bufio.Reader, file string, size int) (*ProcessedFile, error) {
+func ProcessReader(reader *bufio.Reader, file string, sizeHint int) (*ProcessedFile, error) {
 	var builder strings.Builder
-	builder.Grow(size)
+	builder.Grow(sizeHint)
 	isMarkDown := isMd(file)
 	processed := ProcessedFile{context: make(map[string]interface{}, 4)}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}

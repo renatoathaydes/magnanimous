@@ -13,7 +13,7 @@ type IncludeInstruction struct {
 }
 
 func NewIncludeInstruction(arg string, location Location) *IncludeInstruction {
-	path := ResolveFile(arg, "source", location.Origin)
+	path := DefaultFileResolver.Resolve(arg, location)
 	return &IncludeInstruction{Path: path, Origin: location}
 }
 

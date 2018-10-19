@@ -36,8 +36,8 @@ func main() {
 	mg.AddNonWritables(&otherFiles, SourceDir, webFiles)
 	err := mg.WriteTo(TargetDir, webFiles)
 	if err != nil {
-		log.Printf("ERROR: (%s) %s", err.Code, err.Error())
-		panic(*err)
+		log.Printf("ERROR: %s", err)
+		panic(err)
 	}
 
 	log.Printf("Magnanimous generated website in %s\n", time.Since(start))

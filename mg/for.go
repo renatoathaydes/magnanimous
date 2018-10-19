@@ -27,13 +27,14 @@ func NewForInstruction(arg string, location Location, isMarkDown bool, original 
 		log.Printf("WARNING: (%s) Malformed for loop instruction", location.String())
 		return unevaluatedExpression(original)
 	}
-	iter, err := asIterable(parts[1])
+	iter, err := asIterable(parts[1], location)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval iterable in for expression: %s (%s)",
 			location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ForLoop{Variable: parts[0], iter: iter, MarkDown: isMarkDown, Text: original, Location: location}
+	return &ForLoop{Variable: parts[0], iter: iter, MarkDown: isMarkDown,
+		Text: original, Location: location, context: make(map[string]interface{}, 2)}
 }
 
 var _ Content = (*ForLoop)(nil)
@@ -55,15 +56,20 @@ func (f *ForLoop) setParent(scope Scope) {
 	f.parent = scope
 }
 
-func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	err := f.iter.forEach(magParams{
 		webFiles:       files,
 		inclusionChain: inclusionChain,
 		scope:          f.parent,
 	}, func(file string) error {
 		// use the file's context as the value of the bound variable
-		f.context[f.Variable] = files[file].Processed.Context()
-		return writeContents(f, writer, files, inclusionChain)
+		webFile, ok := files[file]
+		if ok {
+			f.context[f.Variable] = webFile.Processed.Context()
+			return writeContents(f, writer, files, inclusionChain)
+		} else {
+			return &MagnanimousError{Code: IOError, message: fmt.Sprintf("File not in sources: %s", file)}
+		}
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
 		f.Context()[f.Variable] = item
@@ -75,7 +81,7 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Lo
 	return nil
 }
 
-func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []Location) *MagnanimousError {
+func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	for _, c := range f.Contents {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 )
 
 type WebFilesMap map[string]WebFile
@@ -19,6 +20,11 @@ type Location struct {
 	Origin string
 	Row    uint32
 	Col    uint32
+}
+
+type FileResolver interface {
+	FilesIn(dir string, from Location) (dirPath string, f []os.FileInfo, e error)
+	Resolve(path string, from Location) string
 }
 
 type Content interface {
