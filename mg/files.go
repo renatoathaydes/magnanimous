@@ -7,9 +7,11 @@ import (
 	"strings"
 )
 
-type resolver struct{}
+type resolver struct {
+	basePath string
+}
 
-var DefaultFileResolver FileResolver = resolver{}
+var DefaultFileResolver FileResolver = resolver{basePath: "source"}
 
 func (r resolver) FilesIn(dir string, from Location) (dirPath string, fi []os.FileInfo, e error) {
 	dirPath = r.Resolve(dir, from)
@@ -18,10 +20,9 @@ func (r resolver) FilesIn(dir string, from Location) (dirPath string, fi []os.Fi
 }
 
 func (r resolver) Resolve(path string, from Location) string {
-	basePath := "source"
 	if strings.HasPrefix(path, "/") {
 		// absolute path
-		return filepath.Join(basePath, path)
+		return filepath.Join(r.basePath, path)
 	}
 
 	// relative path
@@ -31,8 +32,8 @@ func (r resolver) Resolve(path string, from Location) string {
 	for strings.HasPrefix(p, "../") {
 		p = p[3:]
 	}
-	if !strings.HasPrefix(p, basePath) {
-		return filepath.Join(basePath, p)
+	if !strings.HasPrefix(p, r.basePath) {
+		return filepath.Join(r.basePath, p)
 	}
 	return p
 }
