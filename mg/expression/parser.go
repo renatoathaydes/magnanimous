@@ -24,6 +24,14 @@ func ParseExpr(expr string) (Expression, error) {
 	return Expression{expr: e}, nil
 }
 
+func Eval(expr string, context Context) (interface{}, error) {
+	e, err := ParseExpr(expr)
+	if err != nil {
+		return nil, err
+	}
+	return EvalExpr(e, context)
+}
+
 func EvalExpr(e Expression, contex Context) (interface{}, error) {
 	return eval(e.expr, contex)
 }
