@@ -68,7 +68,7 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Lo
 			f.context[f.Variable] = webFile.Processed.Context()
 			return writeContents(f, writer, files, inclusionChain)
 		} else {
-			return &MagnanimousError{Code: IOError, message: fmt.Sprintf("File not in sources: %s", file)}
+			return &MagnanimousError{Code: IOError, message: fmt.Sprintf("File not found: %s", file)}
 		}
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
