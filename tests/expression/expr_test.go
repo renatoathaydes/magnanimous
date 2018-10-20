@@ -191,3 +191,123 @@ func TestIntInequalityExpr(t *testing.T) {
 		t.Errorf("Expected 'false' but got '%v'", v)
 	}
 }
+
+func TestIntGreaterThanExpr(t *testing.T) {
+	v, err := expression.Eval(`5 > 1`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestIntGreaterThanOrEqualExpr(t *testing.T) {
+	v, err := expression.Eval(`5 >= 1`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestIntLessThanExpr(t *testing.T) {
+	v, err := expression.Eval(`10 < 100`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestIntLessThanOrEqualExpr(t *testing.T) {
+	v, err := expression.Eval(`10 <= 10`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringEqualityExpr(t *testing.T) {
+	v, err := expression.Eval(`"Boo" == "Boo"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringInequalityExpr(t *testing.T) {
+	v, err := expression.Eval(`"FOO" != "BAR"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringGreaterThanExpr(t *testing.T) {
+	v, err := expression.Eval(`"z" > "a"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringGreaterThanOrEqualExpr(t *testing.T) {
+	v, err := expression.Eval(`"z" >= "a"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringLessThanExpr(t *testing.T) {
+	v, err := expression.Eval(`"a" < "z"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestStringLessThanOrEqualExpr(t *testing.T) {
+	v, err := expression.Eval(`"a" <= "a"`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}

@@ -88,67 +88,16 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 		return eq(xv, yv)
 	case token.NEQ:
 		return neq(xv, yv)
+	case token.LSS:
+		return lss(xv, yv)
+	case token.GTR:
+		return gtr(xv, yv)
+	case token.LEQ:
+		return leq(xv, yv)
+	case token.GEQ:
+		return geq(xv, yv)
 	}
 	return nil, errors.New(fmt.Sprintf("unknown operator %s", t))
-}
-
-func add(x interface{}, y interface{}) (interface{}, error) {
-	xf, ok := x.(float64)
-	if ok {
-		yf, ok := y.(float64)
-		if ok {
-			return xf + yf, nil
-		}
-	}
-	xs, ok := x.(string)
-	if ok {
-		ys, ok := y.(string)
-		if ok {
-			return xs + ys, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("cannot add %v to %v", x, y))
-}
-
-func multiply(x interface{}, y interface{}) (interface{}, error) {
-	xf, ok := x.(float64)
-	if ok {
-		yf, ok := y.(float64)
-		if ok {
-			return xf * yf, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("cannot multiply %v and %v", x, y))
-}
-
-func divide(x interface{}, y interface{}) (interface{}, error) {
-	xf, ok := x.(float64)
-	if ok {
-		yf, ok := y.(float64)
-		if ok {
-			return xf / yf, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("cannot divide %v by %v", x, y))
-}
-
-func subtract(x interface{}, y interface{}) (interface{}, error) {
-	xf, ok := x.(float64)
-	if ok {
-		yf, ok := y.(float64)
-		if ok {
-			return xf - yf, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("cannot subtract %v from %v", y, x))
-}
-
-func eq(x interface{}, y interface{}) (interface{}, error) {
-	return x == y, nil
-}
-
-func neq(x interface{}, y interface{}) (interface{}, error) {
-	return x != y, nil
 }
 
 func resolveCompositeLit(cl *ast.CompositeLit, ctx Context) (interface{}, error) {
