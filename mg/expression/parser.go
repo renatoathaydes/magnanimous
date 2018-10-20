@@ -40,6 +40,8 @@ func eval(e ast.Expr, ctx Context) (interface{}, error) {
 	switch ex := e.(type) {
 	case *ast.BasicLit:
 		return parseLiteral(ex.Value), nil
+	case *ast.Ident:
+		return resolveIdentifier(ex.Name, ctx)
 	case *ast.BinaryExpr:
 		return resolveBinaryExpr(ex.X, ex.Op, ex.Y, ctx)
 	case *ast.CompositeLit:
@@ -50,6 +52,7 @@ func eval(e ast.Expr, ctx Context) (interface{}, error) {
 
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
 }
+
 func parseLiteral(s string) interface{} {
 	if (strings.HasPrefix(s, `"`) && strings.HasSuffix(s, `"`)) ||
 		(strings.HasPrefix(s, "`") && strings.HasSuffix(s, "`")) {
@@ -64,6 +67,20 @@ func parseLiteral(s string) interface{} {
 		return b
 	}
 	panic(fmt.Sprintf("Unrecognized literal: %s", s))
+}
+
+func resolveIdentifier(name string, ctx Context) (interface{}, error) {
+	if name == "true" {
+		return true, nil
+	}
+	if name == "false" {
+		return false, nil
+	}
+	v, ok := ctx[name]
+	if ok {
+		return v, nil
+	}
+	return nil, errors.New(fmt.Sprintf("cannot resolve identifier: %s", name))
 }
 
 func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (interface{}, error) {
