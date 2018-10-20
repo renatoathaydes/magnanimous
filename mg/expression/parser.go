@@ -48,6 +48,8 @@ func eval(e ast.Expr, ctx Context) (interface{}, error) {
 		return resolveCompositeLit(ex, ctx)
 	case *ast.ParenExpr:
 		return eval(ex.X, ctx)
+	case *ast.UnaryExpr:
+		return resolveUnary(ex, ctx)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
@@ -113,6 +115,10 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 		return leq(xv, yv)
 	case token.GEQ:
 		return geq(xv, yv)
+	case token.LAND:
+		return and(xv, yv)
+	case token.LOR:
+		return or(xv, yv)
 	}
 	return nil, errors.New(fmt.Sprintf("unknown operator %s", t))
 }
@@ -127,4 +133,17 @@ func resolveCompositeLit(cl *ast.CompositeLit, ctx Context) (interface{}, error)
 		array[i] = item
 	}
 	return array, nil
+}
+
+func resolveUnary(expr *ast.UnaryExpr, ctx Context) (interface{}, error) {
+	switch expr.Op {
+	case token.NOT:
+		v, err := eval(expr.X, ctx)
+		if err != nil {
+			return nil, err
+		}
+		return not(v)
+	}
+	return nil, errors.New(fmt.Sprintf("operator %s cannot be used with %v",
+		expr.Op, expr.X))
 }

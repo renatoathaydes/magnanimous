@@ -7,6 +7,7 @@ import (
 
 type numberOp func(x float64, y float64) interface{}
 type stringOp func(x string, y string) interface{}
+type boolOp func(x bool, y bool) interface{}
 type opErr func() error
 
 func op(x interface{}, y interface{}, no numberOp, so stringOp, oe opErr) (interface{}, error) {
@@ -25,6 +26,19 @@ func op(x interface{}, y interface{}, no numberOp, so stringOp, oe opErr) (inter
 			ys, ok := y.(string)
 			if ok {
 				return so(xs, ys), nil
+			}
+		}
+	}
+	return nil, oe()
+}
+
+func bop(x interface{}, y interface{}, bo boolOp, oe opErr) (interface{}, error) {
+	if bo != nil {
+		xf, ok := x.(bool)
+		if ok {
+			yf, ok := y.(bool)
+			if ok {
+				return bo(xf, yf), nil
 			}
 		}
 	}
@@ -110,5 +124,29 @@ func geq(x interface{}, y interface{}) (interface{}, error) {
 		return x >= y
 	}, func() error {
 		return errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
+	})
+}
+
+func and(x interface{}, y interface{}) (interface{}, error) {
+	return bop(x, y, func(x bool, y bool) interface{} {
+		return x && y
+	}, func() error {
+		return errors.New(fmt.Sprintf("cannot AND %v and %v", x, y))
+	})
+}
+
+func or(x interface{}, y interface{}) (interface{}, error) {
+	return bop(x, y, func(x bool, y bool) interface{} {
+		return x || y
+	}, func() error {
+		return errors.New(fmt.Sprintf("cannot OR %v and %v", x, y))
+	})
+}
+
+func not(x interface{}) (interface{}, error) {
+	return bop(x, true, func(x bool, y bool) interface{} {
+		return !x
+	}, func() error {
+		return errors.New(fmt.Sprintf("cannot negate %v", x))
 	})
 }
