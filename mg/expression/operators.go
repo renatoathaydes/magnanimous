@@ -79,6 +79,14 @@ func divide(x interface{}, y interface{}) (interface{}, error) {
 	})
 }
 
+func rem(x interface{}, y interface{}) (interface{}, error) {
+	return op(x, y, func(x float64, y float64) interface{} {
+		return float64(int64(x) % int64(y))
+	}, nil, func() error {
+		return errors.New(fmt.Sprintf("cannot divide %v by %v (remainder)", x, y))
+	})
+}
+
 func eq(x interface{}, y interface{}) (interface{}, error) {
 	return x == y, nil
 }
@@ -148,5 +156,21 @@ func not(x interface{}) (interface{}, error) {
 		return !x
 	}, func() error {
 		return errors.New(fmt.Sprintf("cannot negate %v", x))
+	})
+}
+
+func minus(x interface{}) (interface{}, error) {
+	return op(x, float64(0), func(x float64, y float64) interface{} {
+		return -x
+	}, nil, func() error {
+		return errors.New(fmt.Sprintf("cannot use '-' on %v", x))
+	})
+}
+
+func plus(x interface{}) (interface{}, error) {
+	return op(x, float64(0), func(x float64, y float64) interface{} {
+		return x
+	}, nil, func() error {
+		return errors.New(fmt.Sprintf("cannot use '+' on %v", x))
 	})
 }

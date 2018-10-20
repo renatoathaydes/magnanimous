@@ -78,6 +78,18 @@ func TestIntDivisionExpr(t *testing.T) {
 	}
 }
 
+func TestIntRemainderExpr(t *testing.T) {
+	v, err := expression.Eval(`10 % 4`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(2) {
+		t.Errorf("Expected '2' but got '%v'", v)
+	}
+}
+
 func TestComplexArithmeticExpr(t *testing.T) {
 	v, err := expression.Eval(`(2 + 4) * 5 / 10`, nil)
 
@@ -183,5 +195,29 @@ func TestIntLessThanOrEqualExpr(t *testing.T) {
 
 	if v != true {
 		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestIntMinusSign(t *testing.T) {
+	v, err := expression.Eval(`-19`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(-19) {
+		t.Errorf("Expected '-19' but got '%v'", v)
+	}
+}
+
+func TestIntPlusSign(t *testing.T) {
+	v, err := expression.Eval(`+53`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(53) {
+		t.Errorf("Expected '+53' but got '%v'", v)
 	}
 }

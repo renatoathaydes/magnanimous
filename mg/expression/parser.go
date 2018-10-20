@@ -103,6 +103,8 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 		return multiply(xv, yv)
 	case token.QUO:
 		return divide(xv, yv)
+	case token.REM:
+		return rem(xv, yv)
 	case token.EQL:
 		return eq(xv, yv)
 	case token.NEQ:
@@ -136,13 +138,17 @@ func resolveCompositeLit(cl *ast.CompositeLit, ctx Context) (interface{}, error)
 }
 
 func resolveUnary(expr *ast.UnaryExpr, ctx Context) (interface{}, error) {
+	v, err := eval(expr.X, ctx)
+	if err != nil {
+		return nil, err
+	}
 	switch expr.Op {
 	case token.NOT:
-		v, err := eval(expr.X, ctx)
-		if err != nil {
-			return nil, err
-		}
 		return not(v)
+	case token.SUB:
+		return minus(v)
+	case token.ADD:
+		return plus(v)
 	}
 	return nil, errors.New(fmt.Sprintf("operator %s cannot be used with %v",
 		expr.Op, expr.X))
