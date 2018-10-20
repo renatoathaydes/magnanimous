@@ -14,7 +14,21 @@ type Expression struct {
 	expr ast.Expr
 }
 
-type Context map[string]interface{}
+type Context interface {
+	Get(name string) (interface{}, bool)
+}
+
+type MapContext struct {
+	Map map[string]interface{}
+}
+
+func (m *MapContext) Get(name string) (interface{}, bool) {
+	if m == nil {
+		return nil, false
+	}
+	v, ok := m.Map[name]
+	return v, ok
+}
 
 func ParseExpr(expr string) (Expression, error) {
 	e, err := parser.ParseExpr(expr)
@@ -50,6 +64,8 @@ func eval(e ast.Expr, ctx Context) (interface{}, error) {
 		return eval(ex.X, ctx)
 	case *ast.UnaryExpr:
 		return resolveUnary(ex, ctx)
+	case *ast.SelectorExpr:
+		return resolveAccessField(ex, ctx)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
@@ -78,7 +94,7 @@ func resolveIdentifier(name string, ctx Context) (interface{}, error) {
 	if name == "false" {
 		return false, nil
 	}
-	v, ok := ctx[name]
+	v, ok := ctx.Get(name)
 	if ok {
 		return v, nil
 	}
@@ -152,4 +168,25 @@ func resolveUnary(expr *ast.UnaryExpr, ctx Context) (interface{}, error) {
 	}
 	return nil, errors.New(fmt.Sprintf("operator %s cannot be used with %v",
 		expr.Op, expr.X))
+}
+
+func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error) {
+	rcv, err := eval(expr.X, ctx)
+	if err != nil {
+		return nil, err
+	}
+	if v, ok := ToContext(rcv); ok {
+		return eval(expr.Sel, v)
+	}
+	return nil, errors.New(fmt.Sprintf("cannot access properties of object: %v", rcv))
+}
+
+func ToContext(ctx interface{}) (Context, bool) {
+	if v, ok := ctx.(Context); ok {
+		return v, true
+	}
+	if v, ok := ctx.(map[string]interface{}); ok {
+		return &MapContext{Map: v}, true
+	}
+	return nil, false
 }
