@@ -78,6 +78,36 @@ func TestIntAdditionExpr(t *testing.T) {
 	}
 }
 
+func TestStringAdditionExpr(t *testing.T) {
+	e, err := expression.ParseExpr(`"ab" + "cd"`)
+
+	if err != nil {
+		t.Fatalf("Could not parse: %v", err)
+	}
+
+	v, err := expression.EvalExpr(e, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != "abcd" {
+		t.Errorf("Expected 'abcd' but got '%v'", v)
+	}
+}
+
+func TestIntSubtractionExpr(t *testing.T) {
+	v, err := expression.Eval(`5 - 2`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(3) {
+		t.Errorf("Expected '3' but got '%v'", v)
+	}
+}
+
 func TestIntMultiplicationExpr(t *testing.T) {
 	v, err := expression.Eval(`3*6`, nil)
 
@@ -87,6 +117,18 @@ func TestIntMultiplicationExpr(t *testing.T) {
 
 	if v != float64(18) {
 		t.Errorf("Expected '18' but got '%v'", v)
+	}
+}
+
+func TestIntDivisionExpr(t *testing.T) {
+	v, err := expression.Eval(`10 / 5`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(2) {
+		t.Errorf("Expected '2' but got '%v'", v)
 	}
 }
 
