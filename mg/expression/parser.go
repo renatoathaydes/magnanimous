@@ -44,7 +44,10 @@ func eval(e ast.Expr, ctx Context) (interface{}, error) {
 		return resolveBinaryExpr(ex.X, ex.Op, ex.Y, ctx)
 	case *ast.CompositeLit:
 		return resolveCompositeLit(ex, ctx)
+	case *ast.ParenExpr:
+		return eval(ex.X, ctx)
 	}
+
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
 }
 func parseLiteral(s string) interface{} {

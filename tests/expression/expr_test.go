@@ -132,6 +132,30 @@ func TestIntDivisionExpr(t *testing.T) {
 	}
 }
 
+func TestComplexArithmeticExpr(t *testing.T) {
+	v, err := expression.Eval(`(2 + 4) * 5 / 10`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(3) {
+		t.Errorf("Expected '3' but got '%v'", v)
+	}
+}
+
+func TestComplexArithmeticExpr2(t *testing.T) {
+	v, err := expression.Eval(`( 5 * 2 * 10 / 4 ) + ( 2 * 10 / 4 )`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != float64(30) {
+		t.Errorf("Expected '30' but got '%v'", v)
+	}
+}
+
 func TestIntArrayExpr(t *testing.T) {
 	v, err := expression.Eval(`[]interface{}{1,3,5}`, nil)
 
