@@ -84,6 +84,10 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 		return multiply(xv, yv)
 	case token.QUO:
 		return divide(xv, yv)
+	case token.EQL:
+		return eq(xv, yv)
+	case token.NEQ:
+		return neq(xv, yv)
 	}
 	return nil, errors.New(fmt.Sprintf("unknown operator %s", t))
 }
@@ -137,6 +141,14 @@ func subtract(x interface{}, y interface{}) (interface{}, error) {
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("cannot subtract %v from %v", y, x))
+}
+
+func eq(x interface{}, y interface{}) (interface{}, error) {
+	return x == y, nil
+}
+
+func neq(x interface{}, y interface{}) (interface{}, error) {
+	return x != y, nil
 }
 
 func resolveCompositeLit(cl *ast.CompositeLit, ctx Context) (interface{}, error) {

@@ -167,3 +167,27 @@ func TestIntArrayExpr(t *testing.T) {
 		t.Errorf("Expected '[1,3,5]' but got '%v'", v)
 	}
 }
+
+func TestIntEqualityExpr(t *testing.T) {
+	v, err := expression.Eval(`2 == 2`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != true {
+		t.Errorf("Expected 'true' but got '%v'", v)
+	}
+}
+
+func TestIntInequalityExpr(t *testing.T) {
+	v, err := expression.Eval(`2 != 2`, nil)
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != false {
+		t.Errorf("Expected 'false' but got '%v'", v)
+	}
+}
