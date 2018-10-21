@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 )
+
+type Magnanimous struct {
+	SourcesDir string
+}
 
 type WebFilesMap map[string]WebFile
 
@@ -23,7 +26,7 @@ type Location struct {
 }
 
 type FileResolver interface {
-	FilesIn(dir string, from Location) (dirPath string, f []os.FileInfo, e error)
+	FilesIn(dir string, from Location) (dirPath string, f []WebFile, e error)
 	Resolve(path string, from Location) string
 }
 

@@ -13,7 +13,7 @@ var emptyFilesMap = mg.WebFilesMap{}
 
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
-	processed, err := mg.ProcessReader(r, "", 11)
+	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -23,18 +23,21 @@ func TestProcessSimple(t *testing.T) {
 }
 
 func TestProcessIncludeSimple(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11)
-
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
 	m := mg.WebFilesMap{}
 	m["source/processed/example.html"] = mg.WebFile{Processed: &exampleFile}
+
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: m}
+
+	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"hello ", "from another file!"})
 }
@@ -62,13 +65,7 @@ func TestMarkdownToHtml(t *testing.T) {
 }
 
 func TestProcessIncludeMarkDown(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	// setup a md file to be included
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.HtmlFromMarkdownContent{
 		MarkDownContent: &mg.StringContent{Text: "# header", MarkDown: true},
@@ -77,12 +74,22 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	m := mg.WebFilesMap{}
 	m["source/example.md"] = mg.WebFile{Processed: &exampleFile}
 
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: m}
+
+	// read a file that includes the previous file
+	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"<h2>hello</h2>\n", "<h1>header</h1>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello \\{{ include example.html }}"))
-	processed, err := mg.ProcessReader(r, "", 11)
+	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +100,7 @@ func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 
 func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Hello {{\n  bad-instruction \"contains \\}} ignored\"\n}}. How are you?"))
-	processed, err := mg.ProcessReader(r, "", 11)
+	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)

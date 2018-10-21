@@ -10,11 +10,11 @@ type IncludeInstruction struct {
 	Path     string
 	Origin   Location
 	MarkDown bool
+	resolver FileResolver
 }
 
-func NewIncludeInstruction(arg string, location Location) *IncludeInstruction {
-	path := DefaultFileResolver.Resolve(arg, location)
-	return &IncludeInstruction{Path: path, Origin: location}
+func NewIncludeInstruction(arg string, location Location, resolver FileResolver) *IncludeInstruction {
+	return &IncludeInstruction{Path: arg, Origin: location, resolver: resolver}
 }
 
 func (c *IncludeInstruction) IsMarkDown() bool {
@@ -26,7 +26,9 @@ func (c *IncludeInstruction) String() string {
 }
 
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
-	webFile, ok := files[c.Path]
+	path := c.resolver.Resolve(c.Path, c.Origin)
+	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
+	webFile, ok := files[path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
 		_, err := writer.Write([]byte(fmt.Sprintf("{{ include %s }}", c.Path)))
@@ -35,8 +37,10 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 		}
 	} else {
 		inclusionChain = append(inclusionChain, c.Origin)
+		//ss:= inclusionChainToString(inclusionChain)
+		//fmt.Printf("Chain: %s", ss)
 		for _, f := range inclusionChain {
-			if f.Origin == c.Path {
+			if f.Origin == path {
 				chain := inclusionChainToString(inclusionChain)
 				return &MagnanimousError{
 					Code: InclusionCycleError,

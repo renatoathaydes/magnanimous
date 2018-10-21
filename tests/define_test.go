@@ -9,7 +9,7 @@ import (
 
 func TestDefineNumber(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 2 }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -23,7 +23,7 @@ func TestDefineNumber(t *testing.T) {
 
 func TestDefineString(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define title \"My Site\" }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -37,7 +37,7 @@ func TestDefineString(t *testing.T) {
 
 func TestDefineStringConcat(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define title \"My\" + \" Site\" }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -54,7 +54,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 		"{{ define a 10 }}" +
 			"{{ define b 4 }}" +
 			"{{ define c a * b }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -70,7 +70,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 
 func TestMalformedDefine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +79,7 @@ func TestMalformedDefine(t *testing.T) {
 	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"{{ define }}"})
 
 	r = bufio.NewReader(strings.NewReader("{{ define abc }}"))
-	processed, err = mg.ProcessReader(r, "source/processed/hi.html", 11)
+	processed, err = mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)

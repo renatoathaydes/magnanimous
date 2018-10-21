@@ -5,7 +5,6 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
-	"path/filepath"
 	"strings"
 )
 
@@ -27,10 +26,11 @@ type ExpressionContent struct {
 type iterableExpression struct {
 	array    *expression.Expression
 	path     string
+	resolver FileResolver
 	location Location
 }
 
-type fileConsumer func(string) error
+type fileConsumer func(file *WebFile) error
 type itemConsumer func(interface{}) error
 
 type iterable interface {
@@ -66,7 +66,7 @@ func unevaluatedExpression(original string) Content {
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
 }
 
-func asIterable(arg string, location Location) (iterable, error) {
+func asIterable(arg string, location Location, resolver FileResolver) (iterable, error) {
 	if strings.HasPrefix(arg, "[") && strings.HasSuffix(arg, "]") {
 		expr, err := expression.ParseExpr(fmt.Sprintf("[]interface{}{%s}", arg[1:len(arg)-1]))
 		if err != nil {
@@ -74,7 +74,7 @@ func asIterable(arg string, location Location) (iterable, error) {
 		}
 		return &iterableExpression{array: &expr, location: location}, nil
 	}
-	return &iterableExpression{path: arg, location: location}, nil
+	return &iterableExpression{path: arg, location: location, resolver: resolver}, nil
 }
 
 func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic itemConsumer) error {
@@ -90,17 +90,14 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 			}
 		}
 	} else {
-		dir, f, err := DefaultFileResolver.FilesIn(e.path, e.location)
+		_, f, err := e.resolver.FilesIn(e.path, e.location)
 		if err != nil {
 			return err
 		}
 		for _, item := range f {
-			if !item.IsDir() {
-				path := filepath.Join(dir, item.Name())
-				err := fc(path)
-				if err != nil {
-					return err
-				}
+			err := fc(&item)
+			if err != nil {
+				return err
 			}
 		}
 	}

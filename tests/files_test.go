@@ -6,7 +6,7 @@ import (
 )
 
 func ResolveFile(file, origin string) string {
-	return mg.DefaultFileResolver.Resolve(file, mg.Location{Origin: origin})
+	return mg.Resolve(file, "source", mg.Location{Origin: origin})
 }
 
 func TestResolveFile(t *testing.T) {

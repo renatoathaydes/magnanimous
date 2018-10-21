@@ -18,7 +18,8 @@ type ForLoop struct {
 	parent   Scope
 }
 
-func NewForInstruction(arg string, location Location, isMarkDown bool, original string) Content {
+func NewForInstruction(arg string, location Location, isMarkDown bool,
+	original string, resolver FileResolver) Content {
 	parts := strings.SplitN(arg, " ", 2)
 	switch len(parts) {
 	case 0:
@@ -27,7 +28,7 @@ func NewForInstruction(arg string, location Location, isMarkDown bool, original 
 		log.Printf("WARNING: (%s) Malformed for loop instruction", location.String())
 		return unevaluatedExpression(original)
 	}
-	iter, err := asIterable(parts[1], location)
+	iter, err := asIterable(parts[1], location, resolver)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval iterable in for expression: %s (%s)",
 			location.String(), arg, err.Error())
@@ -61,15 +62,10 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Lo
 		webFiles:       files,
 		inclusionChain: inclusionChain,
 		scope:          f.parent,
-	}, func(file string) error {
+	}, func(webFile *WebFile) error {
 		// use the file's context as the value of the bound variable
-		webFile, ok := files[file]
-		if ok {
-			f.context[f.Variable] = webFile.Processed.Context()
-			return writeContents(f, writer, files, inclusionChain)
-		} else {
-			return &MagnanimousError{Code: IOError, message: fmt.Sprintf("File not found: %s", file)}
-		}
+		f.context[f.Variable] = webFile.Processed.Context()
+		return writeContents(f, writer, files, inclusionChain)
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
 		f.Context()[f.Variable] = item

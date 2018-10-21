@@ -21,18 +21,36 @@ type parserState struct {
 	builder *strings.Builder
 }
 
-func Process(files *[]string, basePath string, filesMap WebFilesMap) {
-	for _, file := range *files {
-		wf, err := ProcessFile(file, basePath)
-		if err != nil {
-			log.Printf("ERROR: %s", err)
-			panic(err)
-		}
-		filesMap[file] = *wf
+func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
+	processedDir := filepath.Join(mag.SourcesDir, "processed")
+	staticDir := filepath.Join(mag.SourcesDir, "static")
+
+	procFiles, staticFiles, otherFiles := collectFiles(mag.SourcesDir, processedDir, staticDir)
+	webFiles := make(WebFilesMap, len(procFiles)+len(staticFiles)+len(otherFiles))
+
+	err := ProcessAll(procFiles, processedDir, mag.SourcesDir, webFiles)
+	if err != nil {
+		return nil, err
 	}
+	CopyAll(&staticFiles, staticDir, webFiles)
+	AddNonWritables(&otherFiles, mag.SourcesDir, webFiles)
+
+	return webFiles, nil
 }
 
-func ProcessFile(file, basePath string) (*WebFile, error) {
+func ProcessAll(files []string, basePath, sourcesDir string, webFiles WebFilesMap) error {
+	resolver := DefaultFileResolver{BasePath: sourcesDir, Files: webFiles}
+	for _, file := range files {
+		wf, err := ProcessFile(file, basePath, &resolver)
+		if err != nil {
+			return err
+		}
+		webFiles[file] = *wf
+	}
+	return nil
+}
+
+func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
@@ -42,7 +60,7 @@ func ProcessFile(file, basePath string) (*WebFile, error) {
 	if err != nil {
 		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 	}
-	processed, magErr := ProcessReader(reader, file, int(s.Size()))
+	processed, magErr := ProcessReader(reader, file, int(s.Size()), resolver)
 	if magErr != nil {
 		return nil, magErr
 	}
@@ -51,13 +69,13 @@ func ProcessFile(file, basePath string) (*WebFile, error) {
 	return &WebFile{BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
 }
 
-func ProcessReader(reader *bufio.Reader, file string, sizeHint int) (*ProcessedFile, error) {
+func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver FileResolver) (*ProcessedFile, error) {
 	var builder strings.Builder
 	builder.Grow(sizeHint)
 	isMarkDown := isMd(file)
 	processed := ProcessedFile{context: make(map[string]interface{}, 4)}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
-	magErr := parseText(&state, isMarkDown)
+	magErr := parseText(&state, isMarkDown, resolver)
 	if magErr != nil {
 		return &processed, magErr
 	}
@@ -67,7 +85,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int) (*ProcessedF
 	return &processed, nil
 }
 
-func parseText(state *parserState, isMarkDown bool) error {
+func parseText(state *parserState, isMarkDown bool, resolver FileResolver) error {
 	previousWasOpenBracket := false
 	previousWasEscape := false
 	reader := state.reader
@@ -103,7 +121,7 @@ func parseText(state *parserState, isMarkDown bool) error {
 					builder.Reset()
 				}
 				previousWasOpenBracket = false
-				magErr := parseInstruction(state, isMarkDown)
+				magErr := parseInstruction(state, isMarkDown, resolver)
 				if magErr != nil {
 					return magErr
 				}
@@ -139,7 +157,7 @@ func parseText(state *parserState, isMarkDown bool) error {
 	return nil
 }
 
-func parseInstruction(state *parserState, isMarkDown bool) error {
+func parseInstruction(state *parserState, isMarkDown bool, resolver FileResolver) error {
 	previousWasCloseBracket := false
 	previousWasEscape := false
 	instrFirstRow := state.row
@@ -174,7 +192,8 @@ func parseInstruction(state *parserState, isMarkDown bool) error {
 			if previousWasCloseBracket {
 				if builder.Len() > 0 {
 					appendContent(state.pf, builder.String(), isMarkDown,
-						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol})
+						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
+						resolver)
 				}
 				builder.Reset()
 				return nil
@@ -201,7 +220,7 @@ func parseInstruction(state *parserState, isMarkDown bool) error {
 			instrFirstRow, instrFirstCol))
 }
 
-func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Location) {
+func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Location, resolver FileResolver) {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
@@ -218,7 +237,7 @@ func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Loc
 			pf.AppendContent(unevaluatedExpression(text))
 		}
 	case 2:
-		content := createInstruction(parts[0], parts[1], isMarkDown, pf.currentScope(), location, text)
+		content := createInstruction(parts[0], parts[1], isMarkDown, pf.currentScope(), location, text, resolver)
 		if content != nil {
 			pf.AppendContent(content)
 		}
@@ -226,16 +245,16 @@ func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Loc
 }
 
 func createInstruction(name, arg string, isMarkDown bool, scope Scope,
-	location Location, original string) Content {
+	location Location, original string, resolver FileResolver) Content {
 	switch name {
 	case "include":
-		return NewIncludeInstruction(arg, location)
+		return NewIncludeInstruction(arg, location, resolver)
 	case "define":
 		return NewVariable(arg, location, original, scope)
 	case "eval":
 		return NewExpression(arg, location, isMarkDown, original, scope)
 	case "for":
-		return NewForInstruction(arg, location, isMarkDown, original)
+		return NewForInstruction(arg, location, isMarkDown, original, resolver)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)

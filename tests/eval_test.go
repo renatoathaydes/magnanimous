@@ -9,7 +9,7 @@ import (
 
 func TestEvalString(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Hello {{ eval \"Joe\" }}"))
-	processed, err := mg.ProcessReader(r, "", 11)
+	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -20,7 +20,7 @@ func TestEvalString(t *testing.T) {
 
 func TestEvalArithmetic(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("2 + 2 == {{ eval 2 + 2 }}"))
-	processed, err := mg.ProcessReader(r, "", 11)
+	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +31,7 @@ func TestEvalArithmetic(t *testing.T) {
 
 func TestEvalNonExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -42,7 +42,7 @@ func TestEvalNonExistingParameter(t *testing.T) {
 
 func TestEvalWithExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -58,23 +58,25 @@ func TestEvalWithExistingParameter(t *testing.T) {
 }
 
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
+	files := make(mg.WebFilesMap)
+	resolver := mg.DefaultFileResolver{BasePath: "", Files: files}
+
 	r := bufio.NewReader(strings.NewReader("A = {{ eval 2 * hello }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
+	processed, err := mg.ProcessReader(r, "processed/hi.txt", 11, &resolver)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("OUTER\n{{ define hello 7 }}{{ include /processed/hi.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11)
+	otherProcessed, otherErr := mg.ProcessReader(r, "processed/other.txt", 11, nil)
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
 	}
 
-	files := mg.WebFilesMap{}
-	files["source/processed/hi.txt"] = mg.WebFile{Processed: processed}
-	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
+	files["/processed/hi.txt"] = mg.WebFile{Processed: processed}
+	files["/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
 
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)
