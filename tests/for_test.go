@@ -13,8 +13,8 @@ import (
 
 func TestForArray(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
-		"{{ for var (1,2,3, 42) }}\n" +
-		"Number {{ eval var }}\n" +
+		"{{ for v [1,2,3, 42] }}\n" +
+		"Number {{ eval v }}\n" +
 		"{{ end }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11)
 
@@ -32,7 +32,7 @@ func TestForArray(t *testing.T) {
 
 func TestForArrayInMarkDown(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
-		"{{ for section (\"Home\", \"About\") }}\n" +
+		"{{ for section [ \"Home\", \"About\" ] }}\n" +
 			"## {{ eval section }}\nSomething something{{ end }}\n" +
 			"END"))
 	processed, err := mg.ProcessReader(r, "source/processed/array.md", 11)

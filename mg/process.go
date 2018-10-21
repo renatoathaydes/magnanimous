@@ -233,7 +233,7 @@ func createInstruction(name, arg string, isMarkDown bool, scope Scope,
 	case "define":
 		return NewVariable(arg, location, original, scope)
 	case "eval":
-		return NewExpression(arg, location, isMarkDown, original)
+		return NewExpression(arg, location, isMarkDown, original, scope)
 	case "for":
 		return NewForInstruction(arg, location, isMarkDown, original)
 	}

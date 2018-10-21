@@ -1,22 +1,17 @@
 package mg
 
-import (
-	"errors"
-	"fmt"
-)
-
 type magParams struct {
 	inclusionChain []Location
 	scope          Scope
 	webFiles       WebFilesMap
 }
 
-func (m magParams) Get(name string) (interface{}, error) {
+func (m magParams) Get(name string) (interface{}, bool) {
 	scope := m.scope
 	for scope != nil {
 		v, ok := scope.Context()[name]
 		if ok {
-			return v, nil
+			return v, true
 		}
 		scope = scope.Parent()
 	}
@@ -26,9 +21,9 @@ func (m magParams) Get(name string) (interface{}, error) {
 			// FIXME check the scopes within the including-file
 			v, ok := file.Processed.Context()[name]
 			if ok {
-				return v, nil
+				return v, true
 			}
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("Parameter '%s' cannot be resolved", name))
+	return nil, false
 }

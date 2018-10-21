@@ -18,7 +18,7 @@ func TestDefineNumber(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["a"] = float64(2)
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{})
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineString(t *testing.T) {
@@ -32,7 +32,7 @@ func TestDefineString(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{})
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineStringConcat(t *testing.T) {
@@ -46,7 +46,7 @@ func TestDefineStringConcat(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{})
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineBasedOnPreviousDefine(t *testing.T) {
@@ -65,7 +65,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	expectedCtx["b"] = float64(4)
 	expectedCtx["c"] = float64(40)
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{})
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{"", "", ""})
 }
 
 func TestMalformedDefine(t *testing.T) {

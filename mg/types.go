@@ -48,10 +48,6 @@ type Scope interface {
 	setParent(scope Scope)
 }
 
-type ScopeSensitive interface {
-	setScope(scope Scope)
-}
-
 type ProcessedFile struct {
 	Contents     []Content
 	scopeStack   []Scope
@@ -91,16 +87,8 @@ func (f *ProcessedFile) AppendContent(content Content) {
 	if s > 0 {
 		topScope = f.scopeStack[s-1]
 		topScope.AppendContent(content)
-		h, ok := content.(ScopeSensitive)
-		if ok {
-			h.setScope(topScope)
-		}
 	} else {
 		f.Contents = append(f.Contents, content)
-		h, ok := content.(ScopeSensitive)
-		if ok {
-			h.setScope(f)
-		}
 	}
 	newScope, ok := content.(Scope)
 	if ok {
