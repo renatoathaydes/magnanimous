@@ -141,7 +141,7 @@ func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 		inclusionChain: inclusionChain,
 	})
 	if err != nil {
-		log.Printf("WARNING: (%s) eval failure: %s", d.Location.String(), err.Error())
+		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
 	d.scope.Context()[d.Name] = v
 	return nil

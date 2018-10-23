@@ -9,7 +9,6 @@ import (
 type IncludeInstruction struct {
 	Path     string
 	Origin   Location
-	MarkDown bool
 	resolver FileResolver
 }
 
@@ -18,11 +17,11 @@ func NewIncludeInstruction(arg string, location Location, resolver FileResolver)
 }
 
 func (c *IncludeInstruction) IsMarkDown() bool {
-	return c.MarkDown
+	return false
 }
 
 func (c *IncludeInstruction) String() string {
-	return fmt.Sprintf("IncludeInstruction{%s}", c.Path)
+	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", c.Path, c.Origin, c.resolver)
 }
 
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {

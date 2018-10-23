@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
 
 type Magnanimous struct {
@@ -122,6 +123,16 @@ func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) ([]b
 		}
 	}
 	return b.Bytes(), nil
+}
+
+func (f *ProcessedFile) String() string {
+	var contentsBuilder strings.Builder
+	contentsBuilder.WriteString("[ ")
+	for _, c := range f.Contents {
+		contentsBuilder.WriteString(fmt.Sprintf("%T ", c))
+	}
+	contentsBuilder.WriteString("]")
+	return fmt.Sprintf("ProcessedFile{%s, %v, %s}", contentsBuilder.String(), f.context, f.NewExtension)
 }
 
 func (l *Location) String() string {
