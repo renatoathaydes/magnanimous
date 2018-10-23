@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"log"
 	"time"
@@ -18,6 +19,11 @@ func main() {
 	if err != nil {
 		log.Printf("ERROR: %s", err)
 		panic(err)
+	}
+
+	if len(webFiles) == 0 {
+		fmt.Printf("No files found in the %s directory, nothing to do.\n", SourceDir)
+		return
 	}
 
 	err = mg.WriteTo(TargetDir, webFiles)
