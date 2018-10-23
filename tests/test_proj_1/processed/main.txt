@@ -1,0 +1,3 @@
+A and B:
+{{ include a.txt }}{{ include b.txt }}
+{{ include _eval_a_and_b.txt }}

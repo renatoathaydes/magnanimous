@@ -120,3 +120,38 @@ func checkContents(t *testing.T,
 	}
 
 }
+
+func runMg(t *testing.T, project string) string {
+	mag := mg.Magnanimous{SourcesDir: project}
+	webFiles, err := mag.ReadAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dir, err := ioutil.TempDir("", project)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mg.WriteTo(dir, webFiles)
+
+	return dir
+}
+
+func assertFileContents(t *testing.T, files []os.FileInfo, file, expectedContent string) {
+	var fi os.FileInfo
+	for _, f := range files {
+		if f.Name() == file {
+			fi = f
+			break
+		}
+	}
+	if fi != nil {
+		c, err := ioutil.ReadFile(fi.Name())
+		if err != nil {
+			verifyEqual(0, t, string(c), expectedContent)
+		}
+	} else {
+		t.Fatalf("Could not find file %s in %v\n", file, files)
+	}
+}

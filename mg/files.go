@@ -51,6 +51,9 @@ func getFilesAt(root string, exclusions ...string) ([]string, error) {
 		}
 		return err
 	})
+	if os.IsNotExist(err) {
+		return []string{}, nil
+	}
 	return files, err
 }
 
