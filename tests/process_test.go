@@ -3,13 +3,9 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
-	"reflect"
 	"strings"
 	"testing"
 )
-
-var emptyContext = make(map[string]interface{})
-var emptyFilesMap = mg.WebFilesMap{}
 
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
@@ -111,51 +107,4 @@ func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 		"{{\n  bad-instruction \"contains }} ignored\"\n}}",
 		". How are you?",
 	})
-}
-
-func checkParsing(t *testing.T,
-	ctx map[string]interface{}, m mg.WebFilesMap, pf *mg.ProcessedFile,
-	expectedCtx map[string]interface{}, expectedContents []string) {
-
-	if len(pf.Contents) != len(expectedContents) {
-		t.Fatalf("Expected %d content parts but got %d: %v",
-			len(expectedContents), len(pf.Contents), pf.Contents)
-	}
-
-	for i, c := range pf.Contents {
-		var result strings.Builder
-		c.Write(&result, m, nil)
-
-		if result.String() != expectedContents[i] {
-			t.Errorf("Unexpected Content[%d]\nExpected: '%s'\nActual  : '%s'",
-				i, expectedContents[i], result.String())
-		}
-	}
-
-	if len(expectedCtx) == 0 {
-		if len(ctx) != 0 {
-			t.Errorf("Expected empty context.\n"+
-				"Actual Context: %v", ctx)
-		}
-	} else if !reflect.DeepEqual(ctx, expectedCtx) {
-		t.Errorf(
-			"Expected Context: %v\n"+
-				"Actual Context: %v", expectedCtx, ctx)
-	}
-}
-
-func checkContents(t *testing.T,
-	m mg.WebFilesMap, pf *mg.ProcessedFile,
-	expectedContent string) {
-
-	content, err := pf.Bytes(m, nil)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if string(content) != expectedContent {
-		t.Errorf("Unexpected content. Expected:\n%s\nActual:\n%s", expectedContent, content)
-	}
-
 }

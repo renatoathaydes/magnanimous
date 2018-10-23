@@ -95,27 +95,3 @@ func TestInclusionSelfCycleError(t *testing.T) {
 		"hi.txt at source/processed/hi.txt:1:5 "+
 		"comes back into itself via [source/processed/hi.txt:1:5]")
 }
-
-func shouldHaveError(t *testing.T, err error, code mg.ErrorCode, messageAlternatives ...string) {
-	if err == nil {
-		t.Fatal("No error occurred!")
-	}
-	merr, ok := err.(*mg.MagnanimousError)
-	if !ok {
-		t.Fatalf("Expected error of type MagnanimousError, but found other type: %v", merr)
-	}
-	if merr.Code != code {
-		t.Errorf("Expected %s but got %s\n", code, merr.Code)
-	}
-	matchFound := false
-	for _, expectedMessage := range messageAlternatives {
-		if err.Error() == expectedMessage {
-			matchFound = true
-			break
-		}
-	}
-	if !matchFound {
-		t.Errorf("Unexpected error message. Expected one of:\n" +
-			strings.Join(messageAlternatives, "\n    OR\n") + "\n    BUT got:\n" + err.Error())
-	}
-}

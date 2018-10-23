@@ -2,9 +2,7 @@ package tests
 
 import (
 	"bufio"
-	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -72,34 +70,4 @@ func TestForFiles(t *testing.T) {
 		"Loop Sample:\n\n"+
 			"Title map[title:File 1]\n\n"+
 			"Title map[title:Second File]\n")
-}
-
-func CreateTempFiles() (mg.WebFilesMap, string) {
-	dir, err := ioutil.TempDir("", "for_test")
-	check(err)
-	fmt.Printf("Temp dir at %s\n", dir)
-
-	// just create the directory structure with empty files, contents are not required
-	err = os.MkdirAll(filepath.Join(dir, "processed/examples"), 0770)
-	check(err)
-	_, err = os.Create(filepath.Join(dir, "processed/examples/f1.txt"))
-	check(err)
-	_, err = os.Create(filepath.Join(dir, "processed/examples/f2.txt"))
-	check(err)
-
-	files := mg.WebFilesMap{}
-
-	files[filepath.Join(dir, "processed/examples/f1.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
-	files[filepath.Join(dir, "processed/examples/f1.txt")].Processed.Context()["title"] = "File 1"
-
-	files[filepath.Join(dir, "processed/examples/f2.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
-	files[filepath.Join(dir, "processed/examples/f2.txt")].Processed.Context()["title"] = "Second File"
-
-	return files, dir
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }
