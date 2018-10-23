@@ -61,7 +61,7 @@ func TestForFiles(t *testing.T) {
 		"{{ for path /processed/examples }}\n" +
 		"Title {{ eval path }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver)
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
 
 	if err != nil {
 		t.Fatal(err)
@@ -89,11 +89,11 @@ func CreateTempFiles() (mg.WebFilesMap, string) {
 
 	files := mg.WebFilesMap{}
 
-	files["/processed/examples/f1.txt"] = mg.WebFile{Processed: &mg.ProcessedFile{}}
-	files["/processed/examples/f1.txt"].Processed.Context()["title"] = "File 1"
+	files[filepath.Join(dir, "processed/examples/f1.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
+	files[filepath.Join(dir, "processed/examples/f1.txt")].Processed.Context()["title"] = "File 1"
 
-	files["/processed/examples/f2.txt"] = mg.WebFile{Processed: &mg.ProcessedFile{}}
-	files["/processed/examples/f2.txt"].Processed.Context()["title"] = "Second File"
+	files[filepath.Join(dir, "processed/examples/f2.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
+	files[filepath.Join(dir, "processed/examples/f2.txt")].Processed.Context()["title"] = "Second File"
 
 	return files, dir
 }
