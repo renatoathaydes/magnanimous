@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -90,11 +91,16 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 			}
 		}
 	} else {
-		_, f, err := e.resolver.FilesIn(e.path, e.location)
+		_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
 		if err != nil {
 			return err
 		}
-		for _, item := range f {
+
+		sort.Slice(webFiles, func(i, j int) bool {
+			return webFiles[i].Name < webFiles[j].Name
+		})
+
+		for _, item := range webFiles {
 			err := fc(&item)
 			if err != nil {
 				return err

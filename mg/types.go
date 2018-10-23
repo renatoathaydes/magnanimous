@@ -16,6 +16,7 @@ type WebFilesMap map[string]WebFile
 
 type WebFile struct {
 	BasePath    string
+	Name        string
 	Processed   *ProcessedFile
 	NonWritable bool
 }

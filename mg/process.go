@@ -66,7 +66,7 @@ func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error)
 	}
 	processed.scopeStack = nil // the stack is no longer required
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
-	return &WebFile{BasePath: basePath, Processed: processed, NonWritable: nonWritable}, nil
+	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: processed, NonWritable: nonWritable}, nil
 }
 
 func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver FileResolver) (*ProcessedFile, error) {

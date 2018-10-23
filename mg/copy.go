@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 func CopyAll(files *[]string, basePath string, filesMap WebFilesMap) {
@@ -23,7 +24,7 @@ func AddNonWritables(files *[]string, basePath string, filesMap WebFilesMap) {
 func Copy(file, basePath string, writable bool) *WebFile {
 	var proc = ProcessedFile{}
 	proc.AppendContent(&copiedContent{file: file})
-	return &WebFile{BasePath: basePath, Processed: &proc, NonWritable: !writable}
+	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: &proc, NonWritable: !writable}
 }
 
 type copiedContent struct {
