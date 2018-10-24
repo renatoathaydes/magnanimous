@@ -59,10 +59,10 @@ func CreateTempFiles() (mg.WebFilesMap, string) {
 
 	files := mg.WebFilesMap{}
 
-	files[filepath.Join(dir, "processed/examples/f1.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
+	files[filepath.Join(dir, "processed/examples/f1.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: "f1.txt"}
 	files[filepath.Join(dir, "processed/examples/f1.txt")].Processed.Context()["title"] = "File 1"
 
-	files[filepath.Join(dir, "processed/examples/f2.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}}
+	files[filepath.Join(dir, "processed/examples/f2.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: "f2.txt"}
 	files[filepath.Join(dir, "processed/examples/f2.txt")].Processed.Context()["title"] = "Second File"
 
 	return files, dir
