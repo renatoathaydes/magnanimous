@@ -9,11 +9,12 @@ import (
 type IncludeInstruction struct {
 	Path     string
 	Origin   Location
+	scope    Scope
 	resolver FileResolver
 }
 
-func NewIncludeInstruction(arg string, location Location, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Path: arg, Origin: location, resolver: resolver}
+func NewIncludeInstruction(arg string, location Location, scope Scope, resolver FileResolver) *IncludeInstruction {
+	return &IncludeInstruction{Path: arg, Origin: location, scope: scope, resolver: resolver}
 }
 
 func (c *IncludeInstruction) IsMarkDown() bool {
@@ -24,7 +25,7 @@ func (c *IncludeInstruction) String() string {
 	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", c.Path, c.Origin, c.resolver)
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	path := c.resolver.Resolve(c.Path, c.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	webFile, ok := files[path]
@@ -35,11 +36,11 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		inclusionChain = append(inclusionChain, c.Origin)
+		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &c.Origin, scope: c.scope})
 		//ss:= inclusionChainToString(inclusionChain)
 		//fmt.Printf("Chain: %s", ss)
 		for _, f := range inclusionChain {
-			if f.Origin == path {
+			if f.Location.Origin == path {
 				chain := inclusionChainToString(inclusionChain)
 				return &MagnanimousError{
 					Code: InclusionCycleError,
@@ -52,6 +53,11 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 		err := webFile.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
+		}
+
+		// mix in the context of the include file into the surrounding context
+		for k, v := range webFile.Processed.Context() {
+			c.scope.Context()[k] = v
 		}
 	}
 	return nil

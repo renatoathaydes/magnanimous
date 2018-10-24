@@ -26,13 +26,12 @@ func TestProj1(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(files) != 3 {
-		t.Fatalf("Expected 3 output files, but got: %v", files)
+	if len(files) != 2 {
+		t.Fatalf("Expected 2 output files, but got: %v", files)
 	}
 
 	assertFileContents(t, files, dir, "a.txt", "")
-	assertFileContents(t, files, dir, "b.txt", "")
-	assertFileContents(t, files, dir, "main.txt", "10\n20")
+	assertFileContents(t, files, dir, "main.txt", "A and B:\n\n10\n20")
 }
 
 func TestProj2(t *testing.T) {

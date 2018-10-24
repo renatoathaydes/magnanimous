@@ -27,13 +27,18 @@ type Location struct {
 	Col    uint32
 }
 
+type InclusionChainItem struct {
+	Location *Location
+	scope    Scope
+}
+
 type FileResolver interface {
 	FilesIn(dir string, from Location) (dirPath string, f []WebFile, e error)
 	Resolve(path string, from Location) string
 }
 
 type Content interface {
-	Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error
+	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
 	IsMarkDown() bool
 }
 
@@ -112,7 +117,7 @@ func (f *ProcessedFile) EndScope() error {
 	}
 }
 
-func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []Location) ([]byte, error) {
+func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range f.Contents {

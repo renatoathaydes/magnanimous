@@ -35,7 +35,8 @@ type fileConsumer func(file *WebFile) error
 type itemConsumer func(interface{}) error
 
 type iterable interface {
-	forEach(files WebFilesMap, inclusionChain []Location, parameters magParams, fc fileConsumer, ic itemConsumer) error
+	forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
+		parameters magParams, fc fileConsumer, ic itemConsumer) error
 }
 
 func NewExpression(arg string, location Location, isMarkDown bool, original string, scope Scope) Content {
@@ -78,7 +79,7 @@ func asIterable(arg string, location Location, resolver FileResolver) (iterable,
 	return &iterableExpression{path: arg, location: location, resolver: resolver}, nil
 }
 
-func (e *iterableExpression) forEach(files WebFilesMap, inclusionChain []Location,
+func (e *iterableExpression) forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
 	if e.array != nil {
 		v, err := expression.EvalExpr(*e.array, parameters)
@@ -114,7 +115,7 @@ func (e *iterableExpression) forEach(files WebFilesMap, inclusionChain []Locatio
 
 var _ Content = (*ExpressionContent)(nil)
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	r, err := expression.EvalExpr(*e.expr, magParams{
 		webFiles:       files,
 		scope:          e.scope,
@@ -142,12 +143,12 @@ func (e *ExpressionContent) IsMarkDown() bool {
 
 var _ Content = (*DefineContent)(nil)
 
-func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	d.Run(files, inclusionChain)
 	return nil
 }
 
-func (d *DefineContent) Run(files WebFilesMap, inclusionChain []Location) {
+func (d *DefineContent) Run(files WebFilesMap, inclusionChain []InclusionChainItem) {
 	v, err := expression.EvalExpr(*d.Expr, magParams{
 		webFiles:       files,
 		scope:          d.scope,

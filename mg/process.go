@@ -248,7 +248,7 @@ func createInstruction(name, arg string, isMarkDown bool, scope Scope,
 	location Location, original string, resolver FileResolver) Content {
 	switch name {
 	case "include":
-		return NewIncludeInstruction(arg, location, resolver)
+		return NewIncludeInstruction(arg, location, scope, resolver)
 	case "define":
 		return NewVariable(arg, location, original, scope)
 	case "eval":
@@ -322,7 +322,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error 
 	return nil
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	_, err := writer.Write([]byte(c.Text))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -338,7 +338,7 @@ func (c *StringContent) String() string {
 	return fmt.Sprintf("StringContent{%s}", c.Text)
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	for _, c := range wf.Processed.Contents {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
@@ -348,7 +348,7 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []L
 	return nil
 }
 
-func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []Location) {
+func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []InclusionChainItem) {
 	for _, c := range wf.Processed.Contents {
 		switch d := c.(type) {
 		case *DefineContent:
@@ -357,7 +357,7 @@ func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []Location)
 	}
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
 		return magErr
@@ -373,7 +373,7 @@ func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
 	return false
 }
 
-func readBytes(c *Content, files WebFilesMap, inclusionChain []Location) ([]byte, error) {
+func readBytes(c *Content, files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(1024)
 	err := (*c).Write(&b, files, inclusionChain)
@@ -383,12 +383,12 @@ func readBytes(c *Content, files WebFilesMap, inclusionChain []Location) ([]byte
 	return b.Bytes(), nil
 }
 
-func inclusionChainToString(locations []Location) string {
+func inclusionChainToString(locations []InclusionChainItem) string {
 	var b strings.Builder
 	b.WriteRune('[')
 	last := len(locations) - 1
 	for i, loc := range locations {
-		b.WriteString(loc.String())
+		b.WriteString(loc.Location.String())
 		if i != last {
 			b.WriteString(" -> ")
 		}

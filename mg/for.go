@@ -57,7 +57,7 @@ func (f *ForLoop) setParent(scope Scope) {
 	f.parent = scope
 }
 
-func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	err := f.iter.forEach(files, inclusionChain, magParams{
 		webFiles:       files,
 		inclusionChain: inclusionChain,
@@ -77,7 +77,7 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []Lo
 	return nil
 }
 
-func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	for _, c := range f.Contents {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
