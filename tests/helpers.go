@@ -138,20 +138,39 @@ func runMg(t *testing.T, project string) string {
 	return dir
 }
 
-func assertFileContents(t *testing.T, files []os.FileInfo, file, expectedContent string) {
-	var fi os.FileInfo
+func assertFileContents(t *testing.T, files []string, baseDir, file, expectedContent string) {
+	var targetFile *string
 	for _, f := range files {
-		if f.Name() == file {
-			fi = f
+		if f == file {
+			targetFile = &f
 			break
 		}
 	}
-	if fi != nil {
-		c, err := ioutil.ReadFile(fi.Name())
-		if err != nil {
+	if targetFile != nil {
+		c, err := ioutil.ReadFile(filepath.Join(baseDir, *targetFile))
+		if err == nil {
 			verifyEqual(0, t, string(c), expectedContent)
+		} else {
+			t.Fatalf("Error reading file %s: %v\n", file, err)
 		}
 	} else {
 		t.Fatalf("Could not find file %s in %v\n", file, files)
 	}
+}
+
+func readAll(dir string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err == nil && !info.IsDir() {
+			fPath, err := filepath.Rel(dir, path)
+			if err != nil {
+				return err
+			}
+			files = append(files, fPath)
+		}
+		return err
+	})
+
+	return files, err
 }

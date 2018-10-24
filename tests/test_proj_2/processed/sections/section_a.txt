@@ -1,0 +1,1 @@
+{{ define title "Section A" }}This is section A.

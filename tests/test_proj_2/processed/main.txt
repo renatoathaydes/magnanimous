@@ -1,0 +1,7 @@
+Main.
+
+Sections:
+{{ for section /processed/sections }}
+  * {{ eval section.title }}
+{{ end }}
+End.
