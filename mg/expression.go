@@ -35,7 +35,7 @@ type fileConsumer func(file *WebFile) error
 type itemConsumer func(interface{}) error
 
 type iterable interface {
-	forEach(parameters magParams, fc fileConsumer, ic itemConsumer) error
+	forEach(files WebFilesMap, inclusionChain []Location, parameters magParams, fc fileConsumer, ic itemConsumer) error
 }
 
 func NewExpression(arg string, location Location, isMarkDown bool, original string, scope Scope) Content {
@@ -78,7 +78,8 @@ func asIterable(arg string, location Location, resolver FileResolver) (iterable,
 	return &iterableExpression{path: arg, location: location, resolver: resolver}, nil
 }
 
-func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic itemConsumer) error {
+func (e *iterableExpression) forEach(files WebFilesMap, inclusionChain []Location,
+	parameters magParams, fc fileConsumer, ic itemConsumer) error {
 	if e.array != nil {
 		v, err := expression.EvalExpr(*e.array, parameters)
 		if err != nil {
@@ -101,6 +102,7 @@ func (e *iterableExpression) forEach(parameters magParams, fc fileConsumer, ic i
 		})
 
 		for _, item := range webFiles {
+			item.evalDefinitions(files, inclusionChain)
 			err := fc(&item)
 			if err != nil {
 				return err
@@ -141,6 +143,11 @@ func (e *ExpressionContent) IsMarkDown() bool {
 var _ Content = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
+	d.Run(files, inclusionChain)
+	return nil
+}
+
+func (d *DefineContent) Run(files WebFilesMap, inclusionChain []Location) {
 	v, err := expression.EvalExpr(*d.Expr, magParams{
 		webFiles:       files,
 		scope:          d.scope,
@@ -150,7 +157,6 @@ func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
 	d.scope.Context()[d.Name] = v
-	return nil
 }
 
 func (DefineContent) IsMarkDown() bool {

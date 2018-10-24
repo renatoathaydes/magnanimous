@@ -348,6 +348,15 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []L
 	return nil
 }
 
+func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []Location) {
+	for _, c := range wf.Processed.Contents {
+		switch d := c.(type) {
+		case *DefineContent:
+			d.Run(files, inclusionChain)
+		}
+	}
+}
+
 func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []Location) error {
 	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
