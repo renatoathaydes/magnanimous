@@ -13,7 +13,7 @@ type ForLoop struct {
 	MarkDown bool
 	Text     string
 	Location Location
-	Contents []Content
+	contents []Content
 	context  map[string]interface{}
 	parent   Scope
 }
@@ -40,9 +40,14 @@ func NewForInstruction(arg string, location Location, isMarkDown bool,
 
 var _ Content = (*ForLoop)(nil)
 var _ Scope = (*ForLoop)(nil)
+var _ ContentContainer = (*ForLoop)(nil)
+
+func (f *ForLoop) GetContents() []Content {
+	return f.contents
+}
 
 func (f *ForLoop) AppendContent(content Content) {
-	f.Contents = append(f.Contents, content)
+	f.contents = append(f.contents, content)
 }
 
 func (f *ForLoop) Context() map[string]interface{} {
@@ -73,16 +78,6 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []In
 	})
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
-	}
-	return nil
-}
-
-func writeContents(f *ForLoop, writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	for _, c := range f.Contents {
-		err := c.Write(writer, files, inclusionChain)
-		if err != nil {
-			return err
-		}
 	}
 	return nil
 }

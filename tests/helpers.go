@@ -78,12 +78,14 @@ func checkParsing(t *testing.T,
 	ctx map[string]interface{}, m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
-	if len(pf.Contents) != len(expectedContents) {
+	contents := pf.GetContents()
+
+	if len(contents) != len(expectedContents) {
 		t.Fatalf("Expected %d content parts but got %d: %v",
-			len(expectedContents), len(pf.Contents), pf.Contents)
+			len(expectedContents), len(contents), contents)
 	}
 
-	for i, c := range pf.Contents {
+	for i, c := range contents {
 		var result strings.Builder
 		c.Write(&result, m, nil)
 

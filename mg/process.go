@@ -262,15 +262,15 @@ func createInstruction(name, arg string, isMarkDown bool, scope Scope,
 }
 
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {
-	convertedContent := make([]Content, 0, len(file.Contents))
-	for _, c := range file.Contents {
+	convertedContent := make([]Content, 0, len(file.contents))
+	for _, c := range file.contents {
 		if c.IsMarkDown() {
 			convertedContent = append(convertedContent, &HtmlFromMarkdownContent{MarkDownContent: c})
 		} else {
 			convertedContent = append(convertedContent, c)
 		}
 	}
-	return ProcessedFile{Contents: convertedContent, context: file.context, NewExtension: ".html"}
+	return ProcessedFile{contents: convertedContent, context: file.context, NewExtension: ".html"}
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) error {
@@ -313,7 +313,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error 
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	defer w.Flush()
-	for _, c := range wf.Processed.Contents {
+	for _, c := range wf.Processed.contents {
 		err := c.Write(w, filesMap, nil)
 		if err != nil {
 			return err
@@ -339,7 +339,11 @@ func (c *StringContent) String() string {
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	for _, c := range wf.Processed.Contents {
+	return writeContents(wf.Processed, writer, files, inclusionChain)
+}
+
+func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+	for _, c := range cc.GetContents() {
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
@@ -349,7 +353,7 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []I
 }
 
 func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []InclusionChainItem) {
-	for _, c := range wf.Processed.Contents {
+	for _, c := range wf.Processed.contents {
 		switch d := c.(type) {
 		case *DefineContent:
 			d.Run(files, inclusionChain)

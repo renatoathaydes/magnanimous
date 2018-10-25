@@ -37,6 +37,10 @@ type FileResolver interface {
 	Resolve(path string, from Location) string
 }
 
+type ContentContainer interface {
+	GetContents() []Content
+}
+
 type Content interface {
 	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
 	IsMarkDown() bool
@@ -59,13 +63,18 @@ type Scope interface {
 }
 
 type ProcessedFile struct {
-	Contents     []Content
+	contents     []Content
 	scopeStack   []Scope
 	context      map[string]interface{}
 	NewExtension string
 }
 
 var _ Scope = (*ProcessedFile)(nil)
+var _ ContentContainer = (*ProcessedFile)(nil)
+
+func (f *ProcessedFile) GetContents() []Content {
+	return f.contents
+}
 
 // currentScope returns the current scope during parsing.
 func (f *ProcessedFile) currentScope() Scope {
@@ -98,7 +107,7 @@ func (f *ProcessedFile) AppendContent(content Content) {
 		topScope = f.scopeStack[s-1]
 		topScope.AppendContent(content)
 	} else {
-		f.Contents = append(f.Contents, content)
+		f.contents = append(f.contents, content)
 	}
 	newScope, ok := content.(Scope)
 	if ok {
@@ -120,7 +129,7 @@ func (f *ProcessedFile) EndScope() error {
 func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
-	for _, c := range f.Contents {
+	for _, c := range f.contents {
 		if c != nil {
 			err := c.Write(&b, files, inclusionChain)
 			if err != nil {
@@ -134,7 +143,7 @@ func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []InclusionChain
 func (f *ProcessedFile) String() string {
 	var contentsBuilder strings.Builder
 	contentsBuilder.WriteString("[ ")
-	for _, c := range f.Contents {
+	for _, c := range f.contents {
 		contentsBuilder.WriteString(fmt.Sprintf("%T ", c))
 	}
 	contentsBuilder.WriteString("]")

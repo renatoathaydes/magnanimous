@@ -31,7 +31,7 @@ func TestCopy(t *testing.T) {
 		t.Errorf("Expected empty context but was %v", result.Processed.Context())
 	}
 
-	contents := result.Processed.Contents
+	contents := result.Processed.GetContents()
 
 	if len(contents) != 1 {
 		t.Errorf("Contents does not have length 1: %v", contents)
