@@ -57,7 +57,7 @@ func TestForFiles(t *testing.T) {
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path /processed/examples }}\n" +
-		"Title {{ eval path }}\n" +
+		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
 	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
 
@@ -65,9 +65,8 @@ func TestForFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// FIXME expression can't evaluate Map properties, so we're just putting the Map itself in the template
 	checkContents(t, files, processed,
 		"Loop Sample:\n\n"+
-			"Title map[title:File 1]\n\n"+
-			"Title map[title:Second File]\n")
+			"Title File 1\n\n"+
+			"Title Second File\n")
 }
