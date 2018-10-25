@@ -34,7 +34,7 @@ Processed files may use the following processor instructions:
 * `{{ if <expression> }}` (conditional content) `{{ end }}`.
 * `{{ for <item> <iterable> }}` (repeated content for each item) `{{ end }}`.
 
-Markdown files (`*.md`) will be converted to HTML after Magnanimous instructions are processed, using
+Markdown files (`*.md`) will be converted to HTML, after Magnanimous instructions are processed, using
 [Blackfriday](https://github.com/russross/blackfriday).
 
 Files whose name starts with `_` will not be present in the output website, but may be included by other files.
@@ -51,7 +51,7 @@ An inclusion may look like this:
 
 This whole expression will be replaced with the contents of the file at `source/static/header.html`.
 If the file does not exist, a warning will be emitted
-during compilation, and the expression will appear as it is in the compiled resource.
+during compilation and the expression will appear as it is in the compiled resource.
 
 #### Variables
 
@@ -77,7 +77,7 @@ or in a file which includes that file.
 If the variable cannot be found, a warning will be emitted during compilation, and the expression will appear as it is
 in the compiled resource.
 
-> The value of a variable is evaluated as a [govaluate](https://github.com/Knetic/govaluate) expression.
+> The value of a variable is evaluated as an *expression*. See the next section for more details.
 
 It's possible to write more advanced expressions with variables as in the following example:
 
@@ -85,21 +85,66 @@ It's possible to write more advanced expressions with variables as in the follow
 < div class="header {{ eval pageName == "Home" ? "highlight" : "" }}">Home</div>
 ```
 
+#### Expressions
+
+Expressions may appear in several different locations:
+
+* as an argument to the `eval` instruction.
+* as the value of a new variable defined by the `define` instruction.
+* as an argument to the `if` instruction.
+* as items of an iterable (array), used with the `for` instruction.
+
+For example, an expression may be evaluated with `eval`, with the result being displayed in the page:
+
+```
+{{ eval 2 + 2 * 5 }}
+```
+
+This should result in `12` being displayed.
+
+> Notice that expressions use a syntax very similar to C-like languages.
+
+The value of a new variable may also be determined by an expression:
+
+```
+{{ define n 10 + 10 * (2 + 4) }}
+```
+
+This results in the variable `n` assuming the value `70`.
+
+When an expression is used as an argument to the `if` instruction, it must evaluate to a boolean value (`true` or `false`).
+
+For example, the following is valid (given variable `n` is defined):
+
+```
+{{ if n > 50 }}N is large{{ end }}
+```
+
+Finally, it's possible to use expressions within arrays declared with the `for` instruction:
+
+```
+{{ for x [1 + 1, 2 + 2] }}
+X is {{ eval x }}
+{{ end }}
+```
+
 #### Conditional content
 
 The `if` instruction allows processed files to include content conditionally.
 
-Its argument is a single [govaluate](https://github.com/Knetic/govaluate) expression.
+Its argument is a single expression that is expected to evaluate to a boolean value.
+
+> Expressions that evaluate to any non-boolean value emit a warning and evaluate to `false`.
 
 For example:
 
 ```
-{{ if $pageName == "Home" }}
+{{ if title == "Home" }}
 <h1>Welcome Home!</h1>
 {{ end }}
 ```
 
-In this example, the content `<h1>Welcome Home!</h1>` will only be displayed if the `pageName` variable has the
+In this example, the content `<h1>Welcome Home!</h1>` will only be displayed if the `title` variable has the
 value `"Home"`, otherwise, nothing would be displayed.
 
 #### Repeated content (for loops)
@@ -111,13 +156,13 @@ The `for` instruction has the following arguments:
 
 Two kinds of objects are iterable:
 
-* arrays, as evaluated by [govaluate](https://github.com/Knetic/govaluate).
+* array expressions (e.g. `[1 2 3]`, `["Home", "About"]`).
 * file references to directories.
 
 Example iterating over an array:
 
 ```
-{{ for title ("Home", "About", "FAQ") }}
+{{ for title ["Home", "About", "FAQ"] }}
 <div>{{ eval title }}</div>
 {{ end for }}
 ```
@@ -194,10 +239,8 @@ Examples:
 
 ```
 <tr>
-{{ 
-    define columns ("ABC", "GHI", "DEF")
-    for col $columns sort reverse
-}}
+{{ define columns ["ABC", "GHI", "DEF"] }}
+{{ for col $columns sort reverse }}
 <th>{{ $col }}</th>
 {{ end }}
 </tr>
@@ -217,13 +260,14 @@ Given a directory `source/processed/posts/` containing 10 files called `p1.md`, 
 defining the `date` and `title` variables as in this example:
 
 ```md
-{{ define date "2014-01-01 23:59:59" define title "Example post" }}
+{{ define date "2014-01-01 23:59:59" }}
+{{ define title "Example post" }}
 ```
 
 We could display the newest 5 posts' titles using the following snippet:
 
 ```
 {{ for post "/processed/posts" sortBy date limit 5 reverse }}
-  <div>{{ $post.title }}</div>
+  <div>{{ eval post.title }}</div>
 {{ end }}
 ```

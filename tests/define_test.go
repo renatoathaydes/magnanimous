@@ -49,6 +49,20 @@ func TestDefineStringConcat(t *testing.T) {
 	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
+func TestDefineFromExpression(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("{{ define n 10 + 10 * (2 + 4) }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["n"] = float64(70)
+
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+}
+
 func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
 		"{{ define a 10 }}" +

@@ -19,14 +19,14 @@ func TestEvalString(t *testing.T) {
 }
 
 func TestEvalArithmetic(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("2 + 2 == {{ eval 2 + 2 }}"))
+	r := bufio.NewReader(strings.NewReader("2 + 2 * 5 == {{ eval 2 + 2 * 5 }}"))
 	processed, err := mg.ProcessReader(r, "", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"2 + 2 == ", "4"})
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
 }
 
 func TestEvalNonExistingParameter(t *testing.T) {

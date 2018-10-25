@@ -28,6 +28,23 @@ func TestForArray(t *testing.T) {
 			"Number 42\n")
 }
 
+func TestForArrayWithExpressions(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Numbers:" +
+		"{{ for x [1 + 1, 2 + 2] }}\n" +
+		"X is {{ eval x }}" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Numbers:\n"+
+			"X is 2\n"+
+			"X is 4")
+}
+
 func TestForArrayInMarkDown(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
 		"{{ for section [ \"Home\", \"About\" ] }}\n" +
