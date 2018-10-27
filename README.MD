@@ -152,12 +152,20 @@ value `"Home"`, otherwise, nothing would be displayed.
 The `for` instruction has the following arguments:
 
 * `item`       - a variable name to associate with each item of `iterable`.
+* `(sub-instructions)` - optional sub-instructions to modify how iteration is performed.
 * `iterable`   - an iterable object. 
 
 Two kinds of objects are iterable:
 
 * array expressions (e.g. `[1 2 3]`, `["Home", "About"]`).
 * file references to directories.
+
+Sub-instructions are optional and may take one of the following forms:
+
+* `sort`           - sorts the iterable.
+* `sortBy <field>` - sorts files by the given field (must be defined within each file).
+* `limit <n>`      - limit the number of items to iterate over.
+* `reverse`        - iterate in reverse order
 
 Example iterating over an array:
 
@@ -212,8 +220,8 @@ For example, to create a HTML menu containing links to each file under the `sour
 ```
 {{ for post /processed/posts }}
     <div>
-        <a href="/processed/posts/{{ $post.name }}">
-        {{ post.date }} - {{ $post.description }}
+        <a href="/processed/posts/{{ eval post.name }}">
+        {{ eval post.date }} - {{ eval post.description }}
         </a>
     </div>
 {{ end }}
@@ -225,23 +233,13 @@ Iterables are object that can be iterated over with the `for` instruction.
 
 As we've seen before, only arrays and file references to directories can be iterable.
 
-The following operations apply to any iterable:
-
-* `limit <n>`    - limit iterations to at most `n`, where `n` is a non-negative integer.
-* `sort`         - sort items based on their value.
-* `reverse`      - reverse the items.
-
-File reference iterables also have the following operations:
-
-* `sortBy <var>` - sort items based on the value of a variable within each file.
-
 Examples:
 
 ```
 <tr>
 {{ define columns ["ABC", "GHI", "DEF"] }}
-{{ for col $columns sort reverse }}
-<th>{{ $col }}</th>
+{{ for col (sort reverse) columns }}
+<th>{{ eval col }}</th>
 {{ end }}
 </tr>
 ```
@@ -267,7 +265,7 @@ defining the `date` and `title` variables as in this example:
 We could display the newest 5 posts' titles using the following snippet:
 
 ```
-{{ for post "/processed/posts" sortBy date limit 5 reverse }}
+{{ for post (sortBy date limit 5 reverse) "/processed/posts" }}
   <div>{{ eval post.title }}</div>
 {{ end }}
 ```

@@ -122,17 +122,17 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 	case token.REM:
 		return rem(xv, yv)
 	case token.EQL:
-		return eq(xv, yv)
+		return Equal(xv, yv)
 	case token.NEQ:
-		return neq(xv, yv)
+		return NotEqual(xv, yv)
 	case token.LSS:
-		return lss(xv, yv)
+		return Less(xv, yv)
 	case token.GTR:
-		return gtr(xv, yv)
+		return Greater(xv, yv)
 	case token.LEQ:
-		return leq(xv, yv)
+		return LessOrEq(xv, yv)
 	case token.GEQ:
-		return geq(xv, yv)
+		return GreaterOrEq(xv, yv)
 	case token.LAND:
 		return and(xv, yv)
 	case token.LOR:

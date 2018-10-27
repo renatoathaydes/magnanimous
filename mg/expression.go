@@ -5,7 +5,6 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
-	"sort"
 	"strings"
 )
 
@@ -24,20 +23,8 @@ type ExpressionContent struct {
 	scope    Scope
 }
 
-type iterableExpression struct {
-	array    *expression.Expression
-	path     string
-	resolver FileResolver
-	location Location
-}
-
 type fileConsumer func(file *WebFile) error
 type itemConsumer func(interface{}) error
-
-type iterable interface {
-	forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
-		parameters magParams, fc fileConsumer, ic itemConsumer) error
-}
 
 func NewExpression(arg string, location Location, isMarkDown bool, original string, scope Scope) Content {
 	expr, err := expression.ParseExpr(arg)
@@ -66,51 +53,6 @@ func NewVariable(arg string, location Location, original string, scope Scope) Co
 
 func unevaluatedExpression(original string) Content {
 	return &StringContent{Text: fmt.Sprintf("{{%s}}", original)}
-}
-
-func asIterable(arg string, location Location, resolver FileResolver) (iterable, error) {
-	if strings.HasPrefix(arg, "[") && strings.HasSuffix(arg, "]") {
-		expr, err := expression.ParseExpr(fmt.Sprintf("[]interface{}{%s}", arg[1:len(arg)-1]))
-		if err != nil {
-			return nil, err
-		}
-		return &iterableExpression{array: &expr, location: location}, nil
-	}
-	return &iterableExpression{path: arg, location: location, resolver: resolver}, nil
-}
-
-func (e *iterableExpression) forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
-	parameters magParams, fc fileConsumer, ic itemConsumer) error {
-	if e.array != nil {
-		v, err := expression.EvalExpr(*e.array, parameters)
-		if err != nil {
-			return err
-		}
-		for _, item := range v.([]interface{}) {
-			err := ic(item)
-			if err != nil {
-				return err
-			}
-		}
-	} else {
-		_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
-		if err != nil {
-			return err
-		}
-
-		sort.Slice(webFiles, func(i, j int) bool {
-			return webFiles[i].Name < webFiles[j].Name
-		})
-
-		for _, item := range webFiles {
-			item.evalDefinitions(files, inclusionChain)
-			err := fc(&item)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 var _ Content = (*ExpressionContent)(nil)

@@ -89,15 +89,15 @@ func rem(x interface{}, y interface{}) (interface{}, error) {
 	})
 }
 
-func eq(x interface{}, y interface{}) (interface{}, error) {
+func Equal(x interface{}, y interface{}) (interface{}, error) {
 	return x == y, nil
 }
 
-func neq(x interface{}, y interface{}) (interface{}, error) {
+func NotEqual(x interface{}, y interface{}) (interface{}, error) {
 	return x != y, nil
 }
 
-func lss(x interface{}, y interface{}) (interface{}, error) {
+func Less(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x < y
 	}, func(x string, y string) interface{} {
@@ -107,7 +107,7 @@ func lss(x interface{}, y interface{}) (interface{}, error) {
 	})
 }
 
-func gtr(x interface{}, y interface{}) (interface{}, error) {
+func Greater(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x > y
 	}, func(x string, y string) interface{} {
@@ -117,7 +117,7 @@ func gtr(x interface{}, y interface{}) (interface{}, error) {
 	})
 }
 
-func leq(x interface{}, y interface{}) (interface{}, error) {
+func LessOrEq(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x <= y
 	}, func(x string, y string) interface{} {
@@ -127,7 +127,7 @@ func leq(x interface{}, y interface{}) (interface{}, error) {
 	})
 }
 
-func geq(x interface{}, y interface{}) (interface{}, error) {
+func GreaterOrEq(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x >= y
 	}, func(x string, y string) interface{} {

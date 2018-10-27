@@ -45,6 +45,38 @@ func TestForArrayWithExpressions(t *testing.T) {
 			"X is 4")
 }
 
+func TestForArraySorted(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Numbers:\n" +
+		"{{ for x ( sort ) [10, 2, 4, 1, 2, 5] }}" +
+		"{{ eval x }} " +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Numbers:\n"+
+			"1 2 2 4 5 10 ")
+}
+
+func TestForArraySortedBy(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Numbers:\n" +
+		"{{ for x (sortBy _) [10, 2, 4, 1, 2, 5] }}" +
+		"{{ eval x }} " +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Numbers:\n"+
+			"1 2 2 4 5 10 ")
+}
+
 func TestForArrayInMarkDown(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
 		"{{ for section [ \"Home\", \"About\" ] }}\n" +
