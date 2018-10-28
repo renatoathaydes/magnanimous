@@ -21,11 +21,15 @@ type ForLoop struct {
 }
 
 type forLoopSubInstructions struct {
-	sortBy *sortBySubInstruction
+	sortBy  *sortBySubInstruction
+	reverse *reverseSubInstruction
 }
 
 type sortBySubInstruction struct {
 	field string
+}
+
+type reverseSubInstruction struct {
 }
 
 type fileConsumer func(file *WebFile) error
@@ -185,28 +189,7 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 		})
 	} else {
 		sortField := e.subInstructions.sortBy.field
-		sort.Slice(webFiles, func(i, j int) bool {
-			webFiles[i].evalDefinitions(files, inclusionChain)
-			iv, ok := webFiles[i].Processed.Context()[sortField]
-			if !ok {
-				log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
-					sortField, webFiles[i].Name)
-				return true
-			}
-			webFiles[j].evalDefinitions(files, inclusionChain)
-			jv, ok := webFiles[j].Processed.Context()[sortField]
-			if !ok {
-				log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
-					sortField, webFiles[j].Name)
-				return true
-			}
-			res, err := expression.Less(iv, jv)
-			if err != nil {
-				log.Printf("WARN: sortBy %s error - %s", sortField, err)
-				return true
-			}
-			return res.(bool)
-		})
+		sortFiles(files, webFiles, inclusionChain, sortField)
 	}
 
 	for _, item := range webFiles {
@@ -234,6 +217,8 @@ func parseForLoopSubInstructions(text string) forLoopSubInstructions {
 				log.Printf("WARN: missing argument for 'sortBy' for-loop sub-instruction")
 				return result
 			}
+		case "reverse":
+			result.reverse = &reverseSubInstruction{}
 		default:
 			log.Printf("Unrecognized for-loop sub-instruction: " + p)
 		}
@@ -256,6 +241,27 @@ func sortArray(array []interface{}, instruction *sortBySubInstruction) {
 	})
 }
 
-func sortFiles() {
-
+func sortFiles(files WebFilesMap, webFiles []WebFile, inclusionChain []InclusionChainItem, sortField string) {
+	sort.Slice(webFiles, func(i, j int) bool {
+		webFiles[i].evalDefinitions(files, inclusionChain)
+		iv, ok := webFiles[i].Processed.Context()[sortField]
+		if !ok {
+			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
+				sortField, webFiles[i].Name)
+			return true
+		}
+		webFiles[j].evalDefinitions(files, inclusionChain)
+		jv, ok := webFiles[j].Processed.Context()[sortField]
+		if !ok {
+			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
+				sortField, webFiles[j].Name)
+			return true
+		}
+		res, err := expression.Less(iv, jv)
+		if err != nil {
+			log.Printf("WARN: sortBy %s error - %s", sortField, err)
+			return true
+		}
+		return res.(bool)
+	})
 }
