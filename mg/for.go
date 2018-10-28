@@ -28,6 +28,10 @@ type sortBySubInstruction struct {
 	field string
 }
 
+type fileConsumer func(file *WebFile) error
+
+type itemConsumer func(interface{}) error
+
 type iterable interface {
 	forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
 		parameters magParams, fc fileConsumer, ic itemConsumer) error
@@ -175,9 +179,35 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 		return err
 	}
 
-	sort.Slice(webFiles, func(i, j int) bool {
-		return webFiles[i].Name < webFiles[j].Name
-	})
+	if e.subInstructions.sortBy == nil {
+		sort.Slice(webFiles, func(i, j int) bool {
+			return webFiles[i].Name < webFiles[j].Name
+		})
+	} else {
+		sortField := e.subInstructions.sortBy.field
+		sort.Slice(webFiles, func(i, j int) bool {
+			webFiles[i].evalDefinitions(files, inclusionChain)
+			iv, ok := webFiles[i].Processed.Context()[sortField]
+			if !ok {
+				log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
+					sortField, webFiles[i].Name)
+				return true
+			}
+			webFiles[j].evalDefinitions(files, inclusionChain)
+			jv, ok := webFiles[j].Processed.Context()[sortField]
+			if !ok {
+				log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
+					sortField, webFiles[j].Name)
+				return true
+			}
+			res, err := expression.Less(iv, jv)
+			if err != nil {
+				log.Printf("WARN: sortBy %s error - %s", sortField, err)
+				return true
+			}
+			return res.(bool)
+		})
+	}
 
 	for _, item := range webFiles {
 		item.evalDefinitions(files, inclusionChain)

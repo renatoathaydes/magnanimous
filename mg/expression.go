@@ -23,9 +23,6 @@ type ExpressionContent struct {
 	scope    Scope
 }
 
-type fileConsumer func(file *WebFile) error
-type itemConsumer func(interface{}) error
-
 func NewExpression(arg string, location Location, isMarkDown bool, original string, scope Scope) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
