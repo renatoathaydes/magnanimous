@@ -122,33 +122,39 @@ func TestProj4(t *testing.T) {
 	}
 
 	assertFileContents(t, files, dir, "index.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>My blog</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h1>Welcome</h1>
 
 <p><div class ="interessant">This is a website.</div>
 My blog posts:</p>
 <ul>
-<li><p>2019-02-23 - Broccoli</p></li>
+<li><p>2019-02-23 - <a href="posts/brocolli.html">Broccoli</a></p></li>
 
-<li><p>2019-01-31 - Capsicum</p></li>
+<li><p>2019-01-31 - <a href="posts/capsicum.html">Capsicum</a></p></li>
 
-<li><p>2018-08-23 - Potatoes</p></li>
+<li><p>2018-08-23 - <a href="posts/potato.html">Potatoes</a></p></li>
 
-<li><p>2018-07-05 - One more blog post</p></li>
+<li><p>2018-07-05 - <a href="posts/second.html">One more blog post</a></p></li>
 </ul>
 <h4>the footer</h4>
 </body>
 </html>`)
 
 	assertFileContents(t, files, dir, "posts/first_post.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>My first blog post</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h2>Post 1</h2>
 
@@ -160,10 +166,13 @@ My blog posts:</p>
 </html>`)
 
 	assertFileContents(t, files, dir, "posts/second.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>One more blog post</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h2>Post 2</h2>
 
@@ -173,10 +182,13 @@ My blog posts:</p>
 </html>`)
 
 	assertFileContents(t, files, dir, "posts/potato.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Potatoes</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h2>Potatoes</h2>
 
@@ -186,10 +198,13 @@ My blog posts:</p>
 </html>`)
 
 	assertFileContents(t, files, dir, "posts/capsicum.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Capsicum</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h2>Capsicum</h2>
 
@@ -199,10 +214,13 @@ My blog posts:</p>
 </html>`)
 
 	assertFileContents(t, files, dir, "posts/brocolli.html",
-		`<html>
+		`<!DOCTYPE html>
+<html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Broccoli</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body><h2>Broccoli and you</h2>
 

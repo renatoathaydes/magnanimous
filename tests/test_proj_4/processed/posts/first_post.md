@@ -1,4 +1,5 @@
 {{ define date "2018-01-01" }}
+{{ define file "first_post.html" }}
 {{ define title "My first blog post" }}
 {{ include ../_header.html }}
 
