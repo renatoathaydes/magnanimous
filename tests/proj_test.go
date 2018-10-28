@@ -108,3 +108,119 @@ My blog posts:</p>
 }`)
 
 }
+
+func TestProj4(t *testing.T) {
+	dir := runMg(t, "test_proj_4")
+	defer os.RemoveAll(dir)
+
+	files, err := readAll(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) != 7 {
+		t.Fatalf("Expected 7 output files, but got: %v", files)
+	}
+
+	assertFileContents(t, files, dir, "index.html",
+		`<html>
+<head>
+    <title>My blog</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h1>Welcome</h1>
+
+<p><div class ="interessant">This is a website.</div>
+My blog posts:</p>
+<ul>
+<li><p>2019-02-23 - Broccoli</p></li>
+
+<li><p>2019-01-31 - Capsicum</p></li>
+
+<li><p>2018-08-23 - Potatoes</p></li>
+
+<li><p>2018-07-05 - One more blog post</p></li>
+</ul>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "posts/first_post.html",
+		`<html>
+<head>
+    <title>My first blog post</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h2>Post 1</h2>
+
+<p>Hello.</p>
+<blockquote>Note: This is a note.</blockquote>
+<p>Bye.</p>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "posts/second.html",
+		`<html>
+<head>
+    <title>One more blog post</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h2>Post 2</h2>
+
+<p>Short one.</p>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "posts/potato.html",
+		`<html>
+<head>
+    <title>Potatoes</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h2>Potatoes</h2>
+
+<p>Potatoes are nice.</p>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "posts/capsicum.html",
+		`<html>
+<head>
+    <title>Capsicum</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h2>Capsicum</h2>
+
+<p>Capsicum is good.</p>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "posts/brocolli.html",
+		`<html>
+<head>
+    <title>Broccoli</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body><h2>Broccoli and you</h2>
+
+<p>You should eat more broccoli.</p>
+<h4>the footer</h4>
+</body>
+</html>`)
+
+	assertFileContents(t, files, dir, "style.css", `h2 {
+    color: blue;
+}
+
+body {
+    background-color: aliceblue;
+}
+
+.interessant {
+    font-weight: bolder;
+}`)
+
+}
