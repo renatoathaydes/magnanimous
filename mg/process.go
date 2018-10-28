@@ -47,6 +47,15 @@ func ProcessAll(files []string, basePath, sourcesDir string, webFiles WebFilesMa
 		}
 		webFiles[file] = *wf
 	}
+	if globalCtx, ok := webFiles[filepath.Join(basePath, "_global_context")]; ok {
+		globalCtx.evalDefinitions(webFiles, nil)
+		var globalContext RootScope = globalCtx.Processed.Context()
+		if len(globalContext) > 0 {
+			for _, webFile := range webFiles {
+				webFile.Processed.setParent(globalContext)
+			}
+		}
+	}
 	return nil
 }
 

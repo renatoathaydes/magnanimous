@@ -242,3 +242,22 @@ body {
 }`)
 
 }
+
+func TestProj5(t *testing.T) {
+	dir := runMg(t, "test_proj_5")
+	defer os.RemoveAll(dir)
+
+	files, err := readAll(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) != 3 {
+		t.Fatalf("Expected 3 output files, but got: %v", files)
+	}
+
+	assertFileContents(t, files, dir, "a.txt", "")
+	assertFileContents(t, files, dir, "main.txt", "A and B:\n\n"+
+		"/my-website/10\n"+
+		"/my-website/20")
+	assertFileContents(t, files, dir, "folder/example.txt", "Full path: /my-website/folder/example.txt")
+}

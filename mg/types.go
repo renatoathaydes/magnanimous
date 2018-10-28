@@ -55,6 +55,8 @@ type HtmlFromMarkdownContent struct {
 	MarkDownContent Content
 }
 
+type RootScope map[string]interface{}
+
 type Scope interface {
 	AppendContent(content Content)
 	Context() map[string]interface{}
@@ -66,6 +68,7 @@ type ProcessedFile struct {
 	contents     []Content
 	scopeStack   []Scope
 	context      map[string]interface{}
+	rootScope    RootScope
 	NewExtension string
 }
 
@@ -93,11 +96,16 @@ func (f *ProcessedFile) Context() map[string]interface{} {
 }
 
 func (f *ProcessedFile) Parent() Scope {
-	return nil
+	return f.rootScope
 }
 
 func (f *ProcessedFile) setParent(content Scope) {
-	panic("Cannot set parent on ProcessedFile as it's the root content scope")
+	switch root := content.(type) {
+	case RootScope:
+		f.rootScope = root
+	default:
+		panic("Cannot set parent on ProcessedFile as it's the top content scope")
+	}
 }
 
 func (f *ProcessedFile) AppendContent(content Content) {
@@ -152,4 +160,22 @@ func (f *ProcessedFile) String() string {
 
 func (l *Location) String() string {
 	return fmt.Sprintf("%s:%d:%d", l.Origin, l.Row, l.Col)
+}
+
+var _ Scope = (*RootScope)(nil)
+
+func (RootScope) AppendContent(content Content) {
+	panic("RootScope cannot append content")
+}
+
+func (r RootScope) Context() map[string]interface{} {
+	return r
+}
+
+func (RootScope) Parent() Scope {
+	return nil
+}
+
+func (RootScope) setParent(scope Scope) {
+	panic("Cannot set RootScope's parent")
 }
