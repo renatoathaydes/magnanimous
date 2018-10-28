@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -23,10 +24,15 @@ type ForLoop struct {
 type forLoopSubInstructions struct {
 	sortBy  *sortBySubInstruction
 	reverse *reverseSubInstruction
+	limit   *limitSubInstruction
 }
 
 type sortBySubInstruction struct {
 	field string
+}
+
+type limitSubInstruction struct {
+	max int
 }
 
 type reverseSubInstruction struct {
@@ -169,6 +175,13 @@ func (e *arrayIterable) forEach(files WebFilesMap, inclusionChain []InclusionCha
 		if e.subInstructions.reverse != nil {
 			reverseArray(array)
 		}
+		if e.subInstructions.limit != nil {
+			limit := len(array)
+			if e.subInstructions.limit.max < limit {
+				limit = e.subInstructions.limit.max
+			}
+			array = array[0:limit]
+		}
 		for _, item := range array {
 			err := ic(item)
 			if err != nil {
@@ -221,7 +234,21 @@ func parseForLoopSubInstructions(text string) forLoopSubInstructions {
 				result.sortBy = &sortBySubInstruction{field: parts[i+1]}
 				i++
 			} else {
-				log.Printf("WARN: missing argument for 'sortBy' for-loop sub-instruction")
+				log.Printf("WARN: missing argument for 'sortBy' in for-loop sub-instruction")
+				return result
+			}
+		case "limit":
+			if i < len(parts)-1 {
+				maxItems, err := strconv.ParseUint(parts[i+1], 10, 32)
+				if err != nil {
+					log.Printf("WARN: invalid argument for 'limit' in for-loop sub-instruction. "+
+						"Expected positive integer, found %s", parts[i+1])
+				} else {
+					result.limit = &limitSubInstruction{max: int(maxItems)}
+				}
+				i++
+			} else {
+				log.Printf("WARN: missing argument for 'limit' in for-loop sub-instruction")
 				return result
 			}
 		case "reverse":

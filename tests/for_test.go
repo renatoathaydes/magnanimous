@@ -109,6 +109,40 @@ func TestForArraySortReverse(t *testing.T) {
 			"10 5 4 2 2 1 ")
 }
 
+func TestForArrayLimit(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ for v (limit 3) [ 1 , 2, 3, 4 , 5 , 6 ] }}\n" +
+		"Number {{ eval v }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Loop Sample:\n\n"+
+			"Number 1\n\n"+
+			"Number 2\n\n"+
+			"Number 3\n")
+}
+
+func TestForArraySortByReverseLimit(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Numbers:\n" +
+		"{{ for x ( sortBy _ reverse limit 4 ) [10, 2, 4, 1, 2, 5] }}" +
+		"{{ eval x }} " +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Numbers:\n"+
+			"10 5 4 2 ")
+}
+
 func TestForArrayInMarkDown(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
 		"{{ for section [ \"Home\", \"About\" ] }}\n" +
