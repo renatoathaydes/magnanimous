@@ -85,6 +85,26 @@ It's possible to write more advanced expressions with variables as in the follow
 < div class="header {{ eval pageName == "Home" ? "highlight" : "" }}">Home</div>
 ```
 
+##### Global context
+
+For convenience, a global context can be defined which can define constants that will be available in all processed
+sources.
+
+Simply create a file at `source/processed/_global_context` and write as many `define` instructions as you wish to define
+the global constants you might need.
+
+This is useful, for example, to define a `baseURL` for a website, which can then be used to create absolute links:
+
+```
+{{ define baseURL "/my-website/root/" }}
+```  
+
+Then, in any file, you can get an absolute URL to some file like this:
+
+```html
+<a href="{{ eval baseURL + `current/page.html` }}">This page link</a>
+```
+
 #### Expressions
 
 Expressions may appear in several different locations:
