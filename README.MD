@@ -32,7 +32,7 @@ Processed files may use the following processor instructions:
 * `{{ define <varible_name> <expression> }}` - define a variable.
 * `{{ eval <expression> }}` - evaluates an expression.
 * `{{ if <expression> }}` (conditional content) `{{ end }}`.
-* `{{ for <item> <iterable> }}` (repeated content for each item) `{{ end }}`.
+* `{{ for <item> (sub-instructions) <iterable> }}` (repeated content for each item) `{{ end }}`.
 
 Markdown files (`*.md`) will be converted to HTML, after Magnanimous instructions are processed, using
 [Blackfriday](https://github.com/russross/blackfriday).
@@ -167,6 +167,8 @@ Sub-instructions are optional and may take one of the following forms:
 * `limit <n>`      - limit the number of items to iterate over.
 * `reverse`        - iterate in reverse order
 
+When multiple sub-instructions are provided, they are applied in the order they are declared, one at a time.
+
 Example iterating over an array:
 
 ```
@@ -262,10 +264,10 @@ defining the `date` and `title` variables as in this example:
 {{ define title "Example post" }}
 ```
 
-We could display the newest 5 posts' titles using the following snippet:
+We could display the 5 most recent posts' titles using the following snippet:
 
 ```
-{{ for post (sortBy date limit 5 reverse) "/processed/posts" }}
+{{ for post (sortBy date reverse limit 5) "/processed/posts" }}
   <div>{{ eval post.title }}</div>
 {{ end }}
 ```
