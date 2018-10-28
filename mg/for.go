@@ -21,7 +21,7 @@ type ForLoop struct {
 	parent   Scope
 }
 
-type forLoopSubInstructions struct {
+type forLoopSubInstruction struct {
 	sortBy  *sortBySubInstruction
 	reverse *reverseSubInstruction
 	limit   *limitSubInstruction
@@ -50,14 +50,14 @@ type iterable interface {
 type arrayIterable struct {
 	array           *expression.Expression
 	location        Location
-	subInstructions forLoopSubInstructions
+	subInstructions []forLoopSubInstruction
 }
 
 type directoryIterable struct {
 	path            string
 	resolver        FileResolver
 	location        Location
-	subInstructions forLoopSubInstructions
+	subInstructions []forLoopSubInstruction
 }
 
 func NewForInstruction(arg string, location Location, isMarkDown bool,
@@ -134,7 +134,7 @@ func (f *ForLoop) IsMarkDown() bool {
 
 func asIterable(arg string, location Location, resolver FileResolver) (iterable, error) {
 	var forArg string
-	var subInstructions forLoopSubInstructions
+	var subInstructions []forLoopSubInstruction
 	if strings.HasPrefix(arg, "(") {
 		idx := strings.Index(arg, ")")
 		if idx > 0 {
@@ -147,7 +147,7 @@ func asIterable(arg string, location Location, resolver FileResolver) (iterable,
 	return iterableFrom(forArg, subInstructions, location, resolver)
 }
 
-func iterableFrom(forArg string, subInstructions forLoopSubInstructions,
+func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
 	location Location, resolver FileResolver) (iterable, error) {
 
 	if strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]") {
@@ -168,19 +168,21 @@ func (e *arrayIterable) forEach(files WebFilesMap, inclusionChain []InclusionCha
 	}
 	array, ok := v.([]interface{})
 	if ok {
-		sortBy := e.subInstructions.sortBy
-		if sortBy != nil {
-			sortArray(array, sortBy)
-		}
-		if e.subInstructions.reverse != nil {
-			reverseArray(array)
-		}
-		if e.subInstructions.limit != nil {
-			limit := len(array)
-			if e.subInstructions.limit.max < limit {
-				limit = e.subInstructions.limit.max
+		for _, subInstruction := range e.subInstructions {
+			sortBy := subInstruction.sortBy
+			if sortBy != nil {
+				sortArray(array, sortBy)
 			}
-			array = array[0:limit]
+			if subInstruction.reverse != nil {
+				reverseArray(array)
+			}
+			if subInstruction.limit != nil {
+				limit := len(array)
+				if subInstruction.limit.max < limit {
+					limit = subInstruction.limit.max
+				}
+				array = array[0:limit]
+			}
 		}
 		for _, item := range array {
 			err := ic(item)
@@ -199,17 +201,33 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 		return err
 	}
 
-	if e.subInstructions.sortBy == nil {
+	// start by sorting by name if there's no sub-instructions or if the first sub-instruction is not sortBy
+	sortByName := len(e.subInstructions) == 0 || e.subInstructions[0].sortBy == nil
+
+	if sortByName {
 		sort.Slice(webFiles, func(i, j int) bool {
 			return webFiles[i].Name < webFiles[j].Name
 		})
-	} else {
-		sortField := e.subInstructions.sortBy.field
-		sortFiles(files, webFiles, inclusionChain, sortField)
 	}
 
-	if e.subInstructions.reverse != nil {
-		reverseFiles(webFiles)
+	for _, subInstruction := range e.subInstructions {
+
+		if subInstruction.sortBy != nil {
+			sortField := subInstruction.sortBy.field
+			sortFiles(files, webFiles, inclusionChain, sortField)
+		}
+
+		if subInstruction.reverse != nil {
+			reverseFiles(webFiles)
+		}
+
+		if subInstruction.limit != nil {
+			limit := len(webFiles)
+			if subInstruction.limit.max < limit {
+				limit = subInstruction.limit.max
+			}
+			webFiles = webFiles[0:limit]
+		}
 	}
 
 	for _, item := range webFiles {
@@ -222,17 +240,20 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 	return nil
 }
 
-func parseForLoopSubInstructions(text string) forLoopSubInstructions {
-	result := forLoopSubInstructions{}
+func parseForLoopSubInstructions(text string) []forLoopSubInstruction {
 	parts := strings.Fields(text)
+	result := make([]forLoopSubInstruction, len(parts), len(parts))
+	resultIdx := 0
 	for i := 0; i < len(parts); i++ {
 		switch p := parts[i]; p {
 		case "sort":
-			result.sortBy = &sortBySubInstruction{field: "_"}
+			result[resultIdx].sortBy = &sortBySubInstruction{field: "_"}
+			resultIdx++
 		case "sortBy":
 			if i < len(parts)-1 {
-				result.sortBy = &sortBySubInstruction{field: parts[i+1]}
+				result[resultIdx].sortBy = &sortBySubInstruction{field: parts[i+1]}
 				i++
+				resultIdx++
 			} else {
 				log.Printf("WARN: missing argument for 'sortBy' in for-loop sub-instruction")
 				return result
@@ -244,7 +265,8 @@ func parseForLoopSubInstructions(text string) forLoopSubInstructions {
 					log.Printf("WARN: invalid argument for 'limit' in for-loop sub-instruction. "+
 						"Expected positive integer, found %s", parts[i+1])
 				} else {
-					result.limit = &limitSubInstruction{max: int(maxItems)}
+					result[resultIdx].limit = &limitSubInstruction{max: int(maxItems)}
+					resultIdx++
 				}
 				i++
 			} else {
@@ -252,7 +274,8 @@ func parseForLoopSubInstructions(text string) forLoopSubInstructions {
 				return result
 			}
 		case "reverse":
-			result.reverse = &reverseSubInstruction{}
+			result[resultIdx].reverse = &reverseSubInstruction{}
+			resultIdx++
 		default:
 			log.Printf("Unrecognized for-loop sub-instruction: " + p)
 		}

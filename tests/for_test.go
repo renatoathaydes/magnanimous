@@ -226,6 +226,70 @@ func TestForFilesReverse(t *testing.T) {
 			"Title A\n")
 }
 
+func TestForFilesLimit(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/a.txt": {"title": "A"},
+		"processed/b.txt": {"title": "B"},
+		"processed/g.txt": {"title": "G"},
+		"processed/f.txt": {"title": "F"},
+		"processed/c.txt": {"title": "C"},
+		"processed/e.txt": {"title": "E"},
+		"processed/d.txt": {"title": "D"},
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ for path ( limit 5 ) /processed/ }}\n" +
+		"Title {{ eval path.title }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
+			"Title A\n\n"+
+			"Title B\n\n"+
+			"Title C\n\n"+
+			"Title D\n\n"+
+			"Title E\n")
+}
+
+func TestForFilesLimitTooMany(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/a.txt": {"title": "A"},
+		"processed/b.txt": {"title": "B"},
+		"processed/c.txt": {"title": "C"},
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ for path ( limit 56 ) /processed/ }}\n" +
+		"Title {{ eval path.title }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
+			"Title A\n\n"+
+			"Title B\n\n"+
+			"Title C\n")
+}
+
 func TestForFilesSortBy(t *testing.T) {
 
 	// create a bunch of files for testing
@@ -318,9 +382,40 @@ func TestForFilesReverseSortBy(t *testing.T) {
 
 	checkContents(t, files, processed,
 		"Loop Sample:\n\n"+
-			"Z file\n\n"+
+			"A file\n\n"+
+			"Final\n\n"+
+			"Other file\n\n"+
+			"Some file\n\n"+
+			"Z file\n")
+}
+
+func TestForFilesLimitSortByReverse(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/examples/f1.txt": {"title": "Other file"},
+		"processed/examples/f2.txt": {"title": "Some file"},
+		"processed/examples/f3.txt": {"title": "A file"},
+		"processed/examples/f4.txt": {"title": "Z file"},
+		"processed/examples/f5.txt": {"title": "Final"},
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ for path ( limit 3 sortBy title reverse ) /processed/examples }}\n" +
+		"{{ eval path.title }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
 			"Some file\n\n"+
 			"Other file\n\n"+
-			"Final\n\n"+
 			"A file\n")
 }
