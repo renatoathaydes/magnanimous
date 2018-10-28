@@ -18,6 +18,19 @@ func TestSimpleIdentifierAccess(t *testing.T) {
 	}
 }
 
+func TestNonExistingIdentifierAccess(t *testing.T) {
+	ctx := map[string]interface{}{"foo": "Hello"}
+	v, err := expression.Eval(`bar`, &expression.MapContext{Map: ctx})
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != nil {
+		t.Errorf("Expected nil but got '%v'", v)
+	}
+}
+
 func TestIdentifierExpression(t *testing.T) {
 	ctx := map[string]interface{}{"p1": "Hello", "p2": " ", "p3": "World"}
 	v, err := expression.Eval(`p1 + p2 + p3`, &expression.MapContext{Map: ctx})
@@ -51,6 +64,27 @@ func TestNestedIdentifierAccess(t *testing.T) {
 	}
 
 	if v != "a person called Joe, age 28, lives on High Street in the city of Metropolis" {
+		t.Errorf("Got unexpected: '%v'", v)
+	}
+}
+
+func TestNestedNonExistingIdentifierAccess(t *testing.T) {
+	person := map[string]interface{}{
+		"name": "Joe",
+		"address": map[string]interface{}{
+			"street": "High Street",
+			"city":   "Metropolis",
+		},
+	}
+	ctx := map[string]interface{}{"person": person}
+
+	v, err := expression.Eval(`person.address.country`, &expression.MapContext{Map: ctx})
+
+	if err != nil {
+		t.Fatalf("Could not evaluate: %v", err)
+	}
+
+	if v != nil {
 		t.Errorf("Got unexpected: '%v'", v)
 	}
 }
