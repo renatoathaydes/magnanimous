@@ -99,7 +99,10 @@ func TestForArrayInMarkDown(t *testing.T) {
 func TestForFiles(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles()
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/examples/f1.txt": {"title": "File 1"},
+		"processed/examples/f2.txt": {"title": "Second File"},
+	})
 	defer os.RemoveAll(dir)
 
 	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}

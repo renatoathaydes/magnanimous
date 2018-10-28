@@ -44,28 +44,26 @@ func verifyEqual(index uint16, t *testing.T, actual, expected string) {
 	}
 }
 
-func CreateTempFiles() (mg.WebFilesMap, string) {
+func CreateTempFiles(files map[string]map[string]string) (mg.WebFilesMap, string) {
 	dir, err := ioutil.TempDir("", "for_test")
 	check(err)
 	fmt.Printf("Temp dir at %s\n", dir)
 
 	// just create the directory structure with empty files, contents are not required
-	err = os.MkdirAll(filepath.Join(dir, "processed/examples"), 0770)
-	check(err)
-	_, err = os.Create(filepath.Join(dir, "processed/examples/f1.txt"))
-	check(err)
-	_, err = os.Create(filepath.Join(dir, "processed/examples/f2.txt"))
-	check(err)
+	filesMap := mg.WebFilesMap{}
+	for name, entry := range files {
+		err = os.MkdirAll(filepath.Join(dir, filepath.Dir(name)), 0770)
+		check(err)
+		_, err = os.Create(filepath.Join(dir, name))
+		check(err)
+		filesMap[filepath.Join(dir, name)] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: filepath.Base(name)}
+		ctx := filesMap[filepath.Join(dir, name)].Processed.Context()
+		for k, v := range entry {
+			ctx[k] = v
+		}
+	}
 
-	files := mg.WebFilesMap{}
-
-	files[filepath.Join(dir, "processed/examples/f1.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: "f1.txt"}
-	files[filepath.Join(dir, "processed/examples/f1.txt")].Processed.Context()["title"] = "File 1"
-
-	files[filepath.Join(dir, "processed/examples/f2.txt")] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: "f2.txt"}
-	files[filepath.Join(dir, "processed/examples/f2.txt")].Processed.Context()["title"] = "Second File"
-
-	return files, dir
+	return filesMap, dir
 }
 
 func check(e error) {
