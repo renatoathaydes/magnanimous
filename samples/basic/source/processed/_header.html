@@ -12,8 +12,8 @@
 
         <div class="" id="navbarNavAltMarkup">
             <div class="">
-                {{ for section "/processed/sections" sortBy index }}
-                <a class="{{ if section.path == "/" }}active{{ end }}" href="{{ section.path }}">{{ section.name }}</a>
+                {{ for section (sortBy index) /processed/sections }}
+                <a class="{{ if section.path == path }}active{{ end }}" href="{{ eval section.path }}">{{ eval section.name }}</a>
                 {{ end }}
             </div>
         </div>
