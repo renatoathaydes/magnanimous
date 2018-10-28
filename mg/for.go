@@ -166,6 +166,9 @@ func (e *arrayIterable) forEach(files WebFilesMap, inclusionChain []InclusionCha
 		if sortBy != nil {
 			sortArray(array, sortBy)
 		}
+		if e.subInstructions.reverse != nil {
+			reverseArray(array)
+		}
 		for _, item := range array {
 			err := ic(item)
 			if err != nil {
@@ -190,6 +193,10 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 	} else {
 		sortField := e.subInstructions.sortBy.field
 		sortFiles(files, webFiles, inclusionChain, sortField)
+	}
+
+	if e.subInstructions.reverse != nil {
+		reverseFiles(webFiles)
 	}
 
 	for _, item := range webFiles {
@@ -264,4 +271,18 @@ func sortFiles(files WebFilesMap, webFiles []WebFile, inclusionChain []Inclusion
 		}
 		return res.(bool)
 	})
+}
+
+func reverseFiles(webFiles []WebFile) {
+	for i := len(webFiles)/2 - 1; i >= 0; i-- {
+		opp := len(webFiles) - 1 - i
+		webFiles[i], webFiles[opp] = webFiles[opp], webFiles[i]
+	}
+}
+
+func reverseArray(array []interface{}) {
+	for i := len(array)/2 - 1; i >= 0; i-- {
+		opp := len(array) - 1 - i
+		array[i], array[opp] = array[opp], array[i]
+	}
 }
