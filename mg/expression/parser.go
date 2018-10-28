@@ -98,7 +98,7 @@ func resolveIdentifier(name string, ctx Context) (interface{}, error) {
 	if ok {
 		return v, nil
 	}
-	return nil, errors.New(fmt.Sprintf("cannot resolve identifier: %s", name))
+	return nil, nil
 }
 
 func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (interface{}, error) {
