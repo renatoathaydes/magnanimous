@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{{ eval title }}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="main-body">
+<nav class="">
+
+<div>
+{{ for section (sortBy index) /processed/sections }}
+    <span class="section-button{{ if section.path == path }} active{{ end }}">
+        <a href="{{ eval section.path }}">{{ eval section.name }}</a>
+    </span>
+{{ end }}
+</div>
+</nav>
