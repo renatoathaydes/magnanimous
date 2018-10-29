@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -14,7 +16,20 @@ const (
 
 func main() {
 	start := time.Now()
-	mag := mg.Magnanimous{SourcesDir: SourceDir}
+
+	var rootDir string
+	switch len(os.Args) {
+	case 0:
+		fallthrough
+	case 1:
+		rootDir = ""
+	case 2:
+		rootDir = os.Args[1]
+	default:
+		log.Printf("ERROR: too many arguments provided")
+	}
+
+	mag := mg.Magnanimous{SourcesDir: filepath.Join(rootDir, SourceDir)}
 	webFiles, err := mag.ReadAll()
 	if err != nil {
 		log.Printf("ERROR: %s", err)
@@ -22,11 +37,11 @@ func main() {
 	}
 
 	if len(webFiles) == 0 {
-		fmt.Printf("No files found in the %s directory, nothing to do.\n", SourceDir)
+		fmt.Printf("No files found in the %s directory, nothing to do.\n", mag.SourcesDir)
 		return
 	}
 
-	err = mg.WriteTo(TargetDir, webFiles)
+	err = mg.WriteTo(filepath.Join(rootDir, TargetDir), webFiles)
 	if err != nil {
 		log.Printf("ERROR: %s", err)
 		panic(err)
