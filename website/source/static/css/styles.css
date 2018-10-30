@@ -26,6 +26,10 @@ blockquote {
     color: #777;
 }
 
+pre {
+    padding: 0.6em;
+}
+
 .section-button {
     border: solid darkblue 0.1em;
     border-radius: 0.7em;
@@ -35,4 +39,19 @@ blockquote {
 
 .section-button.active {
     font-weight: bolder;
+}
+
+.footer {
+    height: 5em;
+    background-color: #343D46;
+    color: #f8f8f2;
+    padding: 1em;
+}
+
+.footer a:link {
+    color: lightseagreen;
+}
+
+.footer a:visited {
+    color: cadetblue;
 }

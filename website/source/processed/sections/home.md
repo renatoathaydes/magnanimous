@@ -3,9 +3,14 @@
 {{ define title "Magnanimous" }}
 {{ define index 0 }}
 {{ include /processed/_header.html }}
+<div style="height: 1em;"></div>
+
 # Magnanimous
 
 > The best and fastest static website generator in the world!
+
+<div style="height: 1em;"></div>
+<hr>
 
 Magnanimous generates static websites from source files at the speed of light.
 
@@ -14,7 +19,7 @@ And it's incredibly simple to use!
 ### 1. Download the binary
 
 ```
-$ curl https://getit
+$ curl <url-will-go-here>
 ```
 
 ### 2. Write some sources
@@ -40,7 +45,7 @@ $ curl https://getit
 
 **source/processed/index.md**
 
-```md
+```markdown
 \{{ define title "My Website" }}
 \{{ include /processed/_header.html }}
 # This is my website
