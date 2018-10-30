@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Magnanimous</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<img src="/images/mag-mid-logo.jpg" alt="Magnanimous Gopher" style="float: right; width: 10em;">
+
+<div class="main-body">
+<nav class="">
+
+<div>
+
+        <span class="section-button active">
+        <a href="/sections/home.html">Home</a>
+</span>
+
+        <span class="section-button">
+        <a href="/sections/about.html">About</a>
+</span>
+
+</div>
+</nav>
+
+<div style="height: 1em;"></div>
+
+<h1>Magnanimous</h1>
+
+<blockquote>
+<p>The best and fastest static website generator in the world!</p>
+</blockquote>
+
+<p><div style="height: 1em;"></div>
+<hr></p>
+
+<p>Magnanimous generates static websites from source files at the speed of light.</p>
+
+<p>And it&rsquo;s incredibly simple to use!</p>
+
+<h3>1. Download the binary</h3>
+<pre style="color:#f8f8f2;background-color:#272822">$ curl &lt;url-will-go-here&gt;
+</pre>
+<h3>2. Write some sources</h3>
+
+<p><strong>source/processed/_header.html</strong></p>
+<pre style="color:#f8f8f2;background-color:#272822"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;{{ eval title }}&lt;/<span style="color:#f92672">title</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+</pre>
+<p><strong>source/_footer.html</strong></p>
+<pre style="color:#f8f8f2;background-color:#272822">&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</pre>
+<p><strong>source/processed/index.md</strong></p>
+<pre style="color:#f8f8f2;background-color:#272822">{{ define title &#34;My Website&#34; }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>{{ include /processed/_header.html }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span># This is my website
+<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>How awesome is it?!<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>{{ include /_footer.html }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span></pre>
+<h3>3. Profit</h3>
+<pre style="color:#f8f8f2;background-color:#272822">$ magnanimous
+</pre>
+<p>Your website is ready on the <code>target</code> directory!</p>
+
+<p><strong>target/index.html</strong></p>
+<pre style="color:#f8f8f2;background-color:#272822"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;My Website&lt;/<span style="color:#f92672">title</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+
+&lt;<span style="color:#f92672">h1</span>&gt;This is my website&lt;/<span style="color:#f92672">h1</span>&gt;
+
+&lt;<span style="color:#f92672">p</span>&gt;How awesome is it?!&lt;/<span style="color:#f92672">p</span>&gt;
+
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</pre>
+<p>You might have noticed some funny contents like <code>{{ }}</code> were <em>translated</em> into something else&hellip;</p>
+
+<p>These are Magnanimous instructions, which let Magnanimous know when you want to do things like
+include a file into another, or declare values to be used somewhere else&hellip; the text inside the
+<code>{{</code> and <code>}}</code> braces are evaluated using the Magnanimous expression language. But don&rsquo;t worry!
+You can learn this little expression language in about 5 minutes!</p>
+</div>
+</div>
+<div class="footer">
+    <div>
+        <small>
+            Magnanimous and its website by <a href="https://github.com/renatoathaydes">Renato Athaydes</a>
+        </small>
+    </div>
+    <div>
+        <small>
+            Logo by <a href="https://se.linkedin.com/in/elisabet-norrgård-148b7ba7">Elisabet Norrgård</a>
+        </small>
+    </div>
+    <div>
+        <small>Sources on <a href="https://github.com/renatoathaydes/magnanimous">GitHub</a></small>
+    </div>
+</div>
+</body>
+</html>
