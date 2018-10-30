@@ -4,7 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/russross/blackfriday"
+	"github.com/Depado/bfchroma"
+	blackfriday "gopkg.in/russross/blackfriday.v2"
 	"io"
 	"log"
 	"os"
@@ -372,12 +373,14 @@ func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []Inclusion
 	}
 }
 
+var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(bfchroma.WithoutAutodetect()))
+
 func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
 	if magErr != nil {
 		return magErr
 	}
-	_, err := writer.Write(blackfriday.Run(content))
+	_, err := writer.Write(blackfriday.Run(content, chromaRenderer))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
