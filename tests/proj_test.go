@@ -69,20 +69,24 @@ func TestProj3(t *testing.T) {
 	}
 
 	assertFileContents(t, files, dir, "index.html",
-		`<link rel="stylesheet" href="/style.css"><h1>Welcome</h1>
+		`<link rel="stylesheet" href="/style.css">
+<h1>Welcome</h1>
 
 <p><div class ="interessant">This is a website.</div>
 My blog posts:</p>
+
 <ul>
 <li><p>01 Jan 2018 - My first blog post</p></li>
 
 <li><p>05 July 2018 - One more blog post</p></li>
 </ul>
+
 <h4>the footer</h4>
 `)
 
 	assertFileContents(t, files, dir, "posts/p1.html",
-		`<link rel="stylesheet" href="/style.css"><h2>Post 1</h2>
+		`<link rel="stylesheet" href="/style.css">
+<h2>Post 1</h2>
 
 <p>Hello.</p>
 
@@ -94,7 +98,8 @@ My blog posts:</p>
 `)
 
 	assertFileContents(t, files, dir, "posts/p2.html",
-		`<link rel="stylesheet" href="/style.css"><h2>Post 2</h2>
+		`<link rel="stylesheet" href="/style.css">
+<h2>Post 2</h2>
 
 <p>Short one.</p>
 `)
@@ -130,10 +135,12 @@ func TestProj4(t *testing.T) {
     <title>My blog</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h1>Welcome</h1>
+<body>
+<h1>Welcome</h1>
 
 <p><div class ="interessant">This is a website.</div>
 My blog posts:</p>
+
 <ul>
 <li><p>2019-02-23 - <a href="posts/brocolli.html">Broccoli</a></p></li>
 
@@ -156,7 +163,8 @@ My blog posts:</p>
     <title>My first blog post</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h2>Post 1</h2>
+<body>
+<h2>Post 1</h2>
 
 <p>Hello.</p>
 <blockquote>Note: This is a note.</blockquote>
@@ -174,7 +182,8 @@ My blog posts:</p>
     <title>One more blog post</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h2>Post 2</h2>
+<body>
+<h2>Post 2</h2>
 
 <p>Short one.</p>
 <h4>the footer</h4>
@@ -190,7 +199,8 @@ My blog posts:</p>
     <title>Potatoes</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h2>Potatoes</h2>
+<body>
+<h2>Potatoes</h2>
 
 <p>Potatoes are nice.</p>
 <h4>the footer</h4>
@@ -206,7 +216,8 @@ My blog posts:</p>
     <title>Capsicum</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h2>Capsicum</h2>
+<body>
+<h2>Capsicum</h2>
 
 <p>Capsicum is good.</p>
 <h4>the footer</h4>
@@ -222,7 +233,8 @@ My blog posts:</p>
     <title>Broccoli</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body><h2>Broccoli and you</h2>
+<body>
+<h2>Broccoli and you</h2>
 
 <p>You should eat more broccoli.</p>
 <h4>the footer</h4>

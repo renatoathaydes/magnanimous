@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 var emptyContext = make(map[string]interface{})
@@ -40,8 +42,30 @@ func shouldHaveError(t *testing.T, err error, code mg.ErrorCode, messageAlternat
 
 func verifyEqual(index uint16, t *testing.T, actual, expected string) {
 	if actual != expected {
-		t.Errorf("[%d] Expected '%s' but was '%s'", index, expected, actual)
+		diff := shortDiff(actual, expected)
+		t.Errorf("[%d] Expected '%s' but was '%s'.\nShort diff:\n%s",
+			index, expected, actual, diff)
 	}
+}
+
+func shortDiff(actual, expected string) string {
+	exptdLeft := expected
+	eIdx := 0
+	for aIdx, a := range actual {
+		if len(exptdLeft) > 0 {
+			e, size := utf8.DecodeRuneInString(exptdLeft)
+			exptdLeft = exptdLeft[size:]
+			eIdx += size
+			if a != e {
+				shortA := actual[uint(math.Max(float64(aIdx-6), 0)):aIdx] + "(" + string(a) + ")"
+				shortE := expected[uint(math.Max(float64(eIdx-6), 0)):eIdx] + "(" + string(e) + ")"
+				return fmt.Sprintf("at index %d\n%s\n%s", aIdx, shortA, shortE)
+			}
+		} else {
+			return fmt.Sprintf("actual longer than expected, max_index=%d", aIdx)
+		}
+	}
+	return fmt.Sprintf("No differences found")
 }
 
 func CreateTempFiles(files map[string]map[string]string) (mg.WebFilesMap, string) {
@@ -116,7 +140,7 @@ func checkContents(t *testing.T,
 	}
 
 	if string(content) != expectedContent {
-		t.Errorf("Unexpected content. Expected:\n%s\nActual:\n%s", expectedContent, content)
+		t.Errorf("Unexpected content. Expected:\n'%s'\nActual:\n'%s'", expectedContent, content)
 	}
 
 }

@@ -54,7 +54,7 @@ func TestMarkdownToHtml(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedHtml := "<html><body class=\"hello\"><h1>Hello</h1>\n<h2>Mag</h2>\n</body></html>"
+	expectedHtml := "<html><body class=\"hello\">\n<h1>Hello</h1>\n\n<h2>Mag</h2>\n</body></html>"
 	if string(result) != expectedHtml {
 		t.Errorf("Expected '%s', but was '%s'", expectedHtml, result)
 	}
@@ -80,7 +80,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"<h2>hello</h2>\n", "<h1>header</h1>\n"})
+	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"\n<h2>hello</h2>\n", "\n<h1>header</h1>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
