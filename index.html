@@ -25,6 +25,7 @@
 
 </div>
 </nav>
+
 <div style="height: 1em;"></div>
 
 <h1>Magnanimous</h1>
@@ -41,65 +42,53 @@
 <p>And it&rsquo;s incredibly simple to use!</p>
 
 <h3>1. Download the binary</h3>
-
-<pre><code>$ curl &lt;url-will-go-here&gt;
-</code></pre>
-
+<pre style="color:#f8f8f2;background-color:#272822">$ curl &lt;url-will-go-here&gt;
+</pre>
 <h3>2. Write some sources</h3>
 
 <p><strong>source/processed/_header.html</strong></p>
-
-<pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot;&gt;
-    &lt;title&gt;{{ eval title }}&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-</code></pre>
-
+<pre style="color:#f8f8f2;background-color:#272822"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;{{ eval title }}&lt;/<span style="color:#f92672">title</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+</pre>
 <p><strong>source/_footer.html</strong></p>
-
-<pre><code class="language-html">&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
+<pre style="color:#f8f8f2;background-color:#272822">&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</pre>
 <p><strong>source/processed/index.md</strong></p>
-
-<pre><code class="language-markdown">{{ define title &quot;My Website&quot; }}
-{{ include /processed/_header.html }}
-# This is my website
-
-How awesome is it?!
-
-{{ include /_footer.html }}
-</code></pre>
-
+<pre style="color:#f8f8f2;background-color:#272822">{{ define title &#34;My Website&#34; }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>{{ include /processed/_header.html }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span># This is my website
+<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>How awesome is it?!<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>{{ include /_footer.html }}<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span></pre>
 <h3>3. Profit</h3>
-
-<pre><code>$ magnanimous
-</code></pre>
-
+<pre style="color:#f8f8f2;background-color:#272822">$ magnanimous
+</pre>
 <p>Your website is ready on the <code>target</code> directory!</p>
 
 <p><strong>target/index.html</strong></p>
+<pre style="color:#f8f8f2;background-color:#272822"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>&gt;
+    &lt;<span style="color:#f92672">title</span>&gt;My Website&lt;/<span style="color:#f92672">title</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
 
-<pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot;&gt;
-    &lt;title&gt;My Website&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
+&lt;<span style="color:#f92672">h1</span>&gt;This is my website&lt;/<span style="color:#f92672">h1</span>&gt;
 
-&lt;h1&gt;This is my website&lt;/h1&gt;
+&lt;<span style="color:#f92672">p</span>&gt;How awesome is it?!&lt;/<span style="color:#f92672">p</span>&gt;
 
-&lt;p&gt;How awesome is it?!&lt;/p&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</pre>
 <p>You might have noticed some funny contents like <code>{{ }}</code> were <em>translated</em> into something else&hellip;</p>
 
 <p>These are Magnanimous instructions, which let Magnanimous know when you want to do things like
