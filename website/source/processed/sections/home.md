@@ -3,13 +3,12 @@
 {{ define title "Magnanimous" }}
 {{ define index 0 }}
 {{ include /processed/_header.html }}
-<div style="height: 1em;"></div>
 
 # Magnanimous
 
 > The best and fastest static website generator in the world!
 
-<div style="height: 1em;"></div>
+{{ include /processed/components/spacer.html }}
 <hr>
 
 Magnanimous generates static websites from source files at the speed of light.

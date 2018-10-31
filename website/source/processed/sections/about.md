@@ -1,7 +1,7 @@
 {{ define path "/sections/about.html" }}
 {{ define name "About" }}
 {{ define title "About" }}
-{{ define index 1 }}
+{{ define index 10 }}
 {{ include /processed/_header.html }}
 # About Magnanimous
 
