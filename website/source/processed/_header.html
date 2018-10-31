@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>{{ eval title }}</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="{{eval baseURL }}/css/styles.css">
 </head>
 <body>
 {{ if name == "Home" }}
-<img src="/images/mag-mid-logo.jpg" alt="Magnanimous Gopher" style="float: right; width: 10em;">
+<img src="{{eval baseURL }}/images/mag-mid-logo.jpg" alt="Magnanimous Gopher" style="float: right; width: 10em;">
 {{ end }}
 <div class="main-body">
 <nav class="">
@@ -16,7 +16,7 @@
 <div>
 {{ for section (sortBy index) /processed/sections }}
         <span class="section-button{{ if section.path == path }} active{{ end }}">
-        <a href="{{ eval section.path }}">{{ eval section.name }}</a>
+        <a href="{{eval baseURL }}{{ eval section.path }}">{{ eval section.name }}</a>
 </span>
 {{ end }}
 </div>
