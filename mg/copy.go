@@ -43,7 +43,3 @@ func (c *copiedContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 	}
 	return nil
 }
-
-func (c *copiedContent) IsMarkDown() bool {
-	return false
-}

@@ -43,16 +43,10 @@ type ContentContainer interface {
 
 type Content interface {
 	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
-	IsMarkDown() bool
 }
 
 type StringContent struct {
-	Text     string
-	MarkDown bool
-}
-
-type HtmlFromMarkdownContent struct {
-	MarkDownContent Content
+	Text string
 }
 
 type RootScope map[string]interface{}

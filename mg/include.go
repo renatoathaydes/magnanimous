@@ -10,23 +10,19 @@ type IncludeInstruction struct {
 	Path     string
 	Origin   Location
 	scope    Scope
-	resolver FileResolver
+	Resolver FileResolver
 }
 
 func NewIncludeInstruction(arg string, location Location, scope Scope, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Path: arg, Origin: location, scope: scope, resolver: resolver}
-}
-
-func (c *IncludeInstruction) IsMarkDown() bool {
-	return false
+	return &IncludeInstruction{Path: arg, Origin: location, scope: scope, Resolver: resolver}
 }
 
 func (c *IncludeInstruction) String() string {
-	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", c.Path, c.Origin, c.resolver)
+	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", c.Path, c.Origin, c.Resolver)
 }
 
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	path := c.resolver.Resolve(c.Path, c.Origin)
+	path := c.Resolver.Resolve(c.Path, c.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	webFile, ok := files[path]
 	if !ok {

@@ -39,15 +39,25 @@ func TestProcessIncludeSimple(t *testing.T) {
 }
 
 func TestMarkdownToHtml(t *testing.T) {
+	header := mg.ProcessedFile{}
+	header.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">"})
+	footer := mg.ProcessedFile{}
+	footer.AppendContent(&mg.StringContent{Text: "</body></html>"})
+
+	m := mg.WebFilesMap{}
+	m["header.html"] = mg.WebFile{Processed: &header, Name: "header.html"}
+	m["footer.html"] = mg.WebFile{Processed: &footer, Name: "footer.html"}
+
+	rsvr := mg.DefaultFileResolver{BasePath: "", Files: m}
+
 	file := mg.ProcessedFile{}
-	file.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">"})
-	file.AppendContent(&mg.StringContent{Text: "# Hello\n", MarkDown: true})
-	file.AppendContent(&mg.StringContent{Text: "## Mag", MarkDown: true})
-	file.AppendContent(&mg.StringContent{Text: "</body></html>"})
+	file.AppendContent(&mg.IncludeInstruction{Path: "header.html", Resolver: &rsvr})
+	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
+	file.AppendContent(&mg.StringContent{Text: "## Mag"})
+	file.AppendContent(&mg.IncludeInstruction{Path: "footer.html", Resolver: &rsvr})
 
 	html := mg.MarkdownToHtml(file)
 
-	m := mg.WebFilesMap{}
 	result, err := html.Bytes(m, nil)
 
 	if err != nil {
@@ -64,7 +74,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	// setup a md file to be included
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.HtmlFromMarkdownContent{
-		MarkDownContent: &mg.StringContent{Text: "# header", MarkDown: true},
+		MarkDownContent: []mg.Content{&mg.StringContent{Text: "# header"}},
 	})
 
 	m := mg.WebFilesMap{}
@@ -80,7 +90,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"\n<h2>hello</h2>\n", "\n<h1>header</h1>\n"})
+	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"\n<h2>hello</h2>\n\n<h1>header</h1>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {

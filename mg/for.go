@@ -13,7 +13,6 @@ import (
 type ForLoop struct {
 	Variable string
 	iter     iterable
-	MarkDown bool
 	Text     string
 	Location Location
 	contents []Content
@@ -60,8 +59,7 @@ type directoryIterable struct {
 	subInstructions []forLoopSubInstruction
 }
 
-func NewForInstruction(arg string, location Location, isMarkDown bool,
-	original string, resolver FileResolver) Content {
+func NewForInstruction(arg string, location Location, original string, resolver FileResolver) Content {
 	parts := strings.SplitN(arg, " ", 2)
 	switch len(parts) {
 	case 0:
@@ -76,7 +74,7 @@ func NewForInstruction(arg string, location Location, isMarkDown bool,
 			location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ForLoop{Variable: parts[0], iter: iter, MarkDown: isMarkDown,
+	return &ForLoop{Variable: parts[0], iter: iter,
 		Text: original, Location: location, context: make(map[string]interface{}, 2)}
 }
 
@@ -126,10 +124,6 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []In
 
 func (f *ForLoop) String() string {
 	return fmt.Sprintf("ForLoop{%s}", f.Text)
-}
-
-func (f *ForLoop) IsMarkDown() bool {
-	return f.MarkDown
 }
 
 func asIterable(arg string, location Location, resolver FileResolver) (iterable, error) {

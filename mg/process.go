@@ -82,7 +82,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	isMarkDown := isMd(file)
 	processed := ProcessedFile{context: make(map[string]interface{}, 4)}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
-	magErr := parseText(&state, isMarkDown, resolver)
+	magErr := parseText(&state, resolver)
 	if magErr != nil {
 		return &processed, magErr
 	}
@@ -92,7 +92,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	return &processed, nil
 }
 
-func parseText(state *parserState, isMarkDown bool, resolver FileResolver) error {
+func parseText(state *parserState, resolver FileResolver) error {
 	previousWasOpenBracket := false
 	previousWasEscape := false
 	reader := state.reader
@@ -124,11 +124,11 @@ func parseText(state *parserState, isMarkDown bool, resolver FileResolver) error
 			}
 			if previousWasOpenBracket {
 				if builder.Len() > 0 {
-					state.pf.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
+					state.pf.AppendContent(&StringContent{Text: builder.String()})
 					builder.Reset()
 				}
 				previousWasOpenBracket = false
-				magErr := parseInstruction(state, isMarkDown, resolver)
+				magErr := parseInstruction(state, resolver)
 				if magErr != nil {
 					return magErr
 				}
@@ -157,14 +157,14 @@ func parseText(state *parserState, isMarkDown bool, resolver FileResolver) error
 		} else if previousWasEscape {
 			builder.WriteRune('\\')
 		}
-		state.pf.AppendContent(&StringContent{Text: builder.String(), MarkDown: isMarkDown})
+		state.pf.AppendContent(&StringContent{Text: builder.String()})
 		builder.Reset()
 	}
 
 	return nil
 }
 
-func parseInstruction(state *parserState, isMarkDown bool, resolver FileResolver) error {
+func parseInstruction(state *parserState, resolver FileResolver) error {
 	previousWasCloseBracket := false
 	previousWasEscape := false
 	instrFirstRow := state.row
@@ -198,7 +198,7 @@ func parseInstruction(state *parserState, isMarkDown bool, resolver FileResolver
 			}
 			if previousWasCloseBracket {
 				if builder.Len() > 0 {
-					appendContent(state.pf, builder.String(), isMarkDown,
+					appendContent(state.pf, builder.String(),
 						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
 						resolver)
 				}
@@ -227,7 +227,7 @@ func parseInstruction(state *parserState, isMarkDown bool, resolver FileResolver
 			instrFirstRow, instrFirstCol))
 }
 
-func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Location, resolver FileResolver) {
+func appendContent(pf *ProcessedFile, text string, location Location, resolver FileResolver) {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
@@ -244,26 +244,26 @@ func appendContent(pf *ProcessedFile, text string, isMarkDown bool, location Loc
 			pf.AppendContent(unevaluatedExpression(text))
 		}
 	case 2:
-		content := createInstruction(parts[0], parts[1], isMarkDown, pf.currentScope(), location, text, resolver)
+		content := createInstruction(parts[0], parts[1], pf.currentScope(), location, text, resolver)
 		if content != nil {
 			pf.AppendContent(content)
 		}
 	}
 }
 
-func createInstruction(name, arg string, isMarkDown bool, scope Scope,
-	location Location, original string, resolver FileResolver) Content {
+func createInstruction(name, arg string, scope Scope, location Location,
+	original string, resolver FileResolver) Content {
 	switch name {
 	case "include":
 		return NewIncludeInstruction(arg, location, scope, resolver)
 	case "define":
 		return NewVariable(arg, location, original, scope)
 	case "eval":
-		return NewExpression(arg, location, isMarkDown, original, scope)
+		return NewExpression(arg, location, original, scope)
 	case "if":
-		return NewIfInstruction(arg, location, isMarkDown, original)
+		return NewIfInstruction(arg, location, original)
 	case "for":
-		return NewForInstruction(arg, location, isMarkDown, original, resolver)
+		return NewForInstruction(arg, location, original, resolver)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)
@@ -325,10 +325,6 @@ func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
 	return nil
-}
-
-func (c *StringContent) IsMarkDown() bool {
-	return c.MarkDown
 }
 
 func (c *StringContent) String() string {

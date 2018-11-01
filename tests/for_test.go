@@ -158,8 +158,8 @@ func TestForArrayInMarkDown(t *testing.T) {
 		"\n<h2>Home</h2>\n\n"+
 			"<p>Something something</p>\n\n"+
 			"<h2>About</h2>\n\n"+
-			"<p>Something something</p>\n"+
-			"<p>END</p>\n")
+			"<p>Something something\n"+
+			"END</p>\n")
 }
 
 func TestForFiles(t *testing.T) {

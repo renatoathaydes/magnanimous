@@ -7,7 +7,6 @@ import (
 )
 
 type IfContent struct {
-	MarkDown  bool
 	Text      string
 	condition *expression.Expression
 	Location  Location
@@ -20,9 +19,7 @@ var _ Content = (*IfContent)(nil)
 var _ Scope = (*IfContent)(nil)
 var _ ContentContainer = (*IfContent)(nil)
 
-func NewIfInstruction(arg string, location Location, isMarkDown bool,
-	original string) Content {
-
+func NewIfInstruction(arg string, location Location, original string) Content {
 	cond, err := expression.ParseExpr(arg)
 
 	if err != nil {
@@ -31,7 +28,6 @@ func NewIfInstruction(arg string, location Location, isMarkDown bool,
 	}
 
 	return &IfContent{
-		MarkDown:  isMarkDown,
 		Text:      original,
 		condition: &cond,
 		Location:  location,
@@ -78,8 +74,4 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain [
 		log.Printf("WARN: If condition evaluated to non-boolean value, assuming false: %v", res)
 	}
 	return nil
-}
-
-func (ic *IfContent) IsMarkDown() bool {
-	return ic.MarkDown
 }

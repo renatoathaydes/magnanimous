@@ -68,7 +68,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 		"{{ define a 10 }}" +
 			"{{ define b 4 }}" +
 			"{{ define c a * b }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
 
 	if err != nil {
 		t.Fatal(err)

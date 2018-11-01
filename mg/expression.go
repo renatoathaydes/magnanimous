@@ -17,19 +17,18 @@ type DefineContent struct {
 
 type ExpressionContent struct {
 	expr     *expression.Expression
-	MarkDown bool
 	Text     string
 	Location Location
 	scope    Scope
 }
 
-func NewExpression(arg string, location Location, isMarkDown bool, original string, scope Scope) Content {
+func NewExpression(arg string, location Location, original string, scope Scope) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ExpressionContent{expr: &expr, MarkDown: isMarkDown, Location: location, Text: original, scope: scope}
+	return &ExpressionContent{expr: &expr, Location: location, Text: original, scope: scope}
 }
 
 func NewVariable(arg string, location Location, original string, scope Scope) Content {
@@ -76,10 +75,6 @@ func (e *ExpressionContent) String() string {
 	return fmt.Sprintf("ExpressionContent{%s}", e.Text)
 }
 
-func (e *ExpressionContent) IsMarkDown() bool {
-	return e.MarkDown
-}
-
 var _ Content = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
@@ -97,8 +92,4 @@ func (d *DefineContent) Run(files WebFilesMap, inclusionChain []InclusionChainIt
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
 	d.scope.Context()[d.Name] = v
-}
-
-func (DefineContent) IsMarkDown() bool {
-	return false
 }
