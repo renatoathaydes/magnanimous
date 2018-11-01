@@ -2,10 +2,7 @@ package mg
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
-	"github.com/Depado/bfchroma"
-	blackfriday "gopkg.in/russross/blackfriday.v2"
 	"io"
 	"log"
 	"os"
@@ -273,18 +270,6 @@ func createInstruction(name, arg string, isMarkDown bool, scope Scope,
 	return unevaluatedExpression(original)
 }
 
-func MarkdownToHtml(file ProcessedFile) ProcessedFile {
-	convertedContent := make([]Content, 0, len(file.contents))
-	for _, c := range file.contents {
-		if c.IsMarkDown() {
-			convertedContent = append(convertedContent, &HtmlFromMarkdownContent{MarkDownContent: c})
-		} else {
-			convertedContent = append(convertedContent, c)
-		}
-	}
-	return ProcessedFile{contents: convertedContent, context: file.context, NewExtension: ".html"}
-}
-
 func WriteTo(dir string, filesMap WebFilesMap) error {
 	err := os.MkdirAll(dir, 0770)
 	if err != nil {
@@ -371,34 +356,6 @@ func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []Inclusion
 			d.Run(files, inclusionChain)
 		}
 	}
-}
-
-var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(bfchroma.WithoutAutodetect()))
-
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	content, magErr := readBytes(&f.MarkDownContent, files, inclusionChain)
-	if magErr != nil {
-		return magErr
-	}
-	_, err := writer.Write(blackfriday.Run(content, chromaRenderer))
-	if err != nil {
-		return &MagnanimousError{Code: IOError, message: err.Error()}
-	}
-	return nil
-}
-
-func (_ *HtmlFromMarkdownContent) IsMarkDown() bool {
-	return false
-}
-
-func readBytes(c *Content, files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
-	var b bytes.Buffer
-	b.Grow(1024)
-	err := (*c).Write(&b, files, inclusionChain)
-	if err != nil {
-		return nil, err
-	}
-	return b.Bytes(), nil
 }
 
 func inclusionChainToString(locations []InclusionChainItem) string {
