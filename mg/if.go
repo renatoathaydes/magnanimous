@@ -69,6 +69,7 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain [
 	case true:
 		writeContents(ic, writer, files, inclusionChain)
 	case false:
+	case nil:
 		// nothing to write
 	default:
 		log.Printf("WARN: If condition evaluated to non-boolean value, assuming false: %v", res)

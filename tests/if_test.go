@@ -49,6 +49,20 @@ func TestIfFalse(t *testing.T) {
 	checkContents(t, emptyFilesMap, processed, "IF:\n")
 }
 
+func TestIfNil(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("IF:\n" +
+		"{{ if nil }}" +
+		"NO" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed, "IF:\n")
+}
+
 func TestIfFalseExpr(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("IF:\n" +
 		"{{ if 2 > 100 }}" +
