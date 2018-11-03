@@ -60,7 +60,7 @@ func getFilesAt(root string, exclusions ...string) ([]string, error) {
 func (r *DefaultFileResolver) FilesIn(dir string, from Location) (dirPath string, webFiles []WebFile, e error) {
 	dirPath = Resolve(dir, r.BasePath, from)
 	for path, wf := range r.Files {
-		if filepath.Dir(path) == dirPath {
+		if !wf.NonWritable && filepath.Dir(path) == dirPath {
 			webFiles = append(webFiles, wf)
 		}
 	}

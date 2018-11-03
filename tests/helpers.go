@@ -80,7 +80,11 @@ func CreateTempFiles(files map[string]map[string]string) (mg.WebFilesMap, string
 		check(err)
 		_, err = os.Create(filepath.Join(dir, name))
 		check(err)
-		filesMap[filepath.Join(dir, name)] = mg.WebFile{Processed: &mg.ProcessedFile{}, Name: filepath.Base(name)}
+		filesMap[filepath.Join(dir, name)] = mg.WebFile{
+			Processed:   &mg.ProcessedFile{},
+			Name:        filepath.Base(name),
+			NonWritable: strings.HasPrefix(filepath.Base(name), "_"),
+		}
 		ctx := filesMap[filepath.Join(dir, name)].Processed.Context()
 		for k, v := range entry {
 			ctx[k] = v

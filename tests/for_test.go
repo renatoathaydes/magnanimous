@@ -210,6 +210,35 @@ func TestForFiles(t *testing.T) {
 			"Title Second File\n")
 }
 
+func TestForFilesWithUnwritableFiles(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/examples/f1.txt": {"title": "File 1"},
+		"processed/examples/_a.txt": {"title": "?"},
+		"processed/examples/f2.txt": {"title": "Second File"},
+		"processed/examples/_b.txt": {"title": "?"},
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ for path /processed/examples }}\n" +
+		"Title {{ eval path.title }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
+			"Title File 1\n\n"+
+			"Title Second File\n")
+}
+
 func TestForFilesReverse(t *testing.T) {
 
 	// create a bunch of files for testing
