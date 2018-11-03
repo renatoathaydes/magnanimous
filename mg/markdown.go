@@ -84,8 +84,22 @@ func readMarkdownFileParts(c []Content, files WebFilesMap,
 
 	for i, content := range c {
 		var writer *bytes.Buffer = nil
+
 		if inHeader {
-			if isHtml(content) {
+			// we want to find the first actual content here, so we can avoid converting HTML to MD from
+			// any HTML inclusions that happen at the top of the file.. so skip empty content
+			skipFromHeader := false
+			switch cont := content.(type) {
+			case *StringContent:
+				if len(strings.TrimSpace(cont.Text)) == 0 {
+					skipFromHeader = true
+				}
+			case *DefineContent:
+				skipFromHeader = true
+			}
+			if skipFromHeader {
+				writer = &main
+			} else if isHtml(content) {
 				writer = &header
 			} else {
 				inHeader = false
