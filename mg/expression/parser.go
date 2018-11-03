@@ -88,9 +88,11 @@ func parseLiteral(s string) interface{} {
 }
 
 func resolveIdentifier(name string, ctx Context) (interface{}, error) {
-	v, ok := ctx.Get(name)
-	if ok {
-		return v, nil
+	if ctx != nil {
+		v, ok := ctx.Get(name)
+		if ok {
+			return v, nil
+		}
 	}
 
 	switch name {
