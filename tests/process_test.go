@@ -7,6 +7,26 @@ import (
 	"testing"
 )
 
+func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
+	contents := []mg.Content{&mg.StringContent{Text: "# hello\n## world"}}
+
+	writeContentToString := func(content mg.Content) string {
+		var w strings.Builder
+		content.Write(&w, nil, nil)
+		return w.String()
+	}
+
+	expectedResult := "<h1>hello</h1>\n\n<h2>world</h2>\n"
+
+	for i := 0; i < 10; i++ {
+		markdown := mg.HtmlFromMarkdownContent{MarkDownContent: contents}
+		r := writeContentToString(&markdown)
+		if r != expectedResult {
+			t.Errorf("[%d] '%s' != %s", i, string(r), expectedResult)
+		}
+	}
+}
+
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
 	processed, err := mg.ProcessReader(r, "", 11, nil)
@@ -40,7 +60,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 
 func TestMarkdownToHtml(t *testing.T) {
 	header := mg.ProcessedFile{}
-	header.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">"})
+	header.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">\n"})
 	footer := mg.ProcessedFile{}
 	footer.AppendContent(&mg.StringContent{Text: "</body></html>"})
 
@@ -74,7 +94,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	// setup a md file to be included
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.HtmlFromMarkdownContent{
-		MarkDownContent: []mg.Content{&mg.StringContent{Text: "# header"}},
+		MarkDownContent: []mg.Content{&mg.StringContent{Text: "## header"}},
 	})
 
 	m := mg.WebFilesMap{}
@@ -83,14 +103,14 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: m}
 
 	// read a file that includes the previous file
-	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md }}"))
+	r := bufio.NewReader(strings.NewReader("# hello\n{{ include /example.md }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, &resolver)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"\n<h2>hello</h2>\n\n<h1>header</h1>\n"})
+	checkParsing(t, processed.Context(), m, processed, emptyContext, []string{"<h1>hello</h1>\n\n<h2>header</h2>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {

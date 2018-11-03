@@ -38,7 +38,15 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inc
 		}
 	}
 
-	_, err = writer.Write(blackfriday.Run(main, chromaRenderer))
+	md := blackfriday.Run(main, chromaRenderer)
+
+	// The Chroma renderer adds a spurious leading new-line "sometimes" that needs to be removed
+	if len(main) > 0 && main[0] != '\n' &&
+		len(md) > 0 && md[0] == '\n' {
+		md = md[1:]
+	}
+
+	_, err = writer.Write(md)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
