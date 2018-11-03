@@ -46,26 +46,26 @@ func Eval(expr string, context Context) (interface{}, error) {
 	return EvalExpr(e, context)
 }
 
-func EvalExpr(e Expression, contex Context) (interface{}, error) {
-	return eval(e.expr, contex)
+func EvalExpr(e Expression, context Context) (interface{}, error) {
+	return eval(e.expr, context)
 }
 
-func eval(e ast.Expr, ctx Context) (interface{}, error) {
+func eval(e ast.Expr, context Context) (interface{}, error) {
 	switch ex := e.(type) {
 	case *ast.BasicLit:
 		return parseLiteral(ex.Value), nil
 	case *ast.Ident:
-		return resolveIdentifier(ex.Name, ctx)
+		return resolveIdentifier(ex.Name, context)
 	case *ast.BinaryExpr:
-		return resolveBinaryExpr(ex.X, ex.Op, ex.Y, ctx)
+		return resolveBinaryExpr(ex.X, ex.Op, ex.Y, context)
 	case *ast.CompositeLit:
-		return resolveCompositeLit(ex, ctx)
+		return resolveCompositeLit(ex, context)
 	case *ast.ParenExpr:
-		return eval(ex.X, ctx)
+		return eval(ex.X, context)
 	case *ast.UnaryExpr:
-		return resolveUnary(ex, ctx)
+		return resolveUnary(ex, context)
 	case *ast.SelectorExpr:
-		return resolveAccessField(ex, ctx)
+		return resolveAccessField(ex, context)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
