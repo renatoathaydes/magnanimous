@@ -46,7 +46,7 @@ func ProcessAll(files []string, basePath, sourcesDir string, webFiles WebFilesMa
 		webFiles[file] = *wf
 	}
 	if globalCtx, ok := webFiles[filepath.Join(basePath, "_global_context")]; ok {
-		globalCtx.evalDefinitions(webFiles, nil)
+		globalCtx.runSideEffects(webFiles, nil)
 		var globalContext RootScope = globalCtx.Processed.Context()
 		if len(globalContext) > 0 {
 			for _, webFile := range webFiles {
@@ -335,6 +335,10 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []I
 	return writeContents(wf.Processed, writer, files, inclusionChain)
 }
 
+func (wf *WebFile) runSideEffects(files WebFilesMap, inclusionChain []InclusionChainItem) {
+	runSideEffects(wf.Processed, files, inclusionChain)
+}
+
 func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	for _, c := range cc.GetContents() {
 		err := c.Write(writer, files, inclusionChain)
@@ -345,11 +349,11 @@ func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, inc
 	return nil
 }
 
-func (wf *WebFile) evalDefinitions(files WebFilesMap, inclusionChain []InclusionChainItem) {
-	for _, c := range wf.Processed.contents {
-		switch d := c.(type) {
-		case *DefineContent:
-			d.Run(files, inclusionChain)
+func runSideEffects(container ContentContainer, files WebFilesMap, inclusionChain []InclusionChainItem) {
+	for _, c := range container.GetContents() {
+		switch sf := c.(type) {
+		case SideEffectContent:
+			sf.Run(files, inclusionChain)
 		}
 	}
 }

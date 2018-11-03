@@ -167,7 +167,9 @@ My blog posts:</p>
 <h2>Post 1</h2>
 
 <p>Hello.</p>
+
 <blockquote>Note: This is a note.</blockquote>
+
 <p>Bye.</p>
 <h4>the footer</h4>
 </body>

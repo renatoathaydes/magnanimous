@@ -76,6 +76,7 @@ func (e *ExpressionContent) String() string {
 }
 
 var _ Content = (*DefineContent)(nil)
+var _ SideEffectContent = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	d.Run(files, inclusionChain)

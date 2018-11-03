@@ -45,6 +45,10 @@ type Content interface {
 	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
 }
 
+type SideEffectContent interface {
+	Run(files WebFilesMap, inclusionChain []InclusionChainItem)
+}
+
 type StringContent struct {
 	Text string
 }

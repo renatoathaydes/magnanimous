@@ -204,11 +204,14 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 		})
 	}
 
-	for _, subInstruction := range e.subInstructions {
+	for _, item := range webFiles {
+		item.runSideEffects(files, inclusionChain)
+	}
 
+	for _, subInstruction := range e.subInstructions {
 		if subInstruction.sortBy != nil {
 			sortField := subInstruction.sortBy.field
-			sortFiles(files, webFiles, inclusionChain, sortField)
+			sortFiles(webFiles, sortField)
 		}
 
 		if subInstruction.reverse != nil {
@@ -225,7 +228,6 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 	}
 
 	for _, item := range webFiles {
-		item.evalDefinitions(files, inclusionChain)
 		err := fc(&item)
 		if err != nil {
 			return err
@@ -292,16 +294,14 @@ func sortArray(array []interface{}, instruction *sortBySubInstruction) {
 	})
 }
 
-func sortFiles(files WebFilesMap, webFiles []WebFile, inclusionChain []InclusionChainItem, sortField string) {
+func sortFiles(webFiles []WebFile, sortField string) {
 	sort.Slice(webFiles, func(i, j int) bool {
-		webFiles[i].evalDefinitions(files, inclusionChain)
 		iv, ok := webFiles[i].Processed.Context()[sortField]
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
 				sortField, webFiles[i].Name)
 			return true
 		}
-		webFiles[j].evalDefinitions(files, inclusionChain)
 		jv, ok := webFiles[j].Processed.Context()[sortField]
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",

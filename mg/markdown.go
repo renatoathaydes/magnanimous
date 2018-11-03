@@ -14,6 +14,8 @@ type HtmlFromMarkdownContent struct {
 }
 
 var _ Content = (*HtmlFromMarkdownContent)(nil)
+var _ ContentContainer = (*HtmlFromMarkdownContent)(nil)
+var _ SideEffectContent = (*HtmlFromMarkdownContent)(nil)
 
 var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(bfchroma.WithoutAutodetect()))
 
@@ -22,12 +24,21 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 		contents:     []Content{&HtmlFromMarkdownContent{MarkDownContent: file.contents}},
 		context:      file.context,
 		rootScope:    file.rootScope,
+		scopeStack:   file.scopeStack,
 		NewExtension: ".html",
 	}
 }
 
+func (f *HtmlFromMarkdownContent) GetContents() []Content {
+	return f.MarkDownContent
+}
+
+func (f *HtmlFromMarkdownContent) Run(files WebFilesMap, inclusionChain []InclusionChainItem) {
+	runSideEffects(f, files, inclusionChain)
+}
+
 func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	htmlHead, main, htmlFooter, err := readBytes(f.MarkDownContent, files, inclusionChain)
+	htmlHead, main, htmlFooter, err := readMarkdownFileParts(f.MarkDownContent, files, inclusionChain)
 	if err != nil {
 		return err
 	}
@@ -61,7 +72,7 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inc
 	return nil
 }
 
-func readBytes(c []Content, files WebFilesMap,
+func readMarkdownFileParts(c []Content, files WebFilesMap,
 	inclusionChain []InclusionChainItem) (head, body, foot []byte, err error) {
 	var header, main, footer bytes.Buffer
 	header.Grow(128)
