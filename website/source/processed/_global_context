@@ -1,1 +1,1 @@
-{{ define baseURL "/magnanimous" }}
+{{ define baseURL "" }}

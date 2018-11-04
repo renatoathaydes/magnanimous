@@ -1,5 +1,5 @@
 {{ define path "/sections/docs/paths.html" }}
-{{ define index 30 }}
+{{ define chapter 3 }}
 {{ define title "Paths and Links" }}
 {{ include _docs_header.html }}
 

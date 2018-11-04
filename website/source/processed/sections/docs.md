@@ -17,15 +17,17 @@ To learn more once you've been there, follow one of the Tutorials listed below.
 
 {{ define referencelink baseURL + "/sections/docs/reference.html" }}
 
-Once you've mastered Magnanimous (which should be really quick and easy), you can just go directly to the
-[Reference]({{ eval referencelink }}) when you just need to refresh your memory on
+Once you've mastered Magnanimous (which should be really quick and easy), you can go directly to the
+[Reference]({{ eval referencelink }}) section when you just need to refresh your memory on
 how to achieve what you want, fast.
 
 ### Table Of Contents
 
-{{ for doc (sortBy index) docs }}
+{{ for doc (sortBy chapter) docs }}
     {{ if doc.path != nil }}
         {{ define docLink baseURL + doc.path }}
-1. [{{ eval doc.title }}]({{ eval docLink }}).
+#### {{ eval doc.chapter }}. [{{ eval doc.title }}]({{ eval docLink }})
     {{ end }}
 {{ end }}
+
+{{ include /processed/_footer.html }}
