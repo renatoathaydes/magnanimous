@@ -1,5 +1,5 @@
 {{ define path "/sections/docs/reference.html" }}
-{{ define chapter 6 }}
+{{ define chapter 7 }}
 {{ define title "Reference" }}
 {{ include _docs_header.html }}
 
