@@ -24,7 +24,7 @@ func (c *IncludeInstruction) String() string {
 func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	path := c.Resolver.Resolve(c.Path, c.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
-	webFile, ok := files[path]
+	webFile, ok := files.WebFiles[path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
 		_, err := writer.Write([]byte(fmt.Sprintf("{{ include %s }}", c.Path)))

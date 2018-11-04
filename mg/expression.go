@@ -55,7 +55,7 @@ var _ Content = (*ExpressionContent)(nil)
 
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	r, err := expression.EvalExpr(*e.expr, magParams{
-		webFiles:       files,
+		webFiles:       &files,
 		scope:          e.scope,
 		inclusionChain: inclusionChain,
 	})
@@ -79,11 +79,11 @@ var _ Content = (*DefineContent)(nil)
 var _ SideEffectContent = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	d.Run(files, inclusionChain)
+	d.Run(&files, inclusionChain)
 	return nil
 }
 
-func (d *DefineContent) Run(files WebFilesMap, inclusionChain []InclusionChainItem) {
+func (d *DefineContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
 	v, err := expression.EvalExpr(*d.Expr, magParams{
 		webFiles:       files,
 		scope:          d.scope,

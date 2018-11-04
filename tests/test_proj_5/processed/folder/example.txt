@@ -1,1 +1,1 @@
-Full path: {{ eval baseURL + "folder/example.txt" }}
+Full path: {{ eval baseURL + "folder/example.txt" }}{{define myBaseURL baseURL }}

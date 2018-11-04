@@ -57,7 +57,7 @@ func (ic *IfContent) setParent(scope Scope) {
 
 func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	res, err := expression.EvalExpr(*ic.condition, magParams{
-		webFiles:       files,
+		webFiles:       &files,
 		scope:          ic,
 		inclusionChain: inclusionChain,
 	})

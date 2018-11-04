@@ -104,9 +104,9 @@ func (f *ForLoop) setParent(scope Scope) {
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	err := f.iter.forEach(files, inclusionChain, magParams{
-		webFiles:       files,
+		webFiles:       &files,
 		inclusionChain: inclusionChain,
-		scope:          f.parent,
+		scope:          f,
 	}, func(webFile *WebFile) error {
 		// use the file's context as the value of the bound variable
 		f.context[f.Variable] = webFile.Processed.Context()
@@ -205,7 +205,7 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 	}
 
 	for _, item := range webFiles {
-		item.runSideEffects(files, inclusionChain)
+		item.runSideEffects(&files, inclusionChain)
 	}
 
 	for _, subInstruction := range e.subInstructions {

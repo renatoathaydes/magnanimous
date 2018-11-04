@@ -24,11 +24,13 @@ func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	staticDir := filepath.Join(mag.SourcesDir, "static")
 
 	procFiles, staticFiles, otherFiles := collectFiles(mag.SourcesDir, processedDir, staticDir)
-	webFiles := make(WebFilesMap, len(procFiles)+len(staticFiles)+len(otherFiles))
+	webFiles := WebFilesMap{
+		WebFiles: make(map[string]WebFile, len(procFiles)+len(staticFiles)+len(otherFiles)),
+	}
 
-	err := ProcessAll(procFiles, processedDir, mag.SourcesDir, webFiles)
+	err := ProcessAll(procFiles, processedDir, mag.SourcesDir, &webFiles)
 	if err != nil {
-		return nil, err
+		return webFiles, err
 	}
 	CopyAll(&staticFiles, staticDir, webFiles)
 	AddNonWritables(&otherFiles, mag.SourcesDir, webFiles)
@@ -36,22 +38,20 @@ func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	return webFiles, nil
 }
 
-func ProcessAll(files []string, basePath, sourcesDir string, webFiles WebFilesMap) error {
+func ProcessAll(files []string, basePath, sourcesDir string, webFiles *WebFilesMap) error {
 	resolver := DefaultFileResolver{BasePath: sourcesDir, Files: webFiles}
 	for _, file := range files {
 		wf, err := ProcessFile(file, basePath, &resolver)
 		if err != nil {
 			return err
 		}
-		webFiles[file] = *wf
+		webFiles.WebFiles[file] = *wf
 	}
-	if globalCtx, ok := webFiles[filepath.Join(basePath, "_global_context")]; ok {
+	if globalCtx, ok := webFiles.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
 		globalCtx.runSideEffects(webFiles, nil)
 		var globalContext RootScope = globalCtx.Processed.Context()
 		if len(globalContext) > 0 {
-			for _, webFile := range webFiles {
-				webFile.Processed.setParent(globalContext)
-			}
+			webFiles.GlobalContext = globalContext
 		}
 	}
 	return nil
@@ -275,7 +275,7 @@ func WriteTo(dir string, filesMap WebFilesMap) error {
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
-	for file, wf := range filesMap {
+	for file, wf := range filesMap.WebFiles {
 		if wf.NonWritable {
 			continue
 		}
@@ -335,7 +335,7 @@ func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []I
 	return writeContents(wf.Processed, writer, files, inclusionChain)
 }
 
-func (wf *WebFile) runSideEffects(files WebFilesMap, inclusionChain []InclusionChainItem) {
+func (wf *WebFile) runSideEffects(files *WebFilesMap, inclusionChain []InclusionChainItem) {
 	runSideEffects(wf.Processed, files, inclusionChain)
 }
 
@@ -349,7 +349,7 @@ func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, inc
 	return nil
 }
 
-func runSideEffects(container ContentContainer, files WebFilesMap, inclusionChain []InclusionChainItem) {
+func runSideEffects(container ContentContainer, files *WebFilesMap, inclusionChain []InclusionChainItem) {
 	for _, c := range container.GetContents() {
 		switch sf := c.(type) {
 		case SideEffectContent:

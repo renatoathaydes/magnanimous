@@ -30,8 +30,8 @@ func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 }
 
 func TestInclusionIndirectCycleError(t *testing.T) {
-	files := make(mg.WebFilesMap)
-	resolver := mg.DefaultFileResolver{BasePath: "", Files: files}
+	files := make(map[string]mg.WebFile)
+	resolver := mg.DefaultFileResolver{BasePath: "", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ include /processed/other.txt }}"))
 	processed, err := mg.ProcessReader(r, "/processed/hi.txt", 11, &resolver)
@@ -58,7 +58,7 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 
 	defer os.RemoveAll(dir)
 
-	magErr := mg.WriteTo(dir, files)
+	magErr := mg.WriteTo(dir, *resolver.Files)
 
 	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
 		"/processed/other.txt at /processed/hi.txt:1:5 "+
@@ -69,8 +69,8 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 }
 
 func TestInclusionSelfCycleError(t *testing.T) {
-	files := make(mg.WebFilesMap)
-	resolver := mg.DefaultFileResolver{BasePath: "", Files: files}
+	files := make(map[string]mg.WebFile)
+	resolver := mg.DefaultFileResolver{BasePath: "", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ include hi.txt }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver)
@@ -89,7 +89,7 @@ func TestInclusionSelfCycleError(t *testing.T) {
 
 	defer os.RemoveAll(dir)
 
-	magErr := mg.WriteTo(dir, files)
+	magErr := mg.WriteTo(dir, *resolver.Files)
 
 	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
 		"hi.txt at source/processed/hi.txt:1:5 "+

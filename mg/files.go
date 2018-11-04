@@ -8,7 +8,7 @@ import (
 
 type DefaultFileResolver struct {
 	BasePath string
-	Files    WebFilesMap
+	Files    *WebFilesMap
 }
 
 var _ FileResolver = (*DefaultFileResolver)(nil)
@@ -59,7 +59,7 @@ func getFilesAt(root string, exclusions ...string) ([]string, error) {
 
 func (r *DefaultFileResolver) FilesIn(dir string, from Location) (dirPath string, webFiles []WebFile, e error) {
 	dirPath = Resolve(dir, r.BasePath, from)
-	for path, wf := range r.Files {
+	for path, wf := range r.Files.WebFiles {
 		if !wf.NonWritable && filepath.Dir(path) == dirPath {
 			webFiles = append(webFiles, wf)
 		}

@@ -12,7 +12,10 @@ type Magnanimous struct {
 	SourcesDir string
 }
 
-type WebFilesMap map[string]WebFile
+type WebFilesMap struct {
+	GlobalContext RootScope
+	WebFiles      map[string]WebFile
+}
 
 type WebFile struct {
 	BasePath    string
@@ -46,7 +49,7 @@ type Content interface {
 }
 
 type SideEffectContent interface {
-	Run(files WebFilesMap, inclusionChain []InclusionChainItem)
+	Run(files *WebFilesMap, inclusionChain []InclusionChainItem)
 }
 
 type StringContent struct {
@@ -98,25 +101,19 @@ func (f *ProcessedFile) Parent() Scope {
 }
 
 func (f *ProcessedFile) setParent(content Scope) {
-	switch root := content.(type) {
-	case RootScope:
-		f.rootScope = root
-	default:
-		panic("Cannot set parent on ProcessedFile as it's the top content scope")
-	}
+	panic("Cannot set parent on ProcessedFile as it's the top content scope")
 }
 
 func (f *ProcessedFile) AppendContent(content Content) {
 	s := len(f.scopeStack)
-	var topScope Scope
+	var topScope Scope = f
 	if s > 0 {
 		topScope = f.scopeStack[s-1]
 		topScope.AppendContent(content)
 	} else {
 		f.contents = append(f.contents, content)
 	}
-	newScope, ok := content.(Scope)
-	if ok {
+	if newScope, ok := content.(Scope); ok {
 		newScope.setParent(topScope)
 		f.scopeStack = append(f.scopeStack, newScope)
 	}

@@ -51,15 +51,15 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["a"] = float64(3)
 
-	files := mg.WebFilesMap{}
-	files["source/processed/hi.md"] = mg.WebFile{Processed: processed}
+	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
 	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
 
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
-	files := make(mg.WebFilesMap)
-	resolver := mg.DefaultFileResolver{BasePath: "source", Files: files}
+	files := make(map[string]mg.WebFile)
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ eval 2 * hello }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver)
@@ -81,7 +81,7 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)
 
-	checkParsing(t, otherProcessed.Context(), files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed.Context(), *resolver.Files, otherProcessed, expectedCtx, []string{
 		"OUTER\n",
 		"",
 		"A = 14",

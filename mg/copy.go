@@ -10,14 +10,14 @@ import (
 func CopyAll(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf := Copy(file, basePath, true)
-		filesMap[file] = *wf
+		filesMap.WebFiles[file] = *wf
 	}
 }
 
 func AddNonWritables(files *[]string, basePath string, filesMap WebFilesMap) {
 	for _, file := range *files {
 		wf := Copy(file, basePath, false)
-		filesMap[file] = *wf
+		filesMap.WebFiles[file] = *wf
 	}
 }
 

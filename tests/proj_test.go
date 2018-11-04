@@ -265,8 +265,8 @@ func TestProj5(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(files) != 3 {
-		t.Fatalf("Expected 3 output files, but got: %v", files)
+	if len(files) != 4 {
+		t.Fatalf("Expected 4 output files, but got: %v", files)
 	}
 
 	assertFileContents(t, files, dir, "a.txt", "")
@@ -274,4 +274,10 @@ func TestProj5(t *testing.T) {
 		"/my-website/10\n"+
 		"/my-website/20")
 	assertFileContents(t, files, dir, "folder/example.txt", "Full path: /my-website/folder/example.txt")
+	assertFileContents(t, files, dir, "scopes.txt", "Base URL: /my-website/\n\n"+
+		"/other-website/A\n"+
+		"/other-website/<nil>\n\n"+
+		"File sees /my-website/\n"+
+		"Full path: /other-website/folder/example.txt\n"+
+		"After unset, base URL: /my-website/")
 }

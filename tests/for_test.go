@@ -192,7 +192,7 @@ func TestForFiles(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path /processed/examples }}\n" +
@@ -210,6 +210,35 @@ func TestForFiles(t *testing.T) {
 			"Title Second File\n")
 }
 
+func TestForFilesScope(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]map[string]string{
+		"processed/examples/f1.txt": {"title": "File 1"},
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
+
+	r := bufio.NewReader(strings.NewReader("Title is {{ eval title }}\n" +
+		"{{ for path /processed/examples }}\n" +
+		"  path.title: {{ eval path.title }}\n" +
+		"  title: {{ eval title }}\n" +
+		"{{ end }}\n" +
+		"Title is {{ eval title }}"))
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Title is <nil>\n\n"+
+			"  path.title: File 1\n"+
+			"  title: <nil>\n\n"+
+			"Title is <nil>")
+}
+
 func TestForFilesWithUnwritableFiles(t *testing.T) {
 
 	// create a bunch of files for testing
@@ -221,7 +250,7 @@ func TestForFilesWithUnwritableFiles(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path /processed/examples }}\n" +
@@ -253,7 +282,7 @@ func TestForFilesReverse(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path ( reverse ) /processed/ }}\n" +
@@ -290,7 +319,7 @@ func TestForFilesLimit(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path ( limit 5 ) /processed/ }}\n" +
@@ -321,7 +350,7 @@ func TestForFilesLimitTooMany(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path ( limit 56 ) /processed/ }}\n" +
@@ -352,7 +381,7 @@ func TestForFilesSortBy(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path (sortBy title) /processed/examples }}\n" +
@@ -385,7 +414,7 @@ func TestForFilesSortByReverse(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path (sortBy title reverse) /processed/examples }}\n" +
@@ -418,7 +447,7 @@ func TestForFilesReverseSortBy(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path (reverse   sortBy title) /processed/examples }}\n" +
@@ -451,7 +480,7 @@ func TestForFilesLimitSortByReverse(t *testing.T) {
 	})
 	defer os.RemoveAll(dir)
 
-	resolver := mg.DefaultFileResolver{BasePath: dir, Files: files}
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
 
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for path ( limit 3 sortBy title reverse ) /processed/examples }}\n" +

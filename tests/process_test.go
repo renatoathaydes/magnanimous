@@ -12,7 +12,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 
 	writeContentToString := func(content mg.Content) string {
 		var w strings.Builder
-		content.Write(&w, nil, nil)
+		content.Write(&w, mg.WebFilesMap{}, nil)
 		return w.String()
 	}
 
@@ -43,10 +43,10 @@ func TestProcessIncludeSimple(t *testing.T) {
 	exampleFile := mg.ProcessedFile{}
 	exampleFile.AppendContent(&mg.StringContent{Text: "from another file!"})
 
-	m := mg.WebFilesMap{}
-	m["source/processed/example.html"] = mg.WebFile{Processed: &exampleFile}
+	m := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	m.WebFiles["source/processed/example.html"] = mg.WebFile{Processed: &exampleFile}
 
-	resolver := mg.DefaultFileResolver{BasePath: "source", Files: m}
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &m}
 
 	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11, &resolver)
@@ -64,11 +64,11 @@ func TestMarkdownToHtml(t *testing.T) {
 	footer := mg.ProcessedFile{}
 	footer.AppendContent(&mg.StringContent{Text: "</body></html>"})
 
-	m := mg.WebFilesMap{}
-	m["header.html"] = mg.WebFile{Processed: &header, Name: "header.html"}
-	m["footer.html"] = mg.WebFile{Processed: &footer, Name: "footer.html"}
+	m := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	m.WebFiles["header.html"] = mg.WebFile{Processed: &header, Name: "header.html"}
+	m.WebFiles["footer.html"] = mg.WebFile{Processed: &footer, Name: "footer.html"}
 
-	rsvr := mg.DefaultFileResolver{BasePath: "", Files: m}
+	rsvr := mg.DefaultFileResolver{BasePath: "", Files: &m}
 
 	file := mg.ProcessedFile{}
 	file.AppendContent(&mg.IncludeInstruction{Path: "header.html", Resolver: &rsvr})
@@ -97,10 +97,10 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		MarkDownContent: []mg.Content{&mg.StringContent{Text: "## header"}},
 	})
 
-	m := mg.WebFilesMap{}
-	m["source/example.md"] = mg.WebFile{Processed: &exampleFile}
+	m := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	m.WebFiles["source/example.md"] = mg.WebFile{Processed: &exampleFile}
 
-	resolver := mg.DefaultFileResolver{BasePath: "source", Files: m}
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &m}
 
 	// read a file that includes the previous file
 	r := bufio.NewReader(strings.NewReader("# hello\n{{ include /example.md }}"))

@@ -33,7 +33,7 @@ func (f *HtmlFromMarkdownContent) GetContents() []Content {
 	return f.MarkDownContent
 }
 
-func (f *HtmlFromMarkdownContent) Run(files WebFilesMap, inclusionChain []InclusionChainItem) {
+func (f *HtmlFromMarkdownContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
 	runSideEffects(f, files, inclusionChain)
 }
 
