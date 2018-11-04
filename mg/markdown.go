@@ -17,7 +17,8 @@ var _ Content = (*HtmlFromMarkdownContent)(nil)
 var _ ContentContainer = (*HtmlFromMarkdownContent)(nil)
 var _ SideEffectContent = (*HtmlFromMarkdownContent)(nil)
 
-var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(bfchroma.WithoutAutodetect()))
+var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(
+	bfchroma.WithoutAutodetect(), bfchroma.Style("lovelace")))
 
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{
