@@ -1,0 +1,9 @@
+#toc-col {
+    float: left;
+    width: 20%;
+}
+
+#doc-col {
+    float: right;
+    width: 78%;
+}
