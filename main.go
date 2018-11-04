@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	if len(webFiles) == 0 {
+	if len(webFiles.WebFiles) == 0 {
 		fmt.Printf("No files found in the %s directory, nothing to do.\n", mag.SourcesDir)
 		return
 	}
