@@ -7,3 +7,17 @@
     float: right;
     width: 78%;
 }
+
+.docs-top {
+    float: right;
+    margin: 1em;
+}
+
+.docs-link {
+    font-style: italic;
+    font-size: smaller;
+}
+
+.main-body {
+    clear: both;
+}
