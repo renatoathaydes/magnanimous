@@ -17,7 +17,95 @@
 </div>
 <div class="main-body">
 
-<h1>Getting Started</h1>
+<h1>1. Getting Started</h1>
+
+<p>This section briefly describes how you can get Magnanimous and quickly get a simple static website built using it.</p>
+
+<p>It&rsquo;s intentionally light on details! Check the next chapters to learn more.</p>
+
+<h2>Downloading</h2>
+
+<p>Magnanimous is a single executable file. To download it using the command line, type the following:</p>
+<pre style="background-color:#fff">$ curl &lt;url-will-go-here&gt;
+</pre>
+<p>You can also download it manually from <a href="link-will-go-here">this page</a>.</p>
+
+<h2>Creating the source directories</h2>
+
+<p>Magnanimous expects you to have a simple directory structure like this:</p>
+
+<p><img src="/magnanimous/images/docs/my-website.jpg" alt="directory-structure" /></p>
+
+<p>The <code>README.md</code> file is not really needed, but you can document how your website works and things like that in this file.</p>
+
+<p>All <strong>source</strong> files go, unsurprisingly, in the <code>source/</code> directory, under one of its sub-directories.</p>
+
+<blockquote>
+<p>A <strong>source</strong> file is just a file that you want to be in your website. We call it source to differentiate it from
+  the generated files, which we are just about to meet!</p>
+</blockquote>
+
+<p>The <code>source/</code> directory contains two sub-directories:</p>
+
+<ul>
+<li><code>static/</code> can be used for files that should be just copied to your website without modifications.</li>
+<li><code>processed/</code> is where <strong>processed</strong> files are placed.</li>
+</ul>
+
+<p>Only files within these two directories will be present in the final website.</p>
+
+<p>A <strong>processed</strong> file is one which contains <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which are
+used to modify the actual contents of the file or provide metadata.</p>
+
+<blockquote>
+<p><strong>Metadata</strong> is some information about a file, like its path, title, or the date it was created, which can be used
+  elsewhere (e.g. on the table of contents) or included in the visible file contents.</p>
+</blockquote>
+
+<p>Any file whose name starts with an underscore, like <code>_header.html</code>, will <strong>not</strong> be present in the final website.
+But they are useful to create <a href="components.html">Components</a>, or <em>fragments</em> which can be included into other files.</p>
+
+<p><img src="/magnanimous/images/docs/transformation.jpg" width="500em;" alt="Magnanimous transformation" /></p>
+
+<h2>Building the website</h2>
+
+<p>After creating a few source files, from inside the root directory (<code>my-website/</code>, in the above example), just run the
+Magnanimous executable from the command line:</p>
+<pre style="background-color:#fff">$ magnanimous
+</pre>
+<p>You can also run <code>magnanimous</code> from other directories, in which case you just need to give the website&rsquo;s directory
+as an argument:</p>
+<pre style="background-color:#fff">$ magnanimous path/to/my-website
+</pre>
+<p>This will create a static website in the <code>target/</code> directory.</p>
+
+<h2>Testing the website</h2>
+
+<p>Now that your website is ready, you can run any web server to serve the <code>target/</code> directory so you can see what
+the website looks like.</p>
+
+<p>For example, if you have Python installed, simply run this command:</p>
+<pre style="background-color:#fff">$ cd target/ &amp;&amp; python -m SimpleHTTPServer 8082
+</pre>
+<blockquote>
+<p><a href="https://gist.github.com/willurd/5720255">Click here</a> for many other web server one-liners.</p>
+</blockquote>
+
+<p>Then, open <code>http://localhost:8082</code> on your browser. If you have a file called <code>index.html</code>, that page should be shown
+in the browser&hellip; otherwise, just add the path to one of your files to the URL (e.g. if you have a source file under
+<code>source/processed/blog/blog1.html</code>, try opening <code>http://localhost:8082/blog/blog1.html</code>).</p>
+
+<p>To publish the website publicly so everyone can visit it, you can use one of many available static website hosts:</p>
+
+<ul>
+<li><a href="https://www.netlify.com/">Netlify</a></li>
+<li><a href="https://pages.github.com/">GitHub Pages</a></li>
+<li><a href="https://www.digitalocean.com/">Digital Ocean</a></li>
+<li><a href="https://www.bitballoon.com/">BitBalloon</a></li>
+<li><a href="http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html">AWS (Amazon)</a></li>
+</ul>
+
+<p>The <a href="basic_tutorial.html">Basic Tutorial</a> shows how to publish a website with GitHub Pages.</p>
 
 <p></div>
 <div class="footer">
