@@ -110,7 +110,18 @@ func parseText(state *parserState, resolver FileResolver) error {
 		if r == '\n' {
 			state.row++
 			state.col = 1
-			builder.WriteRune(r)
+			if !previousWasEscape {
+				builder.WriteRune(r)
+			} else {
+				previousWasEscape = false
+			}
+			continue
+		}
+
+		if r == '\r' {
+			if !previousWasEscape {
+				builder.WriteRune(r)
+			}
 			continue
 		}
 

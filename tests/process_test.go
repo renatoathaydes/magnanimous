@@ -138,3 +138,27 @@ func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 		". How are you?",
 	})
 }
+
+func TestProcessIgnoreEscapedNewLine(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("hello {{ eval \"Joe\" }}\\\n, how are you\\\n, good?"))
+	processed, err := mg.ProcessReader(r, "", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext,
+		[]string{"hello ", "Joe", ", how are you, good?"})
+}
+
+func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("hello {{ eval \"Joe\" }}\\\r\n, how are you\\\r\n, good?\r\nKeep line."))
+	processed, err := mg.ProcessReader(r, "", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext,
+		[]string{"hello ", "Joe", ", how are you, good?\r\nKeep line."})
+}
