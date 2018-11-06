@@ -1,1 +1,2 @@
 {{ define baseURL "/magnanimous" }}
+{{ define INSTRUCTIONS_PATH baseURL + "/sections/docs/expression_lang.html" }}
