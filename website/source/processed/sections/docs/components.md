@@ -13,11 +13,10 @@ To avoid repeating the same code all over the place, you can use Magnanimous com
 
 ## Creating and using a component
 
-A component should be declared in a non-writable file (i.e. its name starts with `_`) somewhere under the 
-`source/processed/` directory.
-
-Components are not usually full HTML pages, but fragments which can be customized to display different
-content, sometimes even in a customizable shape.
+A component should be declared in a non-writable file (i.e. its name starts with underscore, as in `_example`)
+somewhere under the `source/processed/` directory. That's because components are not usually full HTML pages,
+but fragments which can be customized to display different content, sometimes even in a customizable shape
+(so you wouldn't want them served by the server by themselves).
 
 As an example, let's say we want to create a component to represent a simple _warning_ box.
 
@@ -25,7 +24,7 @@ It could look like this:
 
 **source/processed/components/_warning.html**
 ```html
-{{ doc This component takes a 'message' and displays it in a warning box }}\
+\{{ doc This component takes a 'message' and displays it in a warning box }}\
 <div class="warning">{{ eval message }}</div>
 ```
 
@@ -36,10 +35,10 @@ You could then use this component in other files like this:
 ```html
 <div>Some content</div>
 
-{{ component /processed/components/_warning.html }}
+\{{ component /processed/components/_warning.html }}
     Warning Box!! This text is ignored, only definitions in this scope are evaluated.
-    {{ define message "This is a warning message!" }}
-{{ end }}
+    \{{ define message "This is a warning message!" }}
+\{{ end }}
 
 <div>More content</div>
 ```
@@ -58,13 +57,13 @@ mess with the surrounding scope.
 If that's not a concern, we could have just re-used an existing binding, as in this example:
 
 ```html
-{{ define message "This is a warning message!" }}
+\{{ define message "This is a warning message!" }}\
 <div>Some content</div>
 
-{{ component /processed/components/_warning.html }}{{ end }}
+\{{ component /processed/components/_warning.html }}\{{ end }}
 
 <div>More content</div>
-``` 
+```
 
 Notice that the usual scope rules which apply to file inclusions also apply to components.
 
@@ -89,9 +88,9 @@ To make things more concrete, here's what the files could look like:
 
 **source/processed/posts/first_post.md**
 ```markdown
-{{ define name "My first post" }}\
-{{ define path "/processed/posts/first_post.html" }}\
-{{ define date "2018-04-05" }}\
+\{{ define name "My first post" }}\
+\{{ define path "/processed/posts/first_post.html" }}\
+\{{ define date "2018-04-05" }}\
 
 # My first post
 
@@ -100,9 +99,9 @@ etc...
 
 **source/processed/posts/second_post.md**
 ```markdown
-{{ define name "My second post" }}\
-{{ define path baseURL + "/processed/posts/second_post.html" }}\
-{{ define date "2018-06-07" }}\
+\{{ define name "My second post" }}\
+\{{ define path baseURL + "/processed/posts/second_post.html" }}\
+\{{ define date "2018-06-07" }}\
 
 # My second post
 
@@ -113,7 +112,7 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
 
 **source/processed/components/_data_table.html**
 ```html
-{{ doc
+\{{ doc
     Arguments:
       * dataDirectory - path to a directory containing files with the following properties:
           * name
@@ -126,12 +125,12 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
     <th>Post Name</th>
     </thead>
     <tbody>
-    {{ for post (sortBy date) eval dataDirectory }}\
+    \{{ for post (sortBy date) eval dataDirectory }}\
     <tr>
-        <td>{{ eval post.date }}</td>
-        <td><a href="{{ eval post.path }}">{{ eval post.name }}</a></td>
+        <td>\{{ eval post.date }}</td>
+        <td><a href="\{{ eval post.path }}">\{{ eval post.name }}</a></td>
     </tr>
-    {{ end }}\
+    \{{ end }}\
     </tbody>
 </table>
 ```
@@ -143,9 +142,9 @@ Finally, we can add the component to our index page (and any other pages we want
 <html>
 <body>
 <h2>These are my posts</h2>
-{{ component /processed/components/_data_table.html }}\
-    {{ define dataDirectory "/processed/posts" }}\
-{{ end }}\
+\{{ component /processed/components/_data_table.html }}\
+    \{{ define dataDirectory "/processed/posts" }}\
+\{{ end }}\
 </body>
 </html>
 ```
@@ -177,5 +176,7 @@ Here's what the result should look like:
 </body>
 </html>
 ```
+
+Now, go on and create your own awesome components!
 
 {{ include _docs_footer.html }}
