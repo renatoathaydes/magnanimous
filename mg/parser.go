@@ -72,9 +72,9 @@ func parseText(state *parserState, resolver FileResolver) error {
 			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 		}
 		switch r {
-		case '{':
+		case '{', '\\':
 			// don't treat specially, just let it be written
-			_, err = builder.WriteRune('{')
+			_, err = builder.WriteRune(r)
 			return nil, err
 		case '\n':
 			// forget the new line
