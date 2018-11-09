@@ -4,8 +4,8 @@
 
 
 
-body 
-{    margin: 40px auto;
+body {
+    margin: 40px auto;
     max-width: 650px;
     line-height: 1.6;
     font-size: 18px;
@@ -14,57 +14,57 @@ body
     font-family: Helvetica, sans-serif;
 }
 
-h1, h2, h3 
-{    line-height: 1.2
+h1, h2, h3 {
+    line-height: 1.2
 }
 
-blockquote 
-{    font-style: italic;
+blockquote {
+    font-style: italic;
     margin-left: 10px;
     color: #777;
 }
 
-code 
-{    padding: 0.2em;
+code {
+    padding: 0.2em;
     border-radius: 0.3em;
     background-color: #C1C8E4;
 }
 
-pre 
-{    padding: 0.6em;
+pre {
+    padding: 0.6em;
     border-left: 1px black dotted;
 }
 
-.section-button 
-{    border: solid darkblue 0.1em;
+.section-button {
+    border: solid darkblue 0.1em;
     border-radius: 0.7em;
     padding: 0.8em;
     margin-left: 0.5em;
 }
 
-.section-button.active 
-{    font-weight: bolder;
+.section-button.active {
+    font-weight: bolder;
 }
 
-.section-button a:visited 
-{    color: #5680E9;
+.section-button a:visited {
+    color: #5680E9;
 }
 
-a:link 
-{    color: #5680E9;
+a:link {
+    color: #5680E9;
 }
 
-.footer 
-{    height: 5em;
+.footer {
+    height: 5em;
     background-color: #272727;
     color: #C1C8E4;
     padding: 1em;
 }
 
-.footer a:link 
-{    color: #5AB9EA;
+.footer a:link {
+    color: #5AB9EA;
 }
 
-.footer a:visited 
-{    color: #84CEEB;
+.footer a:visited {
+    color: #84CEEB;
 }
