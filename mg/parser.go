@@ -1,86 +1,126 @@
 package mg
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"strings"
 )
 
+type parserState struct {
+	file    string
+	reader  *bufio.Reader
+	row     uint32
+	col     uint32
+	pf      *ProcessedFile
+	builder *strings.Builder
+}
+
 func parseText(state *parserState, resolver FileResolver) error {
-	previousWasOpenBracket := false
-	previousWasEscape := false
 	reader := state.reader
 	builder := state.builder
 
+	//// all functions handling special characters return nil if they handle the next rune,
+	//// or the next rune if it was not handled
+
+	onEscapedReturn := func() (*rune, error) {
+		r, _, err := reader.ReadRune()
+		if err == io.EOF {
+			return nil, nil
+		}
+		state.col++
+		if err != nil {
+			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+		}
+		if r == '\n' {
+			// forget both the return and the new-line
+			state.row++
+			state.col = 1
+			return nil, nil
+		}
+		// forget just the return rune and continue with the next one
+		return &r, nil
+	}
+
+	onOpenBracket := func() (*rune, error) {
+		r, _, err := reader.ReadRune()
+		if err == io.EOF {
+			return nil, nil
+		}
+		state.col++
+		if err != nil {
+			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+		}
+		if r == '{' {
+			if builder.Len() > 0 {
+				state.pf.AppendContent(&StringContent{Text: builder.String()})
+				builder.Reset()
+			}
+			return nil, parseInstruction(state, resolver)
+		}
+		_, err = builder.WriteRune('{')
+		return &r, err
+	}
+
+	onEscape := func() (*rune, error) {
+		r, _, err := reader.ReadRune()
+		if err == io.EOF {
+			return nil, nil
+		}
+		state.col++
+		if err != nil {
+			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+		}
+		switch r {
+		case '{':
+			// don't treat specially, just let it be written
+			_, err = builder.WriteRune('{')
+			return nil, err
+		case '\n':
+			// forget the new line
+			return nil, nil
+		case '\r':
+			return onEscapedReturn()
+		}
+		_, err = builder.WriteRune('\\')
+		return &r, err
+	}
+
 	for {
 		r, _, err := reader.ReadRune()
+		state.col++
+
+	parseRune:
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return &MagnanimousError{message: err.Error(), Code: IOError}
 		}
-
-		if r == '\n' {
+		var nextRune *rune
+		switch r {
+		case '\n':
 			state.row++
 			state.col = 1
-			if !previousWasEscape {
-				builder.WriteRune(r)
-			} else {
-				previousWasEscape = false
-			}
-			continue
+			_, err = builder.WriteRune('\n')
+		case '{':
+			nextRune, err = onOpenBracket()
+		case '\\':
+			nextRune, err = onEscape()
+		default:
+			_, err = builder.WriteRune(r)
 		}
 
-		if r == '\r' {
-			if !previousWasEscape {
-				builder.WriteRune(r)
+		if nextRune != nil || err != nil {
+			if nextRune != nil {
+				r = *nextRune
 			}
-			continue
-		}
-
-		state.col++
-
-		if r == '{' {
-			if previousWasEscape {
-				builder.WriteRune(r)
-				previousWasEscape = false
-				continue
-			}
-			if previousWasOpenBracket {
-				if builder.Len() > 0 {
-					state.pf.AppendContent(&StringContent{Text: builder.String()})
-					builder.Reset()
-				}
-				previousWasOpenBracket = false
-				magErr := parseInstruction(state, resolver)
-				if magErr != nil {
-					return magErr
-				}
-			} else {
-				previousWasOpenBracket = true
-			}
-			continue
-		}
-
-		if previousWasOpenBracket {
-			builder.WriteRune('{')
-		}
-		previousWasOpenBracket = false
-
-		if r == '\\' {
-			previousWasEscape = true
-		} else {
-			builder.WriteRune(r)
+			goto parseRune
 		}
 	}
 
 	// append any pending content to the builder
-	if builder.Len() > 0 || previousWasOpenBracket || previousWasEscape {
-		if previousWasOpenBracket {
-			builder.WriteRune('{')
-		} else if previousWasEscape {
-			builder.WriteRune('\\')
-		}
+	if builder.Len() > 0 {
 		state.pf.AppendContent(&StringContent{Text: builder.String()})
 		builder.Reset()
 	}

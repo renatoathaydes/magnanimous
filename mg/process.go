@@ -10,15 +10,6 @@ import (
 	"strings"
 )
 
-type parserState struct {
-	file    string
-	reader  *bufio.Reader
-	row     uint32
-	col     uint32
-	pf      *ProcessedFile
-	builder *strings.Builder
-}
-
 func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	processedDir := filepath.Join(mag.SourcesDir, "processed")
 	staticDir := filepath.Join(mag.SourcesDir, "static")
