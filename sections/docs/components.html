@@ -36,7 +36,7 @@ but fragments which can be customized to display different content, sometimes ev
 
 <p>It could look like this:</p>
 <pre style="background-color:#fff">{{ doc This component takes a &#39;message&#39; and displays it in a warning box }}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">nil</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval message }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
 <div class="file-box">source/processed/components/_warning.html</div>
 
