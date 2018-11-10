@@ -111,7 +111,7 @@ func createInstruction(name, arg string, scope Scope, location Location,
 	original string, resolver FileResolver) Content {
 	switch name {
 	case "include":
-		return NewIncludeInstruction(arg, location, scope, resolver)
+		return NewIncludeInstruction(arg, location, original, scope, resolver)
 	case "define":
 		return NewVariable(arg, location, original, scope)
 	case "eval":
@@ -120,6 +120,10 @@ func createInstruction(name, arg string, scope Scope, location Location,
 		return NewIfInstruction(arg, location, original)
 	case "for":
 		return NewForInstruction(arg, location, original, resolver)
+	case "doc":
+		return nil
+	case "component":
+		return NewComponentInstruction(arg, location, original, scope, resolver)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)

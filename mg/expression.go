@@ -16,7 +16,7 @@ type DefineContent struct {
 }
 
 type ExpressionContent struct {
-	expr     *expression.Expression
+	Expr     *expression.Expression
 	Text     string
 	Location Location
 	scope    Scope
@@ -28,7 +28,7 @@ func NewExpression(arg string, location Location, original string, scope Scope) 
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ExpressionContent{expr: &expr, Location: location, Text: original, scope: scope}
+	return &ExpressionContent{Expr: &expr, Location: location, Text: original, scope: scope}
 }
 
 func NewVariable(arg string, location Location, original string, scope Scope) Content {
@@ -54,7 +54,7 @@ func unevaluatedExpression(original string) Content {
 var _ Content = (*ExpressionContent)(nil)
 
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	r, err := expression.EvalExpr(*e.expr, magParams{
+	r, err := expression.EvalExpr(*e.Expr, magParams{
 		webFiles:       &files,
 		scope:          e.scope,
 		inclusionChain: inclusionChain,

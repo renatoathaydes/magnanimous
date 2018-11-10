@@ -7,14 +7,15 @@ import (
 )
 
 type IncludeInstruction struct {
+	Text     string
 	Path     string
 	Origin   Location
 	scope    Scope
 	Resolver FileResolver
 }
 
-func NewIncludeInstruction(arg string, location Location, scope Scope, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Path: arg, Origin: location, scope: scope, Resolver: resolver}
+func NewIncludeInstruction(arg string, location Location, original string, scope Scope, resolver FileResolver) *IncludeInstruction {
+	return &IncludeInstruction{Text: original, Path: arg, Origin: location, scope: scope, Resolver: resolver}
 }
 
 func (c *IncludeInstruction) String() string {
@@ -27,7 +28,7 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 	webFile, ok := files.WebFiles[path]
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
-		_, err := writer.Write([]byte(fmt.Sprintf("{{ include %s }}", c.Path)))
+		_, err := writer.Write([]byte(c.Text))
 		if err != nil {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
