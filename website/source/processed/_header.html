@@ -22,7 +22,7 @@
 <div class="main-body">
 <nav class="">
 
-<div>
+<div class="top-menu">
 {{ for section (sortBy index) /processed/sections }}
         <span class="section-button {{ eval section.name }}{{ if section.path == path }} active{{ end }}">
             <a href="{{eval baseURL }}{{ eval section.path }}">{{ eval section.name }}</a>

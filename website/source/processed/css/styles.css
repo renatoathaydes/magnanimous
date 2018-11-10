@@ -18,6 +18,11 @@ h1, h2, h3 {
     line-height: 1.2
 }
 
+.top-menu {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 blockquote {
     font-style: italic;
     margin-left: 10px;
@@ -64,7 +69,7 @@ a:link {
 }
 
 .footer {
-    height: 5em;
+    min-height: 5em;
     background-color: {{ eval darkColor }};
     color: {{ eval funColor4 }};
     padding: 1em;
