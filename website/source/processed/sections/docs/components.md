@@ -24,7 +24,7 @@ It could look like this:
 
 ```html
 \{{ doc This component takes a 'message' and displays it in a warning box }}\\
-<div class="warning">{{ eval message }}</div>
+<div class="warning">\{{ eval message }}</div>
 ```
 
 {{ component /processed/components/file-box.html }}\
