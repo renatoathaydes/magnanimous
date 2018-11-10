@@ -33,6 +33,7 @@ code {
 pre {
     padding: 0.6em;
     border-left: 1px black dotted;
+    overflow: scroll;
 }
 
 .file-box {
