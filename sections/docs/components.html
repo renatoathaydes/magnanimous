@@ -39,73 +39,71 @@ but fragments which can be customized to display different content, sometimes ev
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">nil</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
 <div class="file-box">source/processed/components/_warning.html</div>
-That's it!
 
-You could then use this component in other files like this:
+<p>That&rsquo;s it!</p>
 
-```html
-<div>Some content</div>
+<p>You could then use this component in other files like this:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 
-<p>{{ component /processed/components/_warning.html }}
+{{ component /processed/components/_warning.html }}
     Warning Box!! This text is ignored, only definitions in this scope are evaluated.
-    {{ define message &ldquo;This is a warning message!&rdquo; }}
-{{ end }}</p>
+    {{ define message &#34;This is a warning message!&#34; }}
+{{ end }}
 
-<div>More content</div>
-```
-
-> Notice that all customizable components must go in the `source/processed/` directory (so they can receive
-  the customization via variables), but where under that directory does not matter for Magnanimous... they could
-  go under any sub-directory you wish. If you create static components that don't need to be customized,
-  you could even put them under `source/static`, which guarantees they will be included without changes.
-
-### Component scopes
-
-Notice that our example component expects a variable called `message` to exist in its scope. For that reason, 
-in the above example, we provide a `message` binding within the scope of the component itself, so that we don't
-mess with the surrounding scope.
-
-If that's not a concern, we could have just re-used an existing binding, as in this example:
-
-```html
-{{ define message "This is a warning message!" }}\
-<div>Some content</div>
-
-<p>{{ component /processed/components/_warning.html }}{{ end }}</p>
-
-<p><div>More content</div></p>
-<pre style="background-color:#fff">
-Notice that the usual scope rules which apply to file inclusions also apply to components.
-
-So, the `message` variable for the example component could even have come from another file which includes this file,
-or ultimately, from the `_global_context`.
-
-### A more advanced example
-
-To really understand what can be achieved with components, let&#39;s look at a more advanced example.
-
-Let&#39;s create a data table which will contain a summary of the metadata for each file in a given directory.
-
-This could be used as a table of contents, or blog post summary, for example.
-
-First, we expect the `source/processed/posts/` directory to only contain files that declare the following variables:
-
-* `name`
-* `path`
-* `date`
-
-To make things more concrete, here&#39;s what the files could look like:
-
-```markdown
-{{ define name &#34;My first post&#34; }}\
-{{ define path &#34;/processed/posts/first_post.html&#34; }}\
-{{ define date &#34;2018-04-05&#34; }}\
-
-# My first post
-
-etc...
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
-<p><div class="file-box">source/processed/posts/first_post.md</div></p>
+<blockquote>
+<p>Notice that all customizable components must go in the <code>source/processed/</code> directory (so they can receive
+  the customization via variables), but where under that directory does not matter for Magnanimous&hellip; they could
+  go under any sub-directory you wish. If you create static components that don&rsquo;t need to be customized,
+  you could even put them under <code>source/static</code>, which guarantees they will be included without changes.</p>
+</blockquote>
+
+<h3>Component scopes</h3>
+
+<p>Notice that our example component expects a variable called <code>message</code> to exist in its scope. For that reason,
+in the above example, we provide a <code>message</code> binding within the scope of the component itself, so that we don&rsquo;t
+mess with the surrounding scope.</p>
+
+<p>If that&rsquo;s not a concern, we could have just re-used an existing binding, as in this example:</p>
+<pre style="background-color:#fff">{{ define message &#34;This is a warning message!&#34; }}\
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+
+{{ component /processed/components/_warning.html }}{{ end }}
+
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre>
+<p>Notice that the usual scope rules which apply to file inclusions also apply to components.</p>
+
+<p>So, the <code>message</code> variable for the example component could even have come from another file which includes this file,
+or ultimately, from the <code>_global_context</code>.</p>
+
+<h3>A more advanced example</h3>
+
+<p>To really understand what can be achieved with components, let&rsquo;s look at a more advanced example.</p>
+
+<p>Let&rsquo;s create a data table which will contain a summary of the metadata for each file in a given directory.</p>
+
+<p>This could be used as a table of contents, or blog post summary, for example.</p>
+
+<p>First, we expect the <code>source/processed/posts/</code> directory to only contain files that declare the following variables:</p>
+
+<ul>
+<li><code>name</code></li>
+<li><code>path</code></li>
+<li><code>date</code></li>
+</ul>
+
+<p>To make things more concrete, here&rsquo;s what the files could look like:</p>
+<pre style="background-color:#fff">{{ define name &#34;My first post&#34; }}\<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>{{ define path &#34;/processed/posts/first_post.html&#34; }}\<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>{{ define date &#34;2018-04-05&#34; }}\<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> My first post
+<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span></pre>
+<div class="file-box">source/processed/posts/first_post.md</div>
 <pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ define date &#34;2018-06-07&#34; }}\<span style="background-color:#a848a8">
@@ -114,8 +112,9 @@ etc...
 <span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span></pre>
-<p><div class="file-box">source/processed/posts/second_post.md</div>
-Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
+<div class="file-box">source/processed/posts/second_post.md</div>
+
+<p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
 <pre style="background-color:#fff">{{ doc
     Arguments:
       * dataDirectory - path to a directory containing files with the following properties:
@@ -138,8 +137,9 @@ Now, we can define a simple HTML component that will put the posts&rsquo; metada
     <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
 </pre>
-<p><div class="file-box">source/processed/components/_data_table.html</div>
-Finally, we can add the component to our index page (and any other pages we want!):</p>
+<div class="file-box">source/processed/components/_data_table.html</div>
+
+<p>Finally, we can add the component to our index page (and any other pages we want!):</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
@@ -149,8 +149,9 @@ Finally, we can add the component to our index page (and any other pages we want
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </pre>
-<p><div class="file-box">source/processed/index.html</div>
-And we&rsquo;re done!</p>
+<div class="file-box">source/processed/index.html</div>
+
+<p>And we&rsquo;re done!</p>
 
 <p>Here&rsquo;s what the result should look like:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -175,8 +176,9 @@ And we&rsquo;re done!</p>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </pre>
-<p><div class="file-box">target/index.html</div>
-Now, go on and create your own awesome components!</p>
+<div class="file-box">target/index.html</div>
+
+<p>Now, go on and create your own awesome components!</p>
 </div>
 <div class="footer">
     <div>
