@@ -17,18 +17,65 @@ type parserState struct {
 }
 
 func parseText(state *parserState, resolver FileResolver) error {
+begin:
+	eof, err := parseUntilDoubleRunes('{', state)
+	if err != nil {
+		return err
+	}
+	content := state.builder.String()
+	state.builder.Reset()
+	if len(content) > 0 {
+		state.pf.AppendContent(&StringContent{Text: content})
+	}
+	if !eof {
+		err = parseInstruction(state, resolver)
+		if err != nil {
+			return err
+		} else {
+			goto begin
+		}
+	}
+	return nil
+}
+
+func parseInstruction(state *parserState, resolver FileResolver) error {
+	instrFirstRow := state.row
+	instrFirstCol := state.col - 2
+
+	eof, err := parseUntilDoubleRunes('}', state)
+	if err != nil {
+		return err
+	}
+	if !eof {
+		content := state.builder.String()
+		state.builder.Reset()
+
+		if len(content) > 0 {
+			appendInstructionContent(state.pf, content,
+				Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
+				resolver)
+		}
+		return nil
+	}
+
+	return NewError(Location{Origin: state.file, Row: state.row, Col: state.col}, ParseError,
+		fmt.Sprintf("instruction started at (%d:%d) was not properly closed with '}}'",
+			instrFirstRow, instrFirstCol))
+}
+
+func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {
 	reader := state.reader
 	builder := state.builder
 
-	//// all functions handling special characters return nil if they handle the next rune,
-	//// or the next rune if it was not handled
+	//// All functions handling special characters return nil if they handle the next rune,
+	//// or the next rune if it was not handled.
+	//// If handling the rune, the func must increase the state.col counter.
 
 	onEscapedReturn := func() (*rune, error) {
 		r, _, err := reader.ReadRune()
 		if err == io.EOF {
 			return nil, nil
 		}
-		state.col++
 		if err != nil {
 			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 		}
@@ -42,24 +89,20 @@ func parseText(state *parserState, resolver FileResolver) error {
 		return &r, nil
 	}
 
-	onOpenBracket := func() (*rune, error) {
+	onSpecialRune := func() (*rune, bool, error) {
 		r, _, err := reader.ReadRune()
 		if err == io.EOF {
-			return nil, nil
+			return nil, true, nil
 		}
-		state.col++
 		if err != nil {
-			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
+			return nil, false, &MagnanimousError{message: err.Error(), Code: IOError}
 		}
-		if r == '{' {
-			if builder.Len() > 0 {
-				state.pf.AppendContent(&StringContent{Text: builder.String()})
-				builder.Reset()
-			}
-			return nil, parseInstruction(state, resolver)
+		if r == specialRune {
+			state.col++
+			return nil, false, nil
 		}
-		_, err = builder.WriteRune('{')
-		return &r, err
+		_, err = builder.WriteRune(specialRune)
+		return &r, false, err
 	}
 
 	onEscape := func() (*rune, error) {
@@ -67,14 +110,15 @@ func parseText(state *parserState, resolver FileResolver) error {
 		if err == io.EOF {
 			return nil, nil
 		}
-		state.col++
 		if err != nil {
 			return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 		}
+
 		switch r {
-		case '{', '\\':
+		case specialRune, '\\':
 			// don't treat specially, just let it be written
 			_, err = builder.WriteRune(r)
+			state.col++
 			return nil, err
 		case '\n':
 			// forget the new line
@@ -88,23 +132,30 @@ func parseText(state *parserState, resolver FileResolver) error {
 
 	for {
 		r, _, err := reader.ReadRune()
-		state.col++
 
 	parseRune:
 		if err == io.EOF {
 			break
 		}
+		state.col++
 		if err != nil {
-			return &MagnanimousError{message: err.Error(), Code: IOError}
+			return false, &MagnanimousError{message: err.Error(), Code: IOError}
 		}
 		var nextRune *rune
 		switch r {
+		case specialRune:
+			var eof bool
+			nextRune, eof, err = onSpecialRune()
+			if err == nil && eof {
+				break
+			}
+			if err == nil && nextRune == nil {
+				return false, nil
+			}
 		case '\n':
 			state.row++
 			state.col = 1
 			_, err = builder.WriteRune('\n')
-		case '{':
-			nextRune, err = onOpenBracket()
 		case '\\':
 			nextRune, err = onEscape()
 		default:
@@ -119,74 +170,5 @@ func parseText(state *parserState, resolver FileResolver) error {
 		}
 	}
 
-	// append any pending content to the builder
-	if builder.Len() > 0 {
-		state.pf.AppendContent(&StringContent{Text: builder.String()})
-		builder.Reset()
-	}
-
-	return nil
-}
-
-func parseInstruction(state *parserState, resolver FileResolver) error {
-	previousWasCloseBracket := false
-	previousWasEscape := false
-	instrFirstRow := state.row
-	instrFirstCol := state.col - 2
-	reader := state.reader
-	builder := state.builder
-
-	for {
-		r, _, err := reader.ReadRune()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return &MagnanimousError{message: err.Error(), Code: IOError}
-		}
-
-		if r == '\n' {
-			state.row++
-			state.col = 1
-			builder.WriteRune(r)
-			continue
-		}
-
-		state.col++
-
-		if r == '}' {
-			if previousWasEscape {
-				builder.WriteRune(r)
-				previousWasEscape = false
-				continue
-			}
-			if previousWasCloseBracket {
-				if builder.Len() > 0 {
-					appendContent(state.pf, builder.String(),
-						Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
-						resolver)
-				}
-				builder.Reset()
-				return nil
-			} else {
-				previousWasCloseBracket = true
-			}
-			continue
-		}
-
-		if previousWasCloseBracket {
-			builder.WriteRune('}')
-		}
-		previousWasCloseBracket = false
-
-		if r == '\\' {
-			previousWasEscape = true
-		} else {
-			builder.WriteRune(r)
-		}
-	}
-
-	return NewError(Location{Origin: state.file, Row: state.row, Col: state.col}, ParseError,
-		fmt.Sprintf("instruction started at (%d:%d) was not properly closed with '}}'",
-			instrFirstRow, instrFirstCol))
+	return true, nil
 }

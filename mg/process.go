@@ -83,7 +83,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	return &processed, nil
 }
 
-func appendContent(pf *ProcessedFile, text string, location Location, resolver FileResolver) {
+func appendInstructionContent(pf *ProcessedFile, text string, location Location, resolver FileResolver) {
 	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
 	switch len(parts) {
 	case 0:
