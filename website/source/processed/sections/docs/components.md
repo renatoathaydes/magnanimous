@@ -24,7 +24,7 @@ It could look like this:
 
 **source/processed/components/_warning.html**
 ```html
-\{{ doc This component takes a 'message' and displays it in a warning box }}\
+\{{ doc This component takes a 'message' and displays it in a warning box }}\\
 <div class="warning">{{ eval message }}</div>
 ```
 
@@ -57,7 +57,7 @@ mess with the surrounding scope.
 If that's not a concern, we could have just re-used an existing binding, as in this example:
 
 ```html
-\{{ define message "This is a warning message!" }}\
+\{{ define message "This is a warning message!" }}\\
 <div>Some content</div>
 
 \{{ component /processed/components/_warning.html }}\{{ end }}
@@ -88,9 +88,9 @@ To make things more concrete, here's what the files could look like:
 
 **source/processed/posts/first_post.md**
 ```markdown
-\{{ define name "My first post" }}\
-\{{ define path "/processed/posts/first_post.html" }}\
-\{{ define date "2018-04-05" }}\
+\{{ define name "My first post" }}\\
+\{{ define path "/processed/posts/first_post.html" }}\\
+\{{ define date "2018-04-05" }}\\
 
 # My first post
 
@@ -99,9 +99,9 @@ etc...
 
 **source/processed/posts/second_post.md**
 ```markdown
-\{{ define name "My second post" }}\
-\{{ define path baseURL + "/processed/posts/second_post.html" }}\
-\{{ define date "2018-06-07" }}\
+\{{ define name "My second post" }}\\
+\{{ define path baseURL + "/processed/posts/second_post.html" }}\\
+\{{ define date "2018-06-07" }}\\
 
 # My second post
 
@@ -118,19 +118,19 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
           * name
           * path
           * date
-}}\
+}}\\
 <table class="data-table-component">
     <thead>
     <th>Post Date</th>
     <th>Post Name</th>
     </thead>
     <tbody>
-    \{{ for post (sortBy date) eval dataDirectory }}\
+    \{{ for post (sortBy date) eval dataDirectory }}\\
     <tr>
         <td>\{{ eval post.date }}</td>
         <td><a href="\{{ eval post.path }}">\{{ eval post.name }}</a></td>
     </tr>
-    \{{ end }}\
+    \{{ end }}\\
     </tbody>
 </table>
 ```
@@ -142,9 +142,9 @@ Finally, we can add the component to our index page (and any other pages we want
 <html>
 <body>
 <h2>These are my posts</h2>
-\{{ component /processed/components/_data_table.html }}\
-    \{{ define dataDirectory "/processed/posts" }}\
-\{{ end }}\
+\{{ component /processed/components/_data_table.html }}\\
+    \{{ define dataDirectory "/processed/posts" }}\\
+\{{ end }}\\
 </body>
 </html>
 ```
