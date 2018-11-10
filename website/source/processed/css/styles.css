@@ -1,8 +1,8 @@
-{{ define funColor1 "#5680E9" }}
-{{ define funColor2 "#5AB9EA" }}
-{{ define funColor3 "#84CEEB" }}
-{{ define funColor4 "#C1C8E4" }}
-{{ define darkColor "#272727" }}
+{{ define funColor1 "#5680E9" }}\
+{{ define funColor2 "#5AB9EA" }}\
+{{ define funColor3 "#84CEEB" }}\
+{{ define funColor4 "#C1C8E4" }}\
+{{ define darkColor "#272727" }}\
 
 body {
     margin: 40px auto;
@@ -33,6 +33,15 @@ code {
 pre {
     padding: 0.6em;
     border-left: 1px black dotted;
+}
+
+.file-box {
+    margin-top: -1em;
+    padding: 0.4em;
+    width: 100%;
+    background: linear-gradient(to bottom, white, #EEE);
+    font-family: Menlo, monospace;
+    font-size: small;
 }
 
 .section-button {

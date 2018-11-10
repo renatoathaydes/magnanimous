@@ -22,11 +22,13 @@ As an example, let's say we want to create a component to represent a simple _wa
 
 It could look like this:
 
-**source/processed/components/_warning.html**
 ```html
 \{{ doc This component takes a 'message' and displays it in a warning box }}\\
 <div class="warning">{{ eval message }}</div>
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "source/processed/components/_warning.html" }}
+{{ end }}\
 
 That's it!
 
@@ -86,7 +88,6 @@ First, we expect the `source/processed/posts/` directory to only contain files t
 
 To make things more concrete, here's what the files could look like:
 
-**source/processed/posts/first_post.md**
 ```markdown
 \{{ define name "My first post" }}\\
 \{{ define path "/processed/posts/first_post.html" }}\\
@@ -96,8 +97,10 @@ To make things more concrete, here's what the files could look like:
 
 etc...
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "source/processed/posts/first_post.md" }}
+{{ end }}\
 
-**source/processed/posts/second_post.md**
 ```markdown
 \{{ define name "My second post" }}\\
 \{{ define path baseURL + "/processed/posts/second_post.html" }}\\
@@ -107,10 +110,12 @@ etc...
 
 etc...
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "source/processed/posts/second_post.md" }}
+{{ end }}\
 
 Now, we can define a simple HTML component that will put the posts' metadata in a HTML table:
 
-**source/processed/components/_data_table.html**
 ```html
 \{{ doc
     Arguments:
@@ -134,10 +139,12 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
     </tbody>
 </table>
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "source/processed/components/_data_table.html" }}
+{{ end }}\
 
 Finally, we can add the component to our index page (and any other pages we want!):
 
-**source/processed/index.html**
 ```html
 <html>
 <body>
@@ -148,6 +155,9 @@ Finally, we can add the component to our index page (and any other pages we want
 </body>
 </html>
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "source/processed/index.html" }}
+{{ end }}\
 
 And we're done!
 
@@ -176,6 +186,9 @@ Here's what the result should look like:
 </body>
 </html>
 ```
+{{ component /processed/components/file-box.html }}\
+    {{ define file "target/index.html" }}
+{{ end }}\
 
 Now, go on and create your own awesome components!
 
