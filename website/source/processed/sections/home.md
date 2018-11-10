@@ -97,6 +97,6 @@ to do things like include a file into another, or declare values to be used some
 `\{{` and `}}` braces are evaluated using the Magnanimous expression language. But don't worry!
 You can learn that in about 5 minutes!
 
-Head to the [Documentation](docs.html) to learn more.
+Head to the [Documentation]({{ eval baseURL + "/sections/docs.html" }}) to learn more.
 
 {{ include /processed/_footer.html }}
