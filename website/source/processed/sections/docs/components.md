@@ -1,7 +1,7 @@
-{{ define path "/sections/docs/components.html" }}
-{{ define chapter 4 }}
-{{ define title "Using Components" }}
-{{ include _docs_header.html }}
+{{ define path "/sections/docs/components.html" }}\
+{{ define chapter 4 }}\
+{{ define title "Using Components" }}\
+{{ include _docs_header.html }}\
 
 # Using Components
 
@@ -26,9 +26,10 @@ It could look like this:
 \{{ doc This component takes a 'message' and displays it in a warning box }}\\
 <div class="warning">{{ eval message }}</div>
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "source/processed/components/_warning.html" }}
-{{ end }}\
+{{ end }}
 
 That's it!
 
@@ -97,9 +98,10 @@ To make things more concrete, here's what the files could look like:
 
 etc...
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "source/processed/posts/first_post.md" }}
-{{ end }}\
+{{ end }}
 
 ```markdown
 \{{ define name "My second post" }}\\
@@ -110,9 +112,10 @@ etc...
 
 etc...
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "source/processed/posts/second_post.md" }}
-{{ end }}\
+{{ end }}
 
 Now, we can define a simple HTML component that will put the posts' metadata in a HTML table:
 
@@ -139,9 +142,10 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
     </tbody>
 </table>
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "source/processed/components/_data_table.html" }}
-{{ end }}\
+{{ end }}
 
 Finally, we can add the component to our index page (and any other pages we want!):
 
@@ -155,9 +159,10 @@ Finally, we can add the component to our index page (and any other pages we want
 </body>
 </html>
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "source/processed/index.html" }}
-{{ end }}\
+{{ end }}
 
 And we're done!
 
@@ -186,9 +191,10 @@ Here's what the result should look like:
 </body>
 </html>
 ```
+
 {{ component /processed/components/file-box.html }}\
     {{ define file "target/index.html" }}
-{{ end }}\
+{{ end }}
 
 Now, go on and create your own awesome components!
 
