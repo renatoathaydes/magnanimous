@@ -23,7 +23,7 @@ You can also download it manually from [this page](link-will-go-here).
 
 Magnanimous expects you to have a simple directory structure like this:
 
-![directory-structure]({{ eval baseURL + "/images/docs/my-website.jpg" }})
+<img src="{{ eval baseURL + "/images/docs/my-website.jpg"  }}" width="500em;" alt="Magnanimous directories" />
 
 The `README.md` file is not really needed, but you can document how your website works and things like that in this file.
 
