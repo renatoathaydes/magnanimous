@@ -24,7 +24,12 @@ begin:
 	}
 	content := state.builder.String()
 	state.builder.Reset()
-	if len(content) > 0 {
+	includeContent := len(content) > 0
+	if eof {
+		// last part, only include content if not only whitespaces
+		includeContent = len(strings.TrimSpace(content)) > 0
+	}
+	if includeContent {
 		state.pf.AppendContent(&StringContent{Text: content})
 	}
 	if !eof {
