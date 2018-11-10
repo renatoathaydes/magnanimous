@@ -22,7 +22,7 @@
 <div class="main-body">
 <nav class="">
 
-<div>
+<div class="top-menu">
 
         <span class="section-button Home active">
             <a href="/magnanimous/sections/home.html">Home</a>
@@ -39,15 +39,15 @@
 </div>
 </nav>
 <div style="height: 1em;"></div>
-
 <h1>Magnanimous</h1>
 
 <blockquote>
 <p>The best and fastest static website generator in the world!</p>
 </blockquote>
 
-<p><div style="height: 1em;"></div>
-<hr></p>
+<div style="height: 1em;"></div>
+
+<hr />
 
 <p>Magnanimous generates static websites from source files at the speed of light.</p>
 
@@ -57,8 +57,6 @@
 <pre style="background-color:#fff">$ curl &lt;url-will-go-here&gt;
 </pre>
 <h3>2. Write some sources</h3>
-
-<p><strong>source/processed/_header.html</strong></p>
 <pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -67,11 +65,11 @@
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </pre>
-<p><strong>source/_footer.html</strong></p>
+<div class="file-box">source/processed/_header.html</div>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </pre>
-<p><strong>source/processed/index.md</strong></p>
+<div class="file-box">source/_footer.html</div>
 <pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ include /processed/_header.html }}<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> This is my website
@@ -80,12 +78,12 @@
 </span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ include /_footer.html }}<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span></pre>
+<div class="file-box">source/processed/index.md</div>
+
 <h3>3. Profit</h3>
 <pre style="background-color:#fff">$ magnanimous
 </pre>
 <p>Your website is ready on the <code>target</code> directory!</p>
-
-<p><strong>target/index.html</strong></p>
 <pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -101,14 +99,17 @@
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </pre>
-<p>You might have noticed some funny contents like <code>{{ }}</code> were <em>translated</em> into something else&hellip;</p>
+<div class="file-box">target/index.html</div>
 
-<p>These are Magnanimous instructions, which let Magnanimous know when you want to do things like
-include a file into another, or declare values to be used somewhere else&hellip; the text inside the
+<p>You might have noticed some funny contents like <code>{{ eval title }}</code> were <em>translated</em> into something else&hellip;</p>
+
+<p>These are <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which let Magnanimous know when you want
+to do things like include a file into another, or declare values to be used somewhere else&hellip; the text inside the
 <code>{{</code> and <code>}}</code> braces are evaluated using the Magnanimous expression language. But don&rsquo;t worry!
-You can learn this little expression language in about 5 minutes!</p>
+You can learn that in about 5 minutes!</p>
 
-<p></div>
+<p>Head to the <a href="docs.html">Documentation</a> to learn more.</p>
+</div>
 <div class="footer">
     <div>
         <small>
@@ -125,4 +126,4 @@ You can learn this little expression language in about 5 minutes!</p>
     </div>
 </div>
 </body>
-</html></p>
+</html>

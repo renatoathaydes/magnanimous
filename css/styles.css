@@ -1,9 +1,4 @@
 
-
-
-
-
-
 body {
     margin: 40px auto;
     max-width: 650px;
@@ -16,6 +11,11 @@ body {
 
 h1, h2, h3 {
     line-height: 1.2
+}
+
+.top-menu {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 blockquote {
@@ -33,6 +33,15 @@ code {
 pre {
     padding: 0.6em;
     border-left: 1px black dotted;
+}
+
+.file-box {
+    margin-top: -1em;
+    padding: 0.4em;
+    width: 100%;
+    background: linear-gradient(to bottom, white, #EEE);
+    font-family: Menlo, monospace;
+    font-size: small;
 }
 
 .section-button {
@@ -55,7 +64,7 @@ a:link {
 }
 
 .footer {
-    height: 5em;
+    min-height: 5em;
     background-color: #272727;
     color: #C1C8E4;
     padding: 1em;
