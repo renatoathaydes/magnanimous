@@ -146,11 +146,10 @@ func and(x interface{}, y interface{}) (interface{}, error) {
 }
 
 func or(x interface{}, y interface{}) (interface{}, error) {
-	return bop(x, y, func(x bool, y bool) interface{} {
-		return x || y
-	}, func() (interface{}, error) {
-		return nil, errors.New(fmt.Sprintf("cannot OR %v and %v", x, y))
-	})
+	if x == nil || x == float64(0) || x == false || x == "" {
+		return y, nil
+	}
+	return x, nil
 }
 
 func not(x interface{}) (interface{}, error) {
