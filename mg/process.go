@@ -107,7 +107,7 @@ func appendInstructionContent(pf *ProcessedFile, text string, location Location,
 
 func createInstruction(name, arg string, scope Scope, location Location,
 	original string, resolver FileResolver) Content {
-	switch name {
+	switch strings.TrimSpace(name) {
 	case "include":
 		return NewIncludeInstruction(arg, location, original, scope, resolver)
 	case "define":
@@ -124,7 +124,7 @@ func createInstruction(name, arg string, scope Scope, location Location,
 		return NewComponentInstruction(arg, location, original, scope, resolver)
 	}
 
-	log.Printf("WARNING: (%s) Unknown instruction: %s", location.String(), name)
+	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)
 	return unevaluatedExpression(original)
 }
 

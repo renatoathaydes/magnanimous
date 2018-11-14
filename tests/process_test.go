@@ -175,3 +175,14 @@ func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
 	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext,
 		[]string{"hello ", "Joe", ", how are you, good?\r\nKeep line."})
 }
+
+func TestProcessDoc(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("hello{{ doc this is ignored content }}{{ doc\n And this too\n}}"))
+	processed, err := mg.ProcessReader(r, "", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"hello"})
+}
