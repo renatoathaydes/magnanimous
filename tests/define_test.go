@@ -63,6 +63,20 @@ func TestDefineFromExpression(t *testing.T) {
 	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
+func TestDefineFromOrExpression(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader(`{{ define n not_defined || "alternative" }}`))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["n"] = "alternative"
+
+	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+}
+
 func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader(
 		"{{ define a 10 }}" +

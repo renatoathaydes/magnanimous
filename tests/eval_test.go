@@ -57,6 +57,39 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
 
+func TestEvalWithOrExprParameterExists(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval a || 100 }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["a"] = float64(3)
+
+	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
+
+	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>3</p>\n"})
+}
+
+func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("{{ eval a || 100 }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+
+	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
+
+	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>100</p>\n"})
+}
+
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	files := make(map[string]mg.WebFile)
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
