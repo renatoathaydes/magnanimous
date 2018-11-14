@@ -90,8 +90,8 @@ func (f *ForLoop) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
-func (f *ForLoop) Context() map[string]interface{} {
-	return f.context
+func (f *ForLoop) Context() Context {
+	return &MapContext{Map: f.context}
 }
 
 func (f *ForLoop) Parent() Scope {
@@ -110,11 +110,11 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []In
 	}, func(webFile *WebFile) error {
 		// use the file's context as the value of the bound variable
 		f.context[f.Variable] = webFile.Processed.Context()
-		return writeContents(f, writer, files, inclusionChain)
+		return writeContents(f, writer, files, inclusionChain, false)
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
-		f.Context()[f.Variable] = item
-		return writeContents(f, writer, files, inclusionChain)
+		f.Context().Set(f.Variable, item)
+		return writeContents(f, writer, files, inclusionChain, false)
 	})
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -296,13 +296,13 @@ func sortArray(array []interface{}, instruction *sortBySubInstruction) {
 
 func sortFiles(webFiles []WebFile, sortField string) {
 	sort.Slice(webFiles, func(i, j int) bool {
-		iv, ok := webFiles[i].Processed.Context()[sortField]
+		iv, ok := webFiles[i].Processed.Context().Get(sortField)
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
 				sortField, webFiles[i].Name)
 			return true
 		}
-		jv, ok := webFiles[j].Processed.Context()[sortField]
+		jv, ok := webFiles[j].Processed.Context().Get(sortField)
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
 				sortField, webFiles[j].Name)

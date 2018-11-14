@@ -3,7 +3,6 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"strings"
 	"testing"
 )
@@ -71,11 +70,12 @@ func TestMarkdownToHtml(t *testing.T) {
 
 	rsvr := mg.DefaultFileResolver{BasePath: "", Files: &m}
 
+	loc := mg.Location{}
 	file := mg.ProcessedFile{}
-	file.AppendContent(&mg.IncludeInstruction{Path: "header.html", Resolver: &rsvr})
+	file.AppendContent(mg.NewIncludeInstruction("header.html", loc, "", &file, &rsvr))
 	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
 	file.AppendContent(&mg.StringContent{Text: "## Mag"})
-	file.AppendContent(&mg.IncludeInstruction{Path: "footer.html", Resolver: &rsvr})
+	file.AppendContent(mg.NewIncludeInstruction("footer.html", loc, "", &file, &rsvr))
 
 	html := mg.MarkdownToHtml(file)
 
@@ -174,32 +174,4 @@ func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
 
 	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext,
 		[]string{"hello ", "Joe", ", how are you, good?\r\nKeep line."})
-}
-
-func TestProcessComponentSimple(t *testing.T) {
-	expr, err := expression.ParseExpr("text")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	exampleFile := mg.ProcessedFile{}
-	exampleFile.AppendContent(&mg.StringContent{Text: "from my component: "})
-	exampleFile.AppendContent(&mg.ExpressionContent{Expr: &expr})
-
-	m := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
-	m.WebFiles["source/processed/example.html"] = mg.WebFile{Processed: &exampleFile}
-
-	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &m}
-
-	r := bufio.NewReader(strings.NewReader("My comp: {{ component example.html }}\n" +
-		"  {{ define text \"Hello component\" }}\n" +
-		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11, &resolver)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	checkParsing(t, processed.Context(), m, processed, emptyContext,
-		[]string{"My comp: ", "from my component: Hello component"})
 }

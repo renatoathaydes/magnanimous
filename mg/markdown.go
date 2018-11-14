@@ -124,9 +124,11 @@ func readMarkdownFileParts(c []Content, files WebFilesMap,
 }
 
 func isHtml(c Content) bool {
-	switch inc := c.(type) {
+	switch comp := c.(type) {
+	case *Component:
+		return strings.ToLower(filepath.Ext(comp.Path)) == ".html"
 	case *IncludeInstruction:
-		return strings.ToLower(filepath.Ext(inc.Path)) == ".html"
+		return strings.ToLower(filepath.Ext(comp.Path)) == ".html"
 	}
 	return false
 }

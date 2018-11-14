@@ -43,8 +43,8 @@ func (ic *IfContent) AppendContent(content Content) {
 	ic.contents = append(ic.contents, content)
 }
 
-func (ic *IfContent) Context() map[string]interface{} {
-	return ic.context
+func (ic *IfContent) Context() Context {
+	return &MapContext{Map: ic.context}
 }
 
 func (ic *IfContent) Parent() Scope {
@@ -67,7 +67,7 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain [
 
 	switch res {
 	case true:
-		writeContents(ic, writer, files, inclusionChain)
+		writeContents(ic, writer, files, inclusionChain, false)
 	case false:
 	case nil:
 		// nothing to write

@@ -18,22 +18,22 @@ func NewIncludeInstruction(arg string, location Location, original string, scope
 	return &IncludeInstruction{Text: original, Path: arg, Origin: location, scope: scope, Resolver: resolver}
 }
 
-func (c *IncludeInstruction) String() string {
-	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", c.Path, c.Origin, c.Resolver)
+func (inc *IncludeInstruction) String() string {
+	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", inc.Path, inc.Origin, inc.Resolver)
 }
 
-func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	path := c.Resolver.Resolve(c.Path, c.Origin)
-	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
+func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+	path := inc.Resolver.Resolve(inc.Path, inc.Origin)
+	//fmt.Printf("Including %s from %v : %s\n", inc.Path, inc.Origin, path)
 	webFile, ok := files.WebFiles[path]
 	if !ok {
-		log.Printf("WARNING: (%s) include non-existent resource: %s", c.Origin.String(), c.Path)
-		_, err := writer.Write([]byte(c.Text))
+		log.Printf("WARNING: (%s) include non-existent resource: %s", inc.Origin.String(), inc.Path)
+		_, err := writer.Write([]byte(inc.Text))
 		if err != nil {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &c.Origin, scope: c.scope})
+		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &inc.Origin, scope: inc.scope})
 		//ss:= inclusionChainToString(inclusionChain)
 		//fmt.Printf("Chain: %s", ss)
 		for _, f := range inclusionChain {
@@ -43,7 +43,7 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 					Code: InclusionCycleError,
 					message: fmt.Sprintf(
 						"Cycle detected! Inclusion of %s at %s comes back into itself via %s",
-						c.Path, c.Origin.String(), chain),
+						inc.Path, inc.Origin.String(), chain),
 				}
 			}
 		}
@@ -53,9 +53,7 @@ func (c *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclusio
 		}
 
 		// mix in the context of the include file into the surrounding context
-		for k, v := range webFile.Processed.Context() {
-			c.scope.Context()[k] = v
-		}
+		webFile.Processed.Context().mixInto(inc.scope.Context())
 	}
 	return nil
 }

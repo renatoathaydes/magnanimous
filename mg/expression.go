@@ -92,5 +92,5 @@ func (d *DefineContent) Run(files *WebFilesMap, inclusionChain []InclusionChainI
 	if err != nil {
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
-	d.scope.Context()[d.Name] = v
+	d.scope.Context().Set(d.Name, v)
 }

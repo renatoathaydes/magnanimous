@@ -56,13 +56,24 @@ type StringContent struct {
 	Text string
 }
 
-type RootScope map[string]interface{}
+type RootScope Context
+
+type Context interface {
+	Get(name string) (interface{}, bool)
+	Set(name string, value interface{})
+	IsEmpty() bool
+	mixInto(other Context)
+}
 
 type Scope interface {
 	AppendContent(content Content)
-	Context() map[string]interface{}
+	Context() Context
 	Parent() Scope
 	setParent(scope Scope)
+}
+
+type MapContext struct {
+	Map map[string]interface{}
 }
 
 type ProcessedFile struct {
@@ -75,6 +86,7 @@ type ProcessedFile struct {
 
 var _ Scope = (*ProcessedFile)(nil)
 var _ ContentContainer = (*ProcessedFile)(nil)
+var _ Context = (*MapContext)(nil)
 
 func (f *ProcessedFile) GetContents() []Content {
 	return f.contents
@@ -89,15 +101,15 @@ func (f *ProcessedFile) currentScope() Scope {
 	return f
 }
 
-func (f *ProcessedFile) Context() map[string]interface{} {
+func (f *ProcessedFile) Context() Context {
 	if f.context == nil {
 		f.context = make(map[string]interface{})
 	}
-	return f.context
+	return &MapContext{Map: f.context}
 }
 
 func (f *ProcessedFile) Parent() Scope {
-	return f.rootScope
+	return nil
 }
 
 func (f *ProcessedFile) setParent(content Scope) {
@@ -157,20 +169,21 @@ func (l *Location) String() string {
 	return fmt.Sprintf("%s:%d:%d", l.Origin, l.Row, l.Col)
 }
 
-var _ Scope = (*RootScope)(nil)
-
-func (RootScope) AppendContent(content Content) {
-	panic("RootScope cannot append content")
+func (m *MapContext) Get(name string) (interface{}, bool) {
+	v, ok := m.Map[name]
+	return v, ok
 }
 
-func (r RootScope) Context() map[string]interface{} {
-	return r
+func (m *MapContext) Set(name string, value interface{}) {
+	m.Map[name] = value
 }
 
-func (RootScope) Parent() Scope {
-	return nil
+func (m *MapContext) IsEmpty() bool {
+	return len(m.Map) == 0
 }
 
-func (RootScope) setParent(scope Scope) {
-	panic("Cannot set RootScope's parent")
+func (m *MapContext) mixInto(other Context) {
+	for k, v := range m.Map {
+		other.Set(k, v)
+	}
 }

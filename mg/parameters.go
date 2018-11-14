@@ -18,7 +18,7 @@ func (m magParams) Get(name string) (interface{}, bool) {
 		}
 	}
 	if m.webFiles.GlobalContext != nil {
-		v, ok := m.webFiles.GlobalContext[name]
+		v, ok := m.webFiles.GlobalContext.Get(name)
 		return v, ok
 	}
 	return nil, false
@@ -26,7 +26,7 @@ func (m magParams) Get(name string) (interface{}, bool) {
 
 func searchParamInScope(scope Scope, name string) (interface{}, bool) {
 	for scope != nil {
-		v, ok := scope.Context()[name]
+		v, ok := scope.Context().Get(name)
 		if ok && v != nil {
 			return v, true
 		}

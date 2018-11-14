@@ -87,7 +87,7 @@ func CreateTempFiles(files map[string]map[string]string) (mg.WebFilesMap, string
 		}
 		ctx := filesMap.WebFiles[filepath.Join(dir, name)].Processed.Context()
 		for k, v := range entry {
-			ctx[k] = v
+			ctx.Set(k, v)
 		}
 	}
 
@@ -101,7 +101,7 @@ func check(e error) {
 }
 
 func checkParsing(t *testing.T,
-	ctx map[string]interface{}, m mg.WebFilesMap, pf *mg.ProcessedFile,
+	ctx mg.Context, m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
 	contents := pf.GetContents()
@@ -122,15 +122,25 @@ func checkParsing(t *testing.T,
 	}
 
 	if len(expectedCtx) == 0 {
-		if len(ctx) != 0 {
+		if !ctx.IsEmpty() {
 			t.Errorf("Expected empty context.\n"+
 				"Actual Context: %v", ctx)
 		}
-	} else if !reflect.DeepEqual(ctx, expectedCtx) {
+	} else if !isContextEqual(ctx, expectedCtx) {
 		t.Errorf(
 			"Expected Context: %v\n"+
 				"Actual Context: %v", expectedCtx, ctx)
 	}
+}
+
+func isContextEqual(context mg.Context, expectedContents map[string]interface{}) bool {
+	for key, expectedValue := range expectedContents {
+		actualValue, ok := context.Get(key)
+		if !ok || !reflect.DeepEqual(expectedValue, actualValue) {
+			return false
+		}
+	}
+	return true
 }
 
 func checkContents(t *testing.T,

@@ -41,9 +41,7 @@ func ProcessAll(files []string, basePath, sourcesDir string, webFiles *WebFilesM
 	if globalCtx, ok := webFiles.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
 		globalCtx.runSideEffects(webFiles, nil)
 		var globalContext RootScope = globalCtx.Processed.Context()
-		if len(globalContext) > 0 {
-			webFiles.GlobalContext = globalContext
-		}
+		webFiles.GlobalContext = globalContext
 	}
 	return nil
 }
@@ -192,15 +190,25 @@ func (c *StringContent) String() string {
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	return writeContents(wf.Processed, writer, files, inclusionChain)
+	return writeContents(wf.Processed, writer, files, inclusionChain, false)
 }
 
 func (wf *WebFile) runSideEffects(files *WebFilesMap, inclusionChain []InclusionChainItem) {
 	runSideEffects(wf.Processed, files, inclusionChain)
 }
 
-func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap,
+	inclusionChain []InclusionChainItem, runSideEffectsFirst bool) error {
+	if runSideEffectsFirst {
+		runSideEffects(cc, &files, inclusionChain)
+	}
 	for _, c := range cc.GetContents() {
+		if runSideEffectsFirst {
+			// only skip define content because not all SideEffectContent does only side-effect
+			if _, skip := c.(*DefineContent); skip {
+				continue
+			}
+		}
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
