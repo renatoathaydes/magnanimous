@@ -281,3 +281,28 @@ func TestProj5(t *testing.T) {
 		"Full path: /other-website/folder/example.txt\n"+
 		"After unset, base URL: /my-website/")
 }
+
+func TestProj6(t *testing.T) {
+	dir := runMg(t, "test_proj_6")
+	defer os.RemoveAll(dir)
+
+	files, err := readAll(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) != 2 {
+		t.Fatalf("Expected 2 output files, but got: %v", files)
+	}
+
+	assertFileContents(t, files, dir, "index.html", `<h2>Simple Component Example</h2>
+<div class="wrapper">
+    Hello components
+</div>`)
+
+	assertFileContents(t, files, dir, "example/properties.html", `<div>Component example</div>
+<h1>Component with properties</h1>
+
+<p>Text: This is some text
+Number: 23</p>
+`)
+}
