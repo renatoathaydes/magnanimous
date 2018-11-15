@@ -27,7 +27,7 @@ It could look like this:
 <div class="warning">\{{ eval message }}</div>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/components/_warning.html" }}
 {{ end }}
 
@@ -99,7 +99,7 @@ To make things more concrete, here's what the files could look like:
 etc...
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/posts/first_post.md" }}
 {{ end }}
 
@@ -113,7 +113,7 @@ etc...
 etc...
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/posts/second_post.md" }}
 {{ end }}
 
@@ -143,7 +143,7 @@ Now, we can define a simple HTML component that will put the posts' metadata in 
 </table>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/components/_data_table.html" }}
 {{ end }}
 
@@ -160,7 +160,7 @@ Finally, we can add the component to our index page (and any other pages we want
 </html>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/index.html" }}
 {{ end }}
 
@@ -192,7 +192,7 @@ Here's what the result should look like:
 </html>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "target/index.html" }}
 {{ end }}
 

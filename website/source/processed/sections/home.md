@@ -8,7 +8,7 @@
 
 > The best and fastest static website generator in the world!
 
-{{ include /processed/components/spacer.html }}
+{{ include /processed/components/_spacer.html }}
 
 <hr />
 
@@ -34,7 +34,7 @@ $ curl <url-will-go-here>
 <body>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/_header.html" }}
 {{ end }}
 
@@ -43,7 +43,7 @@ $ curl <url-will-go-here>
 </html>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/_footer.html" }}
 {{ end }}
 
@@ -57,7 +57,7 @@ How awesome is it?!
 \{{ include /_footer.html }}
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/index.md" }}
 {{ end }}
 
@@ -86,7 +86,7 @@ Your website is ready on the `target` directory!
 </html>
 ```
 
-{{ component /processed/components/file-box.html }}\
+{{ component /processed/components/_file-box.html }}\
     {{ define file "target/index.html" }}
 {{ end }}
 
