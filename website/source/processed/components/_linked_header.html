@@ -1,0 +1,12 @@
+{{ doc
+    Creates a linked header based on the following properties:
+        * tag (optional) - the tag name
+        * id - the ID of this element, which becomes the #link
+    The __contents__ of the component is inserted as the header value.
+}}\
+{{include spacer.html }}\
+{{define _tag tag || "h2"}}
+<{{eval _tag}} id="{{eval id}}" class="link-header-component">
+<a href="#{{eval id}}"><img src="{{eval baseURL + "/images/link.svg"}}"></a>
+{{eval __contents__}}
+</{{eval _tag}}>
