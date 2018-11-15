@@ -3,7 +3,7 @@
 {{ define title "Paths and Links" }}
 {{ include _docs_header.html }}
 
-# Paths and Links
+# 3. Paths and Links
 
 
 

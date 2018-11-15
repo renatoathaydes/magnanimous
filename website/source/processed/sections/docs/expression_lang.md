@@ -3,7 +3,7 @@
 {{ define title "Expression Language" }}\
 {{ include _docs_header.html }}\
 
-# Expression Language
+# 2. Expression Language
  
 Magnanimous defines a very simple _expression language_ that is used to **process** documents in the `source/processed`
 directory.
@@ -139,7 +139,7 @@ include
 
 _where:_
 
-* `path` is a [path](#path) to another file.
+* `path` is a [path](paths.html) to another file.
 
 The `include` statement is used to include the contents of a file into another file.
 

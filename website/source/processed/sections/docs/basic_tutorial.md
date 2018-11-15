@@ -3,7 +3,7 @@
 {{ define title "Basic Tutorial" }}
 {{ include _docs_header.html }}
 
-# Basic Tutorial
+# 6. Basic Tutorial
 
 
 

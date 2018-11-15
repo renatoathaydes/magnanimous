@@ -3,7 +3,7 @@
 {{ define title "Markdown Guide" }}
 {{ include _docs_header.html }}
 
-# Markdown Guide
+# 5. Markdown Guide
 
 Magnanimous converts all markdown content (files in the `source/processed` directory and with the `.md` extension)
 into HTML, changing the resulting file's extension from `.md` to `.html`.

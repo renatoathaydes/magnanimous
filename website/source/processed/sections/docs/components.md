@@ -3,7 +3,7 @@
 {{ define title "Using Components" }}\
 {{ include _docs_header.html }}\
 
-# Using Components
+# 4. Using Components
 
 As you develop your website, you will notice that you will keep using similar patterns again and again
 to create things like text boxes, data tables, dividers, and more obvious things like page headers and
