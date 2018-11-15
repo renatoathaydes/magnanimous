@@ -1,12 +1,6 @@
-{{ define funColor1 "#5680E9" }}\
-{{ define funColor2 "#5AB9EA" }}\
-{{ define funColor3 "#84CEEB" }}\
-{{ define funColor4 "#C1C8E4" }}\
-{{ define darkColor "#272727" }}\
-
 body {
-    margin: 40px auto;
-    max-width: 650px;
+    margin: auto;
+    max-width: 85%;
     line-height: 1.6;
     font-size: 18px;
     color: #444;
@@ -32,7 +26,7 @@ blockquote {
 code {
     padding: 0.2em;
     border-radius: 0.3em;
-    background-color: {{ eval funColor4 }};
+    background-color: #EEE;
 }
 
 pre {
@@ -62,26 +56,26 @@ pre {
 }
 
 .section-button a:visited {
-    color: {{ eval funColor1 }};
+    color: #5680E9;
 }
 
 a:link {
-    color: {{ eval funColor1 }};
+    color: #5680E9;
 }
 
 .footer {
     min-height: 5em;
-    background-color: {{ eval darkColor }};
-    color: {{ eval funColor4 }};
+    background-color: #272727;
+    color: #C1C8E4;
     padding: 1em;
 }
 
 .footer a:link {
-    color: {{ eval funColor2 }};
+    color: #5AB9EA;
 }
 
 .footer a:visited {
-    color: {{ eval funColor3 }};
+    color: #84CEEB;
 }
 
 .link-header-component img {
