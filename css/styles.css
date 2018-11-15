@@ -78,3 +78,11 @@ a:link {
 .footer a:visited {
     color: #84CEEB;
 }
+
+.link-header-component img {
+    opacity: 0.2;
+}
+
+.link-header-component:hover img {
+    opacity: 1.0;
+}
