@@ -1,7 +1,6 @@
-
 body {
-    margin: 40px auto;
-    max-width: 650px;
+    margin: auto;
+    max-width: 85%;
     line-height: 1.6;
     font-size: 18px;
     color: #444;
@@ -27,7 +26,7 @@ blockquote {
 code {
     padding: 0.2em;
     border-radius: 0.3em;
-    background-color: #C1C8E4;
+    background-color: #EEE;
 }
 
 pre {
