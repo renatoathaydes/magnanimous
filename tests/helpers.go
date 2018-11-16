@@ -171,7 +171,10 @@ func runMg(t *testing.T, project string) string {
 		t.Fatal(err)
 	}
 
-	mg.WriteTo(dir, webFiles)
+	err = mg.WriteTo(dir, webFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	return dir
 }
