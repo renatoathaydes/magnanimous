@@ -69,7 +69,6 @@ type Scope interface {
 	AppendContent(content Content)
 	Context() Context
 	Parent() Scope
-	setParent(scope Scope)
 }
 
 type MapContext struct {
@@ -112,10 +111,6 @@ func (f *ProcessedFile) Parent() Scope {
 	return nil
 }
 
-func (f *ProcessedFile) setParent(content Scope) {
-	panic("Cannot set parent on ProcessedFile as it's the top content scope")
-}
-
 func (f *ProcessedFile) AppendContent(content Content) {
 	s := len(f.scopeStack)
 	var topScope Scope = f
@@ -126,7 +121,6 @@ func (f *ProcessedFile) AppendContent(content Content) {
 		f.contents = append(f.contents, content)
 	}
 	if newScope, ok := content.(Scope); ok {
-		newScope.setParent(topScope)
 		f.scopeStack = append(f.scopeStack, newScope)
 	}
 }

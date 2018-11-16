@@ -22,7 +22,6 @@ type writeContext struct {
 type Component struct {
 	Location Location
 	context  componentContext
-	scope    Scope
 	parent   Scope
 	Text     string
 	Path     string
@@ -49,10 +48,6 @@ func (c *Component) Context() Context {
 
 func (c *Component) Parent() Scope {
 	return c.parent
-}
-
-func (c *Component) setParent(scope Scope) {
-	c.parent = scope
 }
 
 func (c *componentContext) Get(name string) (interface{}, bool) {
@@ -101,7 +96,7 @@ func NewComponentInstruction(arg string, location Location, original string,
 		Path:     arg,
 		Location: location,
 		Resolver: resolver,
-		scope:    scope,
+		parent:   scope,
 		context:  compContext,
 		Text:     original,
 		Origin:   location,

@@ -19,7 +19,7 @@ var _ Content = (*IfContent)(nil)
 var _ Scope = (*IfContent)(nil)
 var _ ContentContainer = (*IfContent)(nil)
 
-func NewIfInstruction(arg string, location Location, original string) Content {
+func NewIfInstruction(arg string, location Location, original string, scope Scope) Content {
 	cond, err := expression.ParseExpr(arg)
 
 	if err != nil {
@@ -31,6 +31,7 @@ func NewIfInstruction(arg string, location Location, original string) Content {
 		Text:      original,
 		condition: &cond,
 		Location:  location,
+		parent:    scope,
 		context:   make(map[string]interface{}, 2),
 	}
 }
@@ -49,10 +50,6 @@ func (ic *IfContent) Context() Context {
 
 func (ic *IfContent) Parent() Scope {
 	return ic.parent
-}
-
-func (ic *IfContent) setParent(scope Scope) {
-	ic.parent = scope
 }
 
 func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {

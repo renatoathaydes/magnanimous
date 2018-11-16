@@ -59,7 +59,8 @@ type directoryIterable struct {
 	subInstructions []forLoopSubInstruction
 }
 
-func NewForInstruction(arg string, location Location, original string, resolver FileResolver) Content {
+func NewForInstruction(arg string, location Location, original string,
+	scope Scope, resolver FileResolver) Content {
 	parts := strings.SplitN(arg, " ", 2)
 	switch len(parts) {
 	case 0:
@@ -74,7 +75,7 @@ func NewForInstruction(arg string, location Location, original string, resolver 
 			location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ForLoop{Variable: parts[0], iter: iter,
+	return &ForLoop{Variable: parts[0], iter: iter, parent: scope,
 		Text: original, Location: location, context: make(map[string]interface{}, 2)}
 }
 
@@ -96,10 +97,6 @@ func (f *ForLoop) Context() Context {
 
 func (f *ForLoop) Parent() Scope {
 	return f.parent
-}
-
-func (f *ForLoop) setParent(scope Scope) {
-	f.parent = scope
 }
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {

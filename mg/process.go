@@ -115,9 +115,9 @@ func createInstruction(name, arg string, scope Scope, location Location,
 	case "eval":
 		return NewExpression(arg, location, original, scope)
 	case "if":
-		return NewIfInstruction(arg, location, original)
+		return NewIfInstruction(arg, location, original, scope)
 	case "for":
-		return NewForInstruction(arg, location, original, resolver)
+		return NewForInstruction(arg, location, original, scope, resolver)
 	case "doc":
 		return nil
 	case "component":
