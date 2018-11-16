@@ -312,6 +312,11 @@ Number: 23</p>
 // Initial results:
 // 789098 ns/op
 // 801477 ns/op
+//
+// After avoiding expression evaluation for repeated inclusion chain
+// 768579 ns/op
+// 766237 ns/op
+//
 func BenchmarkProject4(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		benchmarkProject(b, "test_proj_4")

@@ -5,14 +5,16 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
+	"reflect"
 	"strings"
 )
 
 type DefineContent struct {
-	Name     string
-	Expr     *expression.Expression
-	Location Location
-	scope    Scope
+	Name             string
+	Expr             *expression.Expression
+	Location         Location
+	scope            Scope
+	latestInclusions []InclusionChainItem
 }
 
 type ExpressionContent struct {
@@ -84,6 +86,12 @@ func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChai
 }
 
 func (d *DefineContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
+	if d.latestInclusions != nil &&
+		reflect.ValueOf(d.latestInclusions).Pointer() == reflect.ValueOf(inclusionChain).Pointer() {
+		// already evaluated for this inclusion chain
+		return
+	}
+
 	v, err := expression.EvalExpr(*d.Expr, magParams{
 		webFiles:       files,
 		scope:          d.scope,
@@ -93,4 +101,5 @@ func (d *DefineContent) Run(files *WebFilesMap, inclusionChain []InclusionChainI
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
 	d.scope.Context().Set(d.Name, v)
+	d.latestInclusions = inclusionChain
 }
