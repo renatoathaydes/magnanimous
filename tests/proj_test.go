@@ -1,7 +1,9 @@
 package tests
 
 import (
+	"github.com/renatoathaydes/magnanimous/mg"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -305,4 +307,35 @@ func TestProj6(t *testing.T) {
 <p>Text: This is some text
 Number: 23</p>
 `)
+}
+
+// Initial results:
+// 789098 ns/op
+// 801477 ns/op
+func BenchmarkProject4(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		benchmarkProject(b, "test_proj_4")
+	}
+}
+
+func benchmarkProject(b *testing.B, project string) {
+	mag := mg.Magnanimous{SourcesDir: project}
+	webFiles, err := mag.ReadAll()
+
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	for _, webFile := range webFiles.WebFiles {
+		var w strings.Builder
+		err = webFile.Write(&w, webFiles, nil)
+
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		if len(w.String()) < 10 {
+			b.Errorf("Expected a String longer than 10, got %s", w.String())
+		}
+	}
 }
