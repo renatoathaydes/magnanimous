@@ -19,7 +19,10 @@ $ curl <url-will-go-here>
 
 You can also download it manually from [this page](link-will-go-here).
 
-## Creating the source directories
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "magnanimous-directories" }}\
+Magnanimous directories
+{{ end }}
 
 Magnanimous expects you to have a simple directory structure like this:
 

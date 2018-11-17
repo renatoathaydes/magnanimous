@@ -264,12 +264,26 @@ For example, you could use an _array_ to iterate over some values, including the
 \{{ end }}
 ```
 
-More commonly, the `for` instruction is used to show the summary of the contents of some files in a certain directory.
+More commonly, the `for` instruction is used to show properties of files in a certain directory.
 
 Example:
 
 ```html
 \{{ for item (sortBy date reverse limit 10) /path/to/directory }}
+<div>Date: \{{ eval date }}</div>
+<div>Post name: \{{ eval name }}</div>
+\{{ end }}
+```
+
+Notice that the path is not normally given as an [expression](#expressions), but as simple text
+(notice that the path is not wrapped into double-quotes).
+If you need to pass in an expression, or just a variable instead of a hardcoded path, you must call `eval` first:
+
+```html
+\{{ define postDirectories "/path/to/directory" }}
+
+<!-- Somewhere else in the file -->
+\{{ for item eval postDirectories }}
 <div>Date: \{{ eval date }}</div>
 <div>Post name: \{{ eval name }}</div>
 \{{ end }}
@@ -322,7 +336,7 @@ For example, the following are all valid expressions:
 
 ```javascript
 2
-2 + 2
+2 + 2.42
 (5 * 2) - 10
 variable == true
 !negated == false
