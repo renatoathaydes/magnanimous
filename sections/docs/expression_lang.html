@@ -263,10 +263,21 @@ for sub-instructions</p>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval item }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 {{ end }}
 </pre>
-<p>More commonly, the <code>for</code> instruction is used to show the summary of the contents of some files in a certain directory.</p>
+<p>More commonly, the <code>for</code> instruction is used to show properties of files in a certain directory.</p>
 
 <p>Example:</p>
 <pre style="background-color:#fff">{{ for item (sortBy date reverse limit 10) /path/to/directory }}
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Date: {{ eval date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post name: {{ eval name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+{{ end }}
+</pre>
+<p>Notice that the path is not normally given as an <a href="#expressions">expression</a>, but as simple text
+(notice that the path is not wrapped into double-quotes).
+If you need to pass in an expression, or just a variable instead of a hardcoded path, you must call <code>eval</code> first:</p>
+<pre style="background-color:#fff">{{ define postDirectories &#34;/path/to/directory&#34; }}
+
+<span style="color:#888;font-style:italic">&lt;!--</span><span style="color:#888;font-style:italic"> Somewhere else in the file </span><span style="color:#888;font-style:italic">--&gt;</span>
+{{ for item eval postDirectories }}
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Date: {{ eval date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post name: {{ eval name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 {{ end }}
@@ -321,7 +332,7 @@ Expressions</p>
 
 <p>For example, the following are all valid expressions:</p>
 <pre style="background-color:#fff"><span style="color:#444">2</span>
-<span style="color:#444">2</span> <span style="color:#666">+</span> <span style="color:#444">2</span>
+<span style="color:#444">2</span> <span style="color:#666">+</span> <span style="color:#444">2.42</span>
 <span style="color:#888">(</span><span style="color:#444">5</span> <span style="color:#666">*</span> <span style="color:#444">2</span><span style="color:#888">)</span> <span style="color:#666">-</span> <span style="color:#444">10</span>
 variable <span style="color:#666">==</span> <span style="color:#444;font-style:italic">true</span>
 <span style="color:#666">!</span>negated <span style="color:#666">==</span> <span style="color:#444;font-style:italic">false</span>

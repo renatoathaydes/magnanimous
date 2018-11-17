@@ -18,7 +18,98 @@
 <div class="main-body">
 
 <h1>3. Paths and Links</h1>
-</div>
+
+<p>When writing your website, you&rsquo;ll probably want to make use of several <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>
+which need to point to another source file. They do that by telling Magnanimous the <strong>path</strong> to the other file.</p>
+
+<p>You&rsquo;ll also likely add <strong>links</strong> to other files in your pages, so that users can easily navigate between the pages
+of your website.</p>
+
+<p>The two concepts are similar, but not quite the same.</p>
+
+<p>A <strong>path</strong> is a compilation-time concept and doesn&rsquo;t exist at runtime, while <strong>links</strong> only exist at runtime.</p>
+
+<p>In the next sections, you&rsquo;ll learn what that means in detail, so you never have to spend time wondering why a link
+does not point where you thought it ought to, or a path does not resolve correctly, giving you compile time warnings.</p>
+
+<h2>Paths</h2>
+
+<p><a href="components.html">Components</a>, the <a href="expression_lang.html#for">for</a> and the <a href="expression_lang.html#include">include</a>
+instructions all need to declare a reference to some file, or directory in the case of <a href="#for">for</a>.</p>
+
+<p>They need to know where to find the information necessary to do their job: the contents of a file, in the case of
+the <code>include</code> and <code>component</code> instructions, and the directory containing the files to be iterated over, in the case of
+the <code>for</code> instruction.</p>
+
+<p>Paths can be of two types:</p>
+
+<ul>
+<li>Absolute paths</li>
+<li>Relative paths</li>
+</ul>
+
+<p><strong>Absolute paths</strong> start with a <code>/</code>, and are always interpreted as being under the
+<a href="get_started.html#magnanimous-directories"><code>source/</code></a> directory.</p>
+
+<p><strong>Relative paths</strong>, unlike absolute paths, do not start with a <code>/</code> and are resolved by the location of the file they
+are declared in.</p>
+
+<p>As an example, if within the file <code>/processed/components/_comp1.html</code>, you have a instruction that uses the path
+<code>example/_comp2.html</code>, then <code>example/_comp2.html</code> points to the absolute path <code>/processed/components/example/_comp2.html</code>.</p>
+
+<p>Paths can refer to a parent directory with <code>../</code>, just like in most file systems. However, trying to access anything
+above the <code>source/</code> directory is forbidden and will result in the <code>../</code> part being ignored.</p>
+
+<p>Notice that paths are a compile-time concept, which means that they are only used by Magnanimous instructions, during
+compilation, to resolve the contents of the final files that will be part of the website. For this reason, paths can
+point to <em>hidden</em> files (whose file names start with <code>_</code>, which are not copied to the final website).</p>
+
+<p>Once the website is created, instructions and paths simply do not exist anymore! All you have if a bunch of static
+files ready to be served by a <em>dumb</em> web server.</p>
+
+<p>For this reason, paths should always point to other source files, not to generated files.</p>
+
+<p>Links, on the other hand, are a different story, as we&rsquo;ll see.</p>
+
+<h2>Links</h2>
+
+<p>Links are not really a Magnanimous concept, but a <em>Markdown</em> and <em>HTML</em> concept. But because, like paths, they point
+to another file, they can be confused with paths, so some explanation of what&rsquo;s different between them is warranted.</p>
+
+<p>The big difference is simple: links are used at runtime by users of your website, while paths are used by Magnanimous
+at compile time, to resolve <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>.</p>
+
+<p>This has an important implication: while paths point to source files, links point to generated files (or other websites).</p>
+
+<p>So, if you want to add a link to some content you wrote in a markdown file, say <code>/processed/blog/post.md</code>, the link to it
+should point to <code>/blog/post.html</code>, the generated file, not the source file.</p>
+
+<blockquote>
+<p>Notice that all processed <code>.md</code> files are converted to <code>.html</code> files by Magnanimous.
+  See the <a href="markdown_guide.html">Markdown Guide</a> for details.</p>
+</blockquote>
+
+<h3>Consider the base path in your links</h3>
+
+<p>If your website is not served from the root path within your domain, you might also need to consider the base path!</p>
+
+<p>For example, if your website will be served under the <code>https://user1.github.io/my-project</code> URL (as a project called
+<code>my-project</code> by <code>user1</code>, served via <a href="https://pages.github.com/">GitHub pages</a> would), then your links need to take the
+<code>/my-project</code> path (the base path) into account, so an absolute link to the source file <code>/processed/blog/post.md</code>
+should actually point to <code>/my-project/blog/post.html</code>.</p>
+
+<p>A good way to approach this is to define a <code>basePath</code> variable in the <code>/processed/_global_context</code> file, as in this
+example:</p>
+<pre style="background-color:#fff">{{ define basePath &#34;/my-project/&#34; }}
+</pre>
+<div class="file-box">source/processed/_global_context</div>
+
+<p>Now, from anywhere, a link can be safely created as follows:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + `blog/post.html` }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A link<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</pre>
+<p>Or, in markdown:</p>
+<pre style="background-color:#fff">[<span style="color:#2838b0">A link</span>](<span style="color:#388038">{{ eval basePath + &#34;blog/post.html&#34; }}</span>)<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span></pre></div>
 <div class="footer">
     <div>
         <small>
