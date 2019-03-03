@@ -2,7 +2,6 @@ package mg
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -18,7 +17,7 @@ type Magnanimous struct {
 
 // WebFilesMap contains the result of reading a source directory with ReadAll().
 type WebFilesMap struct {
-	GlobalContext RootScope
+	GlobalContext RootContext
 	// WebFiles is a map from each file path to the parsed WebFile.
 	WebFiles map[string]WebFile
 }
@@ -40,10 +39,10 @@ type Location struct {
 
 // InclusionChainItem is an object that contains the current scope.
 //
-// It is used by Content implementations to write their contents using the given scope to resolve data.
+// It is used by Content implementations to write their contents using the given context to resolve data.
 type InclusionChainItem struct {
 	Location *Location
-	scope    Scope
+	context  Context
 }
 
 // FileResolver defines how Magnanimous finds source files.
@@ -77,91 +76,30 @@ type Content interface {
 	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
 }
 
-type SideEffectContent interface {
-	Run(files *WebFilesMap, inclusionChain []InclusionChainItem)
-}
-
-type StringContent struct {
-	Text string
-}
-
-type RootScope Context
-
+// Context represents the current context of a Content being written.
 type Context interface {
 	Get(name string) (interface{}, bool)
 	Set(name string, value interface{})
 	IsEmpty() bool
-	mixInto(other Context)
+	Parent() *Context
 }
 
-type Scope interface {
-	AppendContent(content Content)
-	Context() Context
-	Parent() Scope
-}
-
-type MapContext struct {
-	Map map[string]interface{}
-}
-
+// ProcessedFile is the result of parsing a source file.
 type ProcessedFile struct {
 	contents     []Content
-	scopeStack   []Scope
-	context      map[string]interface{}
-	rootScope    RootScope
 	NewExtension string
 }
 
-var _ Scope = (*ProcessedFile)(nil)
+type RootContext Context
+
 var _ ContentContainer = (*ProcessedFile)(nil)
-var _ Context = (*MapContext)(nil)
 
 func (f *ProcessedFile) GetContents() []Content {
 	return f.contents
 }
 
-// currentScope returns the current scope during parsing.
-func (f *ProcessedFile) currentScope() Scope {
-	s := len(f.scopeStack)
-	if s > 0 {
-		return f.scopeStack[s-1]
-	}
-	return f
-}
-
-func (f *ProcessedFile) Context() Context {
-	if f.context == nil {
-		f.context = make(map[string]interface{})
-	}
-	return &MapContext{Map: f.context}
-}
-
-func (f *ProcessedFile) Parent() Scope {
-	return nil
-}
-
 func (f *ProcessedFile) AppendContent(content Content) {
-	s := len(f.scopeStack)
-	var topScope Scope = f
-	if s > 0 {
-		topScope = f.scopeStack[s-1]
-		topScope.AppendContent(content)
-	} else {
-		f.contents = append(f.contents, content)
-	}
-	if newScope, ok := content.(Scope); ok {
-		f.scopeStack = append(f.scopeStack, newScope)
-	}
-}
-
-func (f *ProcessedFile) EndScope() error {
-	s := len(f.scopeStack)
-	if s > 0 {
-		f.scopeStack = f.scopeStack[0 : s-1]
-		return nil
-	} else {
-		return errors.New("'end' does not match any previous instruction")
-	}
+	f.contents = append(f.contents, content)
 }
 
 func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
@@ -185,28 +123,9 @@ func (f *ProcessedFile) String() string {
 		contentsBuilder.WriteString(fmt.Sprintf("%T ", c))
 	}
 	contentsBuilder.WriteString("]")
-	return fmt.Sprintf("ProcessedFile{%s, %v, %s}", contentsBuilder.String(), f.context, f.NewExtension)
+	return fmt.Sprintf("ProcessedFile{%s, %s}", contentsBuilder.String(), f.NewExtension)
 }
 
 func (l *Location) String() string {
 	return fmt.Sprintf("%s:%d:%d", l.Origin, l.Row, l.Col)
-}
-
-func (m *MapContext) Get(name string) (interface{}, bool) {
-	v, ok := m.Map[name]
-	return v, ok
-}
-
-func (m *MapContext) Set(name string, value interface{}) {
-	m.Map[name] = value
-}
-
-func (m *MapContext) IsEmpty() bool {
-	return len(m.Map) == 0
-}
-
-func (m *MapContext) mixInto(other Context) {
-	for k, v := range m.Map {
-		other.Set(k, v)
-	}
 }

@@ -2,7 +2,6 @@ package mg
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -38,11 +37,6 @@ func ProcessAll(files []string, basePath, sourcesDir string, webFiles *WebFilesM
 		}
 		webFiles.WebFiles[file] = *wf
 	}
-	if globalCtx, ok := webFiles.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
-		globalCtx.runSideEffects(webFiles, nil)
-		var globalContext RootScope = globalCtx.Processed.Context()
-		webFiles.GlobalContext = globalContext
-	}
 	return nil
 }
 
@@ -60,7 +54,6 @@ func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error)
 	if magErr != nil {
 		return nil, magErr
 	}
-	processed.scopeStack = nil // the stack is no longer required
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
 	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: processed, NonWritable: nonWritable}, nil
 }
@@ -69,7 +62,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	var builder strings.Builder
 	builder.Grow(sizeHint)
 	isMarkDown := isMd(file)
-	processed := ProcessedFile{context: make(map[string]interface{}, 4)}
+	processed := ProcessedFile{}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
 	magErr := parseText(&state, resolver)
 	if magErr != nil {
@@ -98,30 +91,30 @@ func appendInstructionContent(pf *ProcessedFile, text string, location Location,
 			pf.AppendContent(unevaluatedExpression(text))
 		}
 	case 2:
-		content := createInstruction(parts[0], parts[1], pf.currentScope(), location, text, resolver)
+		content := createInstruction(parts[0], parts[1], location, text, resolver)
 		if content != nil {
 			pf.AppendContent(content)
 		}
 	}
 }
 
-func createInstruction(name, arg string, scope Scope, location Location,
+func createInstruction(name, arg string, location Location,
 	original string, resolver FileResolver) Content {
 	switch strings.TrimSpace(name) {
 	case "include":
-		return NewIncludeInstruction(arg, location, original, scope, resolver)
+		return NewIncludeInstruction(arg, location, original, resolver)
 	case "define":
-		return NewVariable(arg, location, original, scope)
+		return NewVariable(arg, location, original)
 	case "eval":
-		return NewExpression(arg, location, original, scope)
+		return NewExpression(arg, location, original)
 	case "if":
-		return NewIfInstruction(arg, location, original, scope)
+		return NewIfInstruction(arg, location, original)
 	case "for":
-		return NewForInstruction(arg, location, original, scope, resolver)
+		return NewForInstruction(arg, location, original, resolver)
 	case "doc":
 		return nil
 	case "component":
-		return NewComponentInstruction(arg, location, original, scope, resolver)
+		return NewComponentInstruction(arg, location, original, resolver)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)
@@ -129,6 +122,14 @@ func createInstruction(name, arg string, scope Scope, location Location,
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) error {
+	// FIXME evaluate global context first
+	if globalCtx, ok := filesMap.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
+		//globalCtx.runSideEffects(webFiles, nil)
+		globalCtx.Write()
+		var globalContext RootContext = globalCtx.()
+		webFiles.GlobalContext = globalContext
+	}
+
 	err := os.MkdirAll(dir, 0770)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -177,53 +178,19 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error 
 	return nil
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	_, err := writer.Write([]byte(c.Text))
-	if err != nil {
-		return &MagnanimousError{Code: IOError, message: err.Error()}
-	}
-	return nil
-}
-
-func (c *StringContent) String() string {
-	return fmt.Sprintf("StringContent{%s}", c.Text)
-}
-
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	return writeContents(wf.Processed, writer, files, inclusionChain, false)
-}
-
-func (wf *WebFile) runSideEffects(files *WebFilesMap, inclusionChain []InclusionChainItem) {
-	runSideEffects(wf.Processed, files, inclusionChain)
+	return writeContents(wf.Processed, writer, files, inclusionChain)
 }
 
 func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap,
-	inclusionChain []InclusionChainItem, runSideEffectsFirst bool) error {
-	if runSideEffectsFirst {
-		runSideEffects(cc, &files, inclusionChain)
-	}
+	inclusionChain []InclusionChainItem) error {
 	for _, c := range cc.GetContents() {
-		if runSideEffectsFirst {
-			// only skip define content because not all SideEffectContent does only side-effect
-			if _, skip := c.(*DefineContent); skip {
-				continue
-			}
-		}
 		err := c.Write(writer, files, inclusionChain)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func runSideEffects(container ContentContainer, files *WebFilesMap, inclusionChain []InclusionChainItem) {
-	for _, c := range container.GetContents() {
-		switch sf := c.(type) {
-		case SideEffectContent:
-			sf.Run(files, inclusionChain)
-		}
-	}
 }
 
 func inclusionChainToString(locations []InclusionChainItem) string {

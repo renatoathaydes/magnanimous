@@ -13,7 +13,6 @@ type DefineContent struct {
 	Name             string
 	Expr             *expression.Expression
 	Location         Location
-	scope            Scope
 	latestInclusions []InclusionChainItem
 }
 
@@ -21,19 +20,18 @@ type ExpressionContent struct {
 	Expr     *expression.Expression
 	Text     string
 	Location Location
-	scope    Scope
 }
 
-func NewExpression(arg string, location Location, original string, scope Scope) Content {
+func NewExpression(arg string, location Location, original string) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ExpressionContent{Expr: &expr, Location: location, Text: original, scope: scope}
+	return &ExpressionContent{Expr: &expr, Location: location, Text: original}
 }
 
-func NewVariable(arg string, location Location, original string, scope Scope) Content {
+func NewVariable(arg string, location Location, original string) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 2 {
 		variable, rawExpr := parts[0], parts[1]
@@ -43,7 +41,7 @@ func NewVariable(arg string, location Location, original string, scope Scope) Co
 				location.String(), variable, rawExpr, err.Error())
 			return unevaluatedExpression(original)
 		}
-		return &DefineContent{Name: variable, Expr: &expr, Location: location, scope: scope}
+		return &DefineContent{Name: variable, Expr: &expr, Location: location}
 	}
 	log.Printf("WARNING: (%s) malformed define expression: %s", location.String(), arg)
 	return unevaluatedExpression(original)
@@ -55,6 +53,7 @@ func unevaluatedExpression(original string) Content {
 
 var _ Content = (*ExpressionContent)(nil)
 
+// FIXME
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	r, err := expression.EvalExpr(*e.Expr, magParams{
 		webFiles:       &files,
@@ -78,7 +77,6 @@ func (e *ExpressionContent) String() string {
 }
 
 var _ Content = (*DefineContent)(nil)
-var _ SideEffectContent = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
 	d.Run(&files, inclusionChain)

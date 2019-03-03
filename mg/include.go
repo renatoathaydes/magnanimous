@@ -10,12 +10,11 @@ type IncludeInstruction struct {
 	Text     string
 	Path     string
 	Origin   Location
-	scope    Scope
 	Resolver FileResolver
 }
 
-func NewIncludeInstruction(arg string, location Location, original string, scope Scope, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Text: original, Path: arg, Origin: location, scope: scope, Resolver: resolver}
+func NewIncludeInstruction(arg string, location Location, original string, resolver FileResolver) *IncludeInstruction {
+	return &IncludeInstruction{Text: original, Path: arg, Origin: location, Resolver: resolver}
 }
 
 func (inc *IncludeInstruction) String() string {
@@ -33,7 +32,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclus
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &inc.Origin, scope: inc.scope})
+		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &inc.Origin})
 		//ss:= inclusionChainToString(inclusionChain)
 		//fmt.Printf("Chain: %s", ss)
 		for _, f := range inclusionChain {
@@ -51,9 +50,6 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, inclus
 		if err != nil {
 			return err
 		}
-
-		// mix in the context of the include file into the surrounding context
-		webFile.Processed.Context().mixInto(inc.scope.Context())
 	}
 	return nil
 }
