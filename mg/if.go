@@ -64,7 +64,10 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain [
 
 	switch res {
 	case true:
-		writeContents(ic, writer, files, inclusionChain, false)
+		err = writeContents(ic, writer, files, inclusionChain, false)
+		if err != nil {
+			return err
+		}
 	case false:
 	case nil:
 		// nothing to write

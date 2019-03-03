@@ -79,7 +79,10 @@ func (c *componentContext) content() (string, bool) {
 		// resolve contents and cache it
 		var writer strings.Builder
 		for _, content := range c.contents {
-			content.Write(&writer, wctx.files, wctx.inclusionChain)
+			err := content.Write(&writer, wctx.files, wctx.inclusionChain)
+			if err != nil {
+				return "", false
+			}
 		}
 		contents := writer.String()
 		c.cachedContents = &contents
