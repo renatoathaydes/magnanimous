@@ -62,8 +62,9 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	var builder strings.Builder
 	builder.Grow(sizeHint)
 	isMarkDown := isMd(file)
-	processed := ProcessedFile{}
-	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, pf: &processed}
+	processed := ProcessedFile{Path: file}
+	stack := []ContentContainer{&processed}
+	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, contentStack: stack}
 	magErr := parseText(&state, resolver)
 	if magErr != nil {
 		return &processed, magErr
@@ -74,59 +75,13 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	return &processed, nil
 }
 
-func appendInstructionContent(pf *ProcessedFile, text string, location Location, resolver FileResolver) {
-	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
-	switch len(parts) {
-	case 0:
-		// nothing to do
-	case 1:
-		if parts[0] == "end" {
-			err := pf.EndScope()
-			if err != nil {
-				log.Printf("WARNING: (%s) %s", location.String(), err.Error())
-				pf.AppendContent(unevaluatedExpression(text))
-			}
-		} else {
-			log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
-			pf.AppendContent(unevaluatedExpression(text))
-		}
-	case 2:
-		content := createInstruction(parts[0], parts[1], location, text, resolver)
-		if content != nil {
-			pf.AppendContent(content)
-		}
-	}
-}
-
-func createInstruction(name, arg string, location Location,
-	original string, resolver FileResolver) Content {
-	switch strings.TrimSpace(name) {
-	case "include":
-		return NewIncludeInstruction(arg, location, original, resolver)
-	case "define":
-		return NewVariable(arg, location, original)
-	case "eval":
-		return NewExpression(arg, location, original)
-	case "if":
-		return NewIfInstruction(arg, location, original)
-	case "for":
-		return NewForInstruction(arg, location, original, resolver)
-	case "doc":
-		return nil
-	case "component":
-		return NewComponentInstruction(arg, location, original, resolver)
-	}
-
-	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)
-	return unevaluatedExpression(original)
-}
-
 func WriteTo(dir string, filesMap WebFilesMap) error {
 	// FIXME evaluate global context first
 	if globalCtx, ok := filesMap.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
 		//globalCtx.runSideEffects(webFiles, nil)
 		globalCtx.Write()
-		var globalContext RootContext = globalCtx.()
+		var globalContext RootContext = globalCtx.
+		()
 		webFiles.GlobalContext = globalContext
 	}
 
@@ -178,14 +133,14 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error 
 	return nil
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	return writeContents(wf.Processed, writer, files, inclusionChain)
+func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	return writeContents(wf.Processed, writer, files, stack)
 }
 
 func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap,
-	inclusionChain []InclusionChainItem) error {
+	stack ContextStack) error {
 	for _, c := range cc.GetContents() {
-		err := c.Write(writer, files, inclusionChain)
+		err := c.Write(writer, files, stack)
 		if err != nil {
 			return err
 		}
@@ -193,7 +148,7 @@ func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap,
 	return nil
 }
 
-func inclusionChainToString(locations []InclusionChainItem) string {
+func inclusionChainToString(locations []ContextStackItem) string {
 	var b strings.Builder
 	b.WriteRune('[')
 	last := len(locations) - 1

@@ -5,24 +5,22 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
-	"reflect"
 	"strings"
 )
 
 type DefineContent struct {
-	Name             string
-	Expr             *expression.Expression
-	Location         Location
-	latestInclusions []InclusionChainItem
+	Name     string
+	Expr     *expression.Expression
+	Location *Location
 }
 
 type ExpressionContent struct {
 	Expr     *expression.Expression
 	Text     string
-	Location Location
+	Location *Location
 }
 
-func NewExpression(arg string, location Location, original string) Content {
+func NewExpression(arg string, location *Location, original string) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
@@ -31,7 +29,7 @@ func NewExpression(arg string, location Location, original string) Content {
 	return &ExpressionContent{Expr: &expr, Location: location, Text: original}
 }
 
-func NewVariable(arg string, location Location, original string) Content {
+func NewVariable(arg string, location *Location, original string) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 2 {
 		variable, rawExpr := parts[0], parts[1]
@@ -53,12 +51,10 @@ func unevaluatedExpression(original string) Content {
 
 var _ Content = (*ExpressionContent)(nil)
 
-// FIXME
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	r, err := expression.EvalExpr(*e.Expr, magParams{
-		webFiles:       &files,
-		scope:          e.scope,
-		inclusionChain: inclusionChain,
+		stack:    stack,
+		webFiles: &files,
 	})
 	if err == nil {
 		_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
@@ -78,26 +74,19 @@ func (e *ExpressionContent) String() string {
 
 var _ Content = (*DefineContent)(nil)
 
-func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	d.Run(&files, inclusionChain)
+func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	// DefineContent does not write anything, it just runs an expression and assigns it to a variable
+	d.Run(&files, stack)
 	return nil
 }
 
-func (d *DefineContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
-	if d.latestInclusions != nil &&
-		reflect.ValueOf(d.latestInclusions).Pointer() == reflect.ValueOf(inclusionChain).Pointer() {
-		// already evaluated for this inclusion chain
-		return
-	}
-
+func (d *DefineContent) Run(files *WebFilesMap, stack ContextStack) {
 	v, err := expression.EvalExpr(*d.Expr, magParams{
-		webFiles:       files,
-		scope:          d.scope,
-		inclusionChain: inclusionChain,
+		webFiles: files,
+		stack:    stack,
 	})
 	if err != nil {
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
 	}
-	d.scope.Context().Set(d.Name, v)
-	d.latestInclusions = inclusionChain
+	stack.Top().Context.Set(d.Name, v)
 }

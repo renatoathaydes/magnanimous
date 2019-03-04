@@ -31,7 +31,7 @@ type copiedContent struct {
 	file string
 }
 
-func (c *copiedContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func (c *copiedContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []ContextStackItem) error {
 	f, err := os.Open(c.file)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}

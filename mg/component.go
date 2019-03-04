@@ -16,7 +16,7 @@ type componentContext struct {
 
 type writeContext struct {
 	files          WebFilesMap
-	inclusionChain []InclusionChainItem
+	inclusionChain []ContextStackItem
 }
 
 type Component struct {
@@ -106,7 +106,7 @@ func NewComponentInstruction(arg string, location Location, original string,
 	}
 }
 
-func (c *Component) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func (c *Component) Write(writer io.Writer, files WebFilesMap, inclusionChain []ContextStackItem) error {
 	path := c.Resolver.Resolve(c.Path, c.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	componentFile, ok := files.WebFiles[path]
@@ -117,7 +117,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, inclusionChain []
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		inclusionChain = append(inclusionChain, InclusionChainItem{Location: &c.Origin, scope: c})
+		inclusionChain = append(inclusionChain, ContextStackItem{Location: &c.Origin, scope: c})
 		//ss:= inclusionChainToString(inclusionChain)
 		//fmt.Printf("Chain: %s", ss)
 		for _, f := range inclusionChain {

@@ -9,17 +9,14 @@ import (
 type IfContent struct {
 	Text      string
 	condition *expression.Expression
-	Location  Location
+	Location  *Location
 	contents  []Content
-	context   map[string]interface{}
-	parent    Scope
 }
 
 var _ Content = (*IfContent)(nil)
-var _ Scope = (*IfContent)(nil)
 var _ ContentContainer = (*IfContent)(nil)
 
-func NewIfInstruction(arg string, location Location, original string, scope Scope) Content {
+func NewIfInstruction(arg string, location *Location, original string) Content {
 	cond, err := expression.ParseExpr(arg)
 
 	if err != nil {
@@ -31,8 +28,6 @@ func NewIfInstruction(arg string, location Location, original string, scope Scop
 		Text:      original,
 		condition: &cond,
 		Location:  location,
-		parent:    scope,
-		context:   make(map[string]interface{}, 2),
 	}
 }
 
@@ -44,19 +39,10 @@ func (ic *IfContent) AppendContent(content Content) {
 	ic.contents = append(ic.contents, content)
 }
 
-func (ic *IfContent) Context() Context {
-	return &MapContext{Map: ic.context}
-}
-
-func (ic *IfContent) Parent() Scope {
-	return ic.parent
-}
-
-func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	res, err := expression.EvalExpr(*ic.condition, magParams{
-		webFiles:       &files,
-		scope:          ic,
-		inclusionChain: inclusionChain,
+		webFiles: &files,
+		stack:    stack,
 	})
 	if err != nil {
 		return err
@@ -64,7 +50,8 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, inclusionChain [
 
 	switch res {
 	case true:
-		err = writeContents(ic, writer, files, inclusionChain, false)
+		stack = stack.Push(ic.Location)
+		err = writeContents(ic, writer, files, stack)
 		if err != nil {
 			return err
 		}

@@ -37,12 +37,20 @@ type Location struct {
 	Col    uint32
 }
 
-// InclusionChainItem is an object that contains the current scope.
+// ContextStack is a stack of InclusionChainItems.
+//
+// Used to keep state when writing nested Content.
+type ContextStack struct {
+	chain []ContextStackItem
+}
+
+// ContextStackItem is an object that contains the local Context and Location.
 //
 // It is used by Content implementations to write their contents using the given context to resolve data.
-type InclusionChainItem struct {
+// Content implementations that create new scopes must add an item to the ContextStack.
+type ContextStackItem struct {
 	Location *Location
-	context  Context
+	Context  Context
 }
 
 // FileResolver defines how Magnanimous finds source files.
@@ -59,6 +67,7 @@ type FileResolver interface {
 // Content implementations that have nested Content must implement this interface.
 type ContentContainer interface {
 	GetContents() []Content
+	AppendContent(content Content)
 }
 
 // Content is a processed unit of a source file.
@@ -69,11 +78,10 @@ type Content interface {
 	// Write writes its contents using the given writer.
 	//
 	// The files argument contains all parsed source files.
-	// The inclusionChain contains the scope under which the Content is being written.
 	//
-	// When writing nested contents, implementations must append their immediate InclusionChainItem
-	// to the slice before calling the Write method on the nested Content instances.
-	Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error
+	// The stack contains context in which local data can be stored.
+	// Each implementation of Content that starts a new scope must push a new item onto the stack.
+	Write(writer io.Writer, files WebFilesMap, stack ContextStack) error
 }
 
 // Context represents the current context of a Content being written.
@@ -81,13 +89,13 @@ type Context interface {
 	Get(name string) (interface{}, bool)
 	Set(name string, value interface{})
 	IsEmpty() bool
-	Parent() *Context
 }
 
 // ProcessedFile is the result of parsing a source file.
 type ProcessedFile struct {
 	contents     []Content
 	NewExtension string
+	Path         string
 }
 
 type RootContext Context
@@ -102,12 +110,13 @@ func (f *ProcessedFile) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
-func (f *ProcessedFile) Bytes(files WebFilesMap, inclusionChain []InclusionChainItem) ([]byte, error) {
+func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, error) {
+	stack = stack.Push(&Location{Origin: f.Path, Row: 0, Col: 0})
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range f.contents {
 		if c != nil {
-			err := c.Write(&b, files, inclusionChain)
+			err := c.Write(&b, files, stack)
 			if err != nil {
 				return nil, err
 			}

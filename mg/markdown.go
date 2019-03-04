@@ -34,11 +34,11 @@ func (f *HtmlFromMarkdownContent) GetContents() []Content {
 	return f.MarkDownContent
 }
 
-func (f *HtmlFromMarkdownContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
+func (f *HtmlFromMarkdownContent) Run(files *WebFilesMap, inclusionChain []ContextStackItem) {
 	runSideEffects(f, files, inclusionChain)
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []ContextStackItem) error {
 	htmlHead, main, htmlFooter, err := readMarkdownFileParts(f.MarkDownContent, files, inclusionChain)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inc
 }
 
 func readMarkdownFileParts(c []Content, files WebFilesMap,
-	inclusionChain []InclusionChainItem) (head, body, foot []byte, err error) {
+	inclusionChain []ContextStackItem) (head, body, foot []byte, err error) {
 	var header, main, footer bytes.Buffer
 	header.Grow(128)
 	main.Grow(1024)
