@@ -90,8 +90,7 @@ func (c *componentContext) content() (string, bool) {
 	}
 }
 
-func NewComponentInstruction(arg string, location Location, original string,
-	scope Scope, resolver FileResolver) Content {
+func NewComponentInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	compContext := componentContext{Map: make(map[string]interface{}, 2)}
 	return &Component{
 		Path:     arg,

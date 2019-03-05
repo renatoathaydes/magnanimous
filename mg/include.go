@@ -22,7 +22,7 @@ func (inc *IncludeInstruction) String() string {
 }
 
 func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	path := inc.Resolver.Resolve(inc.Path, *inc.Origin)
+	path := inc.Resolver.Resolve(inc.Path, inc.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", inc.Path, inc.Origin, path)
 	webFile, ok := files.WebFiles[path]
 	if !ok {

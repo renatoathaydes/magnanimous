@@ -41,7 +41,7 @@ func (ic *IfContent) AppendContent(content Content) {
 
 func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	res, err := expression.EvalExpr(*ic.condition, magParams{
-		webFiles: &files,
+		webFiles: files,
 		stack:    stack,
 	})
 	if err != nil {

@@ -15,7 +15,6 @@ type HtmlFromMarkdownContent struct {
 
 var _ Content = (*HtmlFromMarkdownContent)(nil)
 var _ ContentContainer = (*HtmlFromMarkdownContent)(nil)
-var _ SideEffectContent = (*HtmlFromMarkdownContent)(nil)
 
 var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(
 	bfchroma.WithoutAutodetect(), bfchroma.Style("lovelace")))
@@ -38,8 +37,8 @@ func (f *HtmlFromMarkdownContent) Run(files *WebFilesMap, inclusionChain []Conte
 	runSideEffects(f, files, inclusionChain)
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []ContextStackItem) error {
-	htmlHead, main, htmlFooter, err := readMarkdownFileParts(f.MarkDownContent, files, inclusionChain)
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	htmlHead, main, htmlFooter, err := readMarkdownFileParts(f.MarkDownContent, files, stack)
 	if err != nil {
 		return err
 	}
@@ -73,8 +72,7 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inc
 	return nil
 }
 
-func readMarkdownFileParts(c []Content, files WebFilesMap,
-	inclusionChain []ContextStackItem) (head, body, foot []byte, err error) {
+func readMarkdownFileParts(c []Content, files WebFilesMap, stack ContextStack) (head, body, foot []byte, err error) {
 	var header, main, footer bytes.Buffer
 	header.Grow(128)
 	main.Grow(1024)
@@ -113,7 +111,7 @@ func readMarkdownFileParts(c []Content, files WebFilesMap,
 				writer = &main
 			}
 		}
-		err = content.Write(writer, files, inclusionChain)
+		err = content.Write(writer, files, stack)
 		if err != nil {
 			return
 		}
