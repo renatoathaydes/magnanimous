@@ -76,13 +76,10 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) error {
-	// FIXME evaluate global context first
-	if globalCtx, ok := filesMap.WebFiles[filepath.Join(basePath, "_global_context")]; ok {
-		//globalCtx.runSideEffects(webFiles, nil)
-		globalCtx.Write()
-		var globalContext RootContext = globalCtx.
-		()
-		webFiles.GlobalContext = globalContext
+	stack := ContextStack{}
+	if globalCtx, ok := filesMap.WebFiles["source/_global_context"]; ok {
+		ctx := globalCtx.Processed.ResolveContext(filesMap, stack)
+		stack = NewContextStack(ctx)
 	}
 
 	err := os.MkdirAll(dir, 0770)
@@ -103,7 +100,7 @@ func WriteTo(dir string, filesMap WebFilesMap) error {
 			ext := filepath.Ext(targetFile)
 			targetFile = targetFile[0:len(targetFile)-len(ext)] + wf.Processed.NewExtension
 		}
-		magErr := writeFile(file, targetFile, wf, filesMap)
+		magErr := writeFile(file, targetFile, wf, filesMap, stack)
 		if magErr != nil {
 			return magErr
 		}
@@ -111,7 +108,7 @@ func WriteTo(dir string, filesMap WebFilesMap) error {
 	return nil
 }
 
-func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error {
+func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack ContextStack) error {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	if err != nil {
@@ -125,7 +122,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap) error 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	for _, c := range wf.Processed.contents {
-		err := c.Write(w, filesMap, nil)
+		err := c.Write(w, filesMap, stack)
 		if err != nil {
 			return err
 		}

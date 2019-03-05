@@ -17,7 +17,6 @@ type Magnanimous struct {
 
 // WebFilesMap contains the result of reading a source directory with ReadAll().
 type WebFilesMap struct {
-	GlobalContext RootContext
 	// WebFiles is a map from each file path to the parsed WebFile.
 	WebFiles map[string]WebFile
 }
@@ -97,8 +96,6 @@ type ProcessedFile struct {
 	NewExtension string
 	Path         string
 }
-
-type RootContext Context
 
 var _ ContentContainer = (*ProcessedFile)(nil)
 

@@ -13,8 +13,5 @@ func (m magParams) Get(name string) (interface{}, bool) {
 			return v, true
 		}
 	}
-	if m.webFiles.GlobalContext != nil {
-		return m.webFiles.GlobalContext.Get(name)
-	}
 	return nil, false
 }

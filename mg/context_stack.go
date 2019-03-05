@@ -19,6 +19,12 @@ func (c *mapContext) IsEmpty() bool {
 	return len(c.data) == 0
 }
 
+func NewContextStack(context Context) ContextStack {
+	items := make([]ContextStackItem, 1)
+	items[0] = ContextStackItem{Context: context}
+	return ContextStack{items}
+}
+
 func (c *ContextStack) Push(location *Location) ContextStack {
 	item := ContextStackItem{Location: location, Context: &mapContext{}}
 	items := append(c.chain, item)

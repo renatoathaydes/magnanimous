@@ -22,7 +22,6 @@ type writeContext struct {
 type Component struct {
 	Location Location
 	context  componentContext
-	parent   Scope
 	Text     string
 	Path     string
 	Origin   Location
@@ -30,7 +29,6 @@ type Component struct {
 }
 
 var _ Context = (*componentContext)(nil)
-var _ Scope = (*Component)(nil)
 var _ Content = (*Component)(nil)
 var _ ContentContainer = (*Component)(nil)
 
@@ -106,7 +104,7 @@ func NewComponentInstruction(arg string, location Location, original string,
 	}
 }
 
-func (c *Component) Write(writer io.Writer, files WebFilesMap, inclusionChain []ContextStackItem) error {
+func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	path := c.Resolver.Resolve(c.Path, c.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	componentFile, ok := files.WebFiles[path]
