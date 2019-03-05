@@ -57,7 +57,7 @@ func getFilesAt(root string, exclusions ...string) ([]string, error) {
 	return files, err
 }
 
-func (r *DefaultFileResolver) FilesIn(dir string, from Location) (dirPath string, webFiles []WebFile, e error) {
+func (r *DefaultFileResolver) FilesIn(dir string, from *Location) (dirPath string, webFiles []WebFile, e error) {
 	dirPath = Resolve(dir, r.BasePath, from)
 	for path, wf := range r.Files.WebFiles {
 		if !wf.NonWritable && filepath.Dir(path) == dirPath {
@@ -67,11 +67,11 @@ func (r *DefaultFileResolver) FilesIn(dir string, from Location) (dirPath string
 	return
 }
 
-func (r *DefaultFileResolver) Resolve(path string, from Location) string {
+func (r *DefaultFileResolver) Resolve(path string, from *Location) string {
 	return Resolve(path, r.BasePath, from)
 }
 
-func Resolve(path, basePath string, from Location) string {
+func Resolve(path, basePath string, from *Location) string {
 	if strings.HasPrefix(path, "/") {
 		// absolute path
 		return filepath.Join(basePath, path)

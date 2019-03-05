@@ -54,7 +54,7 @@ var _ Content = (*ExpressionContent)(nil)
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	r, err := expression.EvalExpr(*e.Expr, magParams{
 		stack:    stack,
-		webFiles: &files,
+		webFiles: files,
 	})
 	if err == nil {
 		_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
@@ -75,18 +75,21 @@ func (e *ExpressionContent) String() string {
 var _ Content = (*DefineContent)(nil)
 
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	// DefineContent does not write anything, it just runs an expression and assigns it to a variable
-	d.Run(&files, stack)
+	// DefineContent does not write anything!
+	if v, ok := d.Eval(files, stack); ok {
+		stack.Top().Context.Set(d.Name, v)
+	}
 	return nil
 }
 
-func (d *DefineContent) Run(files *WebFilesMap, stack ContextStack) {
+func (d *DefineContent) Eval(files WebFilesMap, stack ContextStack) (interface{}, bool) {
 	v, err := expression.EvalExpr(*d.Expr, magParams{
 		webFiles: files,
 		stack:    stack,
 	})
 	if err != nil {
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())
+		return nil, false
 	}
-	stack.Top().Context.Set(d.Name, v)
+	return v, true
 }

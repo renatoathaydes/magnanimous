@@ -2,7 +2,7 @@ package mg
 
 type magParams struct {
 	stack    ContextStack
-	webFiles *WebFilesMap
+	webFiles WebFilesMap
 }
 
 func (m magParams) Get(name string) (interface{}, bool) {
