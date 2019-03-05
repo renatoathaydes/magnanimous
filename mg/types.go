@@ -56,10 +56,10 @@ type ContextStackItem struct {
 // FileResolver defines how Magnanimous finds source files.
 type FileResolver interface {
 	// FilesIn return the files in a certain directory, or an error if something goes wrong.
-	FilesIn(dir string, from Location) (dirPath string, f []WebFile, e error)
+	FilesIn(dir string, from *Location) (dirPath string, f []WebFile, e error)
 	// Resolve resolves a path given a location to resolve it from.
 	// It allows Magnanimous to resolve relative paths correctly.
-	Resolve(path string, from Location) string
+	Resolve(path string, from *Location) string
 }
 
 // ContentContainer is a collection of Content.
@@ -110,6 +110,22 @@ func (f *ProcessedFile) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
+// ResolveContext evaluates all of the [DefineContent] instructions at the top-level scope
+// of the [ProcessedFile].
+func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Context {
+	ctx := make(map[string]interface{})
+	for _, c := range f.contents {
+		if content, ok := c.(*DefineContent); ok {
+			v, ok := content.Eval(files, stack)
+			if ok {
+				ctx[content.Name] = v
+			}
+		}
+	}
+	return &mapContext{ctx}
+}
+
+// Bytes returns the bytes of the processed file.
 func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, error) {
 	stack = stack.Push(&Location{Origin: f.Path, Row: 0, Col: 0})
 	var b bytes.Buffer
