@@ -131,11 +131,12 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack 
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	location := Location{Origin: wf.Processed.Path, Col: 0, Row: 0}
+	stack = stack.Push(&location)
 	return writeContents(wf.Processed, writer, files, stack)
 }
 
-func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap,
-	stack ContextStack) error {
+func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	for _, c := range cc.GetContents() {
 		err := c.Write(writer, files, stack)
 		if err != nil {

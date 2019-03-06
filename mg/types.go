@@ -124,10 +124,13 @@ func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Co
 
 // Bytes returns the bytes of the processed file.
 func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, error) {
-	stack = stack.Push(&Location{Origin: f.Path, Row: 0, Col: 0})
+	return body(f, files, stack)
+}
+
+func body(c ContentContainer, files WebFilesMap, stack ContextStack) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
-	for _, c := range f.contents {
+	for _, c := range c.GetContents() {
 		if c != nil {
 			err := c.Write(&b, files, stack)
 			if err != nil {
