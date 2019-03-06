@@ -128,9 +128,13 @@ func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, er
 }
 
 func body(c ContentContainer, files WebFilesMap, stack ContextStack) ([]byte, error) {
+	return asBytes(c.GetContents(), files, stack)
+}
+
+func asBytes(c []Content, files WebFilesMap, stack ContextStack) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
-	for _, c := range c.GetContents() {
+	for _, c := range c {
 		if c != nil {
 			err := c.Write(&b, files, stack)
 			if err != nil {
