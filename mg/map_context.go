@@ -18,9 +18,3 @@ func (m *MapContext) Set(name string, value interface{}) {
 func (m *MapContext) IsEmpty() bool {
 	return len(m.Map) == 0
 }
-
-func (m *MapContext) mixInto(other Context) {
-	for k, v := range m.Map {
-		other.Set(k, v)
-	}
-}
