@@ -127,6 +127,8 @@ func createInstruction(name, arg string, location *Location,
 		return nil
 	case "component":
 		return NewComponentInstruction(arg, location, original, resolver)
+	case "slot":
+		return NewSlotInstruction(arg, location, original)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)

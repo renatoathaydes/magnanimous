@@ -57,7 +57,15 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 		webFiles: files,
 	})
 	if err == nil {
-		_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
+		// an expression can evaluate to a content container, such as a slot
+		if c, ok := r.(ContentContainer); ok {
+			err = writeContents(c, writer, files, stack)
+			if err != nil {
+				return err
+			}
+		} else {
+			_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
+		}
 	} else {
 		log.Printf("WARNING: (%s) eval failure: %s", e.Location.String(), err.Error())
 		_, err = writer.Write([]byte(fmt.Sprintf("{{%s}}", e.Text)))
