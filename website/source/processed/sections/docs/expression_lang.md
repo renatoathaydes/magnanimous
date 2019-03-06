@@ -27,10 +27,11 @@ Here's a list of all Magnanimous instructions:
 * [`eval`](#eval)            - evaluates an [expression](#expressions) and inserts the result into the current position.
 * [`include`](#include)      - includes another file into the current position.
 * [`component`](#component)  - includes a [Component](components.html) into the current position.
+* [`slot`](#slot)            - defines a variable whose content is the body of the instruction.
 * [`if`](#if)                - conditionally includes some content into the current position.
 * [`for`](#for)              - repeats some content for each item in an [iterable](#iterables).
 * [`doc`](#doc)              - allows documentation to be added to sources (not included in the resource).
-* [`end`](#end)              - ends a scoped instruction (`component`, `if` and `for`).
+* [`end`](#end)              - ends a scoped instruction (`component`, `slot`, `if` and `for`).
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "instructions" }}\
@@ -108,7 +109,7 @@ content:
 <h2>The dog is big</h2>
 ```
 
-Of course, `eval` is mostly useful when combined with variables and expressions.
+Of course, `eval` is mostly useful when combined with variables, [slots](#slot) and expressions.
 
 For example, you could define a number of variables beforehand, to be used later in several other places
 (so you could change them in only one place if you ever changed your mind about their values):
@@ -147,7 +148,7 @@ Example:
 
 ```html
 <div id="other-file-contents">
-{{ include path/to/other/file.md }}
+\{{ include path/to/other/file.md }}
 </div>
 ```
 
@@ -169,13 +170,13 @@ component
 _where:_
 
 * `path` is a [path](#path) to another file.
-* `content` is some content that might be used by the component via the `__contents__` implicit variable.
+* `content` the body of the component.
 
 The `component` instruction is quite similar to `include`. It also includes the contents of another file, 
-the component (which is usually designed specifically for this purpose), into another file.
+the component file (which is usually designed specifically for this purpose), into the file using it.
 
-However, components are more powerful as they may include some content which can be placed anywhere inside the 
-component, or just `define` instructions which can set values that are used to customize the component.
+However, components are more powerful as they may also declare some content which can be placed anywhere inside the 
+component (typically using `slot`s).
 
 Example:
 
@@ -197,6 +198,33 @@ Include this in my component.
 ```
 
 See [Components](components.html) for more details about using components.
+
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "slot" }}{{ define tag "h3" }}\
+slot
+{{ end }}
+
+#### Syntax:
+
+```
+\{{ slot <slot-name> }}
+<content>
+\{{ end }}
+```
+
+_where:_
+
+* `slot-name` the name of this slot.
+* `content` the content the slot evaluates to.
+
+A `slot` instruction, like [`define`](#define), defines a variable and does not include any content at the location where it is
+declared. But unlike `define`, `slot` uses the body of its declaration as it value.
+
+That means that evaluating the `slot` with [`eval`](#eval) results in the body of the slot being inserted into the 
+processed document where the `eval` instruction was located.
+
+Slots are commonly used together with [Components](components.html) (but may also be used on their own), so they are
+explained in more detail in the [Components](components.htlm) page.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "if" }}{{ define tag "h3" }}\
