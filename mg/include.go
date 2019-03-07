@@ -33,7 +33,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 		}
 	} else {
 		stack = stack.Push(inc.Origin)
-		err := detectCycle(stack, path, inc.Origin)
+		err := detectCycle(stack, inc.Path, path, inc.Origin)
 		if err != nil {
 			return err
 		}
@@ -45,15 +45,15 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 	return nil
 }
 
-func detectCycle(stack ContextStack, path string, location *Location) error {
+func detectCycle(stack ContextStack, includedPath, absPath string, location *Location) error {
 	for _, f := range stack.chain {
-		if f.Location.Origin == path {
+		if f.Location != nil && f.Location.Origin == absPath {
 			chain := inclusionChainToString(stack.chain)
 			return &MagnanimousError{
 				Code: InclusionCycleError,
 				message: fmt.Sprintf(
 					"Cycle detected! Inclusion of %s at %s comes back into itself via %s",
-					path, location.String(), chain),
+					includedPath, location.String(), chain),
 			}
 		}
 	}

@@ -45,7 +45,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 		}
 	} else {
 		stack = stack.Push(c.Location)
-		err := detectCycle(stack, path, c.Location)
+		err := detectCycle(stack, c.Path, path, c.Location)
 		if err != nil {
 			return err
 		}

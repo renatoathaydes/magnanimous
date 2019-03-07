@@ -131,8 +131,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack 
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	location := Location{Origin: wf.Processed.Path, Col: 0, Row: 0}
-	stack = stack.Push(&location)
+	stack = stack.Push(nil)
 	return writeContents(wf.Processed, writer, files, stack)
 }
 
@@ -146,16 +145,16 @@ func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, sta
 	return nil
 }
 
-func inclusionChainToString(locations []ContextStackItem) string {
+func inclusionChainToString(stackItems []ContextStackItem) string {
 	var b strings.Builder
 	b.WriteRune('[')
-	last := len(locations) - 1
-	for i, loc := range locations {
-		b.WriteString(loc.Location.String())
-		if i != last {
-			b.WriteString(" -> ")
+	var includes []string
+	for _, loc := range stackItems {
+		if loc.Location != nil {
+			includes = append(includes, loc.Location.String())
 		}
 	}
+	b.WriteString(strings.Join(includes, " -> "))
 	b.WriteRune(']')
 	return b.String()
 }

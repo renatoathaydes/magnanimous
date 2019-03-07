@@ -6,8 +6,10 @@ func NewContextStack(context Context) ContextStack {
 	return ContextStack{items}
 }
 
+// Push a new item on the scope stack.
+// Only provide a location if this scope is including another file.
 func (c *ContextStack) Push(location *Location) ContextStack {
-	item := ContextStackItem{Location: location, Context: &MapContext{}}
+	item := ContextStackItem{Location: location, Context: CreateContext()}
 	items := append(c.chain, item)
 	return ContextStack{items}
 }

@@ -92,7 +92,7 @@ func (f *ForLoop) AppendContent(content Content) {
 }
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	stack = stack.Push(f.Location)
+	stack = stack.Push(nil)
 	err := f.iter.forEach(files, stack, magParams{
 		webFiles: files,
 		stack:    stack,

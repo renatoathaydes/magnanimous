@@ -1,20 +1,25 @@
 package mg
 
-type MapContext struct {
-	Map map[string]interface{}
+type mapContext struct {
+	ctx map[string]interface{}
 }
 
-var _ Context = (*MapContext)(nil)
+func CreateContext() Context {
+	m := make(map[string]interface{}, 10)
+	return &mapContext{ctx: m}
+}
 
-func (m *MapContext) Get(name string) (interface{}, bool) {
-	v, ok := m.Map[name]
+var _ Context = (*mapContext)(nil)
+
+func (m *mapContext) Get(name string) (interface{}, bool) {
+	v, ok := m.ctx[name]
 	return v, ok
 }
 
-func (m *MapContext) Set(name string, value interface{}) {
-	m.Map[name] = value
+func (m *mapContext) Set(name string, value interface{}) {
+	m.ctx[name] = value
 }
 
-func (m *MapContext) IsEmpty() bool {
-	return len(m.Map) == 0
+func (m *mapContext) IsEmpty() bool {
+	return len(m.ctx) == 0
 }

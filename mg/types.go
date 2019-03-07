@@ -119,7 +119,7 @@ func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Co
 			}
 		}
 	}
-	return &MapContext{ctx}
+	return CreateContext()
 }
 
 // Bytes returns the bytes of the processed file.
