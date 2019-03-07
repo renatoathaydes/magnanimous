@@ -27,10 +27,6 @@ func TestCopy(t *testing.T) {
 		t.Errorf("Expected basePath 'b' but was '%s'", result.BasePath)
 	}
 
-	if !result.Processed.Context().IsEmpty() {
-		t.Errorf("Expected empty context but was %v", result.Processed.Context())
-	}
-
 	contents := result.Processed.GetContents()
 
 	if len(contents) != 1 {
@@ -39,7 +35,7 @@ func TestCopy(t *testing.T) {
 
 	w := strings.Builder{}
 	m := mg.WebFilesMap{}
-	me := contents[0].Write(&w, m, nil)
+	me := contents[0].Write(&w, m, mg.ContextStack{})
 
 	if me != nil {
 		t.Fatal(me)

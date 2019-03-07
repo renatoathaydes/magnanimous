@@ -18,7 +18,7 @@ func TestDefineNumber(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["a"] = float64(2)
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineString(t *testing.T) {
@@ -32,7 +32,7 @@ func TestDefineString(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineStringConcat(t *testing.T) {
@@ -46,7 +46,7 @@ func TestDefineStringConcat(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineFromExpression(t *testing.T) {
@@ -60,7 +60,7 @@ func TestDefineFromExpression(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["n"] = float64(70)
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineFromOrExpression(t *testing.T) {
@@ -74,7 +74,7 @@ func TestDefineFromOrExpression(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["n"] = "alternative"
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
 func TestDefineBasedOnPreviousDefine(t *testing.T) {
@@ -93,7 +93,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	expectedCtx["b"] = float64(4)
 	expectedCtx["c"] = float64(40)
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, expectedCtx, []string{"", "", ""})
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{"", "", ""})
 }
 
 func TestMalformedDefine(t *testing.T) {
@@ -104,7 +104,7 @@ func TestMalformedDefine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"{{ define }}"})
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ define }}"})
 
 	r = bufio.NewReader(strings.NewReader("{{ define abc }}"))
 	processed, err = mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
@@ -113,5 +113,5 @@ func TestMalformedDefine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"{{ define abc }}"})
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ define abc }}"})
 }

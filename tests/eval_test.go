@@ -15,7 +15,7 @@ func TestEvalString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"Hello ", "Joe"})
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Hello ", "Joe"})
 }
 
 func TestEvalArithmetic(t *testing.T) {
@@ -26,7 +26,7 @@ func TestEvalArithmetic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
 }
 
 func TestEvalNonExistingParameter(t *testing.T) {
@@ -37,7 +37,7 @@ func TestEvalNonExistingParameter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed.Context(), emptyFilesMap, processed, emptyContext, []string{"{{ eval 2 * a }}"})
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ eval 2 * a }}"})
 }
 
 func TestEvalWithExistingParameter(t *testing.T) {
@@ -54,7 +54,7 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>6</p>\n"})
+	checkParsing(t, files, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
 
 func TestEvalWithOrExprParameterExists(t *testing.T) {
@@ -71,7 +71,7 @@ func TestEvalWithOrExprParameterExists(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>3</p>\n"})
+	checkParsing(t, files, processed, expectedCtx, []string{"<p>3</p>\n"})
 }
 
 func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
@@ -87,7 +87,7 @@ func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed.Context(), files, processed, expectedCtx, []string{"<p>100</p>\n"})
+	checkParsing(t, files, processed, expectedCtx, []string{"<p>100</p>\n"})
 }
 
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
@@ -114,7 +114,7 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)
 
-	checkParsing(t, otherProcessed.Context(), *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
 		"OUTER\n",
 		"",
 		"A = 14",

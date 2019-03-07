@@ -332,8 +332,9 @@ func benchmarkProject(b *testing.B, project string) {
 	}
 
 	for _, webFile := range webFiles.WebFiles {
+		stack := mg.NewContextStack(mg.CreateContext())
 		var w strings.Builder
-		err = webFile.Write(&w, webFiles, nil)
+		err = webFile.Write(&w, webFiles, stack)
 
 		if err != nil {
 			b.Fatal(err)
