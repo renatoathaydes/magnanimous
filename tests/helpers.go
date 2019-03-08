@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
@@ -82,8 +83,11 @@ func CreateTempFiles(files map[string]string) (mg.WebFilesMap, string) {
 		check(err)
 		_, err = file.Write([]byte(content))
 		check(err)
+		fileReader := bufio.NewReader(strings.NewReader(content))
+		pf, err := mg.ProcessReader(fileReader, name, len(content), nil)
+		check(err)
 		filesMap.WebFiles[filepath.Join(dir, name)] = mg.WebFile{
-			Processed:   &mg.ProcessedFile{},
+			Processed:   pf,
 			Name:        filepath.Base(name),
 			NonWritable: strings.HasPrefix(filepath.Base(name), "_"),
 		}

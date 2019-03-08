@@ -22,10 +22,8 @@ func (c *ContextStack) Top() *ContextStackItem {
 }
 
 func (c *ContextStack) GetContextAt(index int) Context {
-	if len(c.chain) > 0 {
-		return c.chain[0].Context
-	}
-	return nil
+	l := len(c.chain)
+	return c.chain[l-1-index].Context
 }
 
 func (c *ContextStack) Size() int {

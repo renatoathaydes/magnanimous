@@ -8,8 +8,7 @@ type magParams struct {
 func (m magParams) Get(name string) (interface{}, bool) {
 	for i := 0; i < m.stack.Size(); i++ {
 		ctx := m.stack.GetContextAt(i)
-		v, ok := ctx.Get(name)
-		if ok {
+		if v, ok := ctx.Get(name); ok {
 			return v, true
 		}
 	}

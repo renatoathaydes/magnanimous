@@ -185,9 +185,9 @@ func (e *directoryIterable) filesWithContext(files WebFilesMap, stack ContextSta
 	}
 
 	webFilesCtx := make([]webFileWithContext, len(webFiles))
-	for i, webFile := range webFiles {
-		ctx := webFile.Processed.ResolveContext(files, stack)
-		webFilesCtx[i] = webFileWithContext{file: &webFile, context: ctx}
+	for i, wf := range webFiles {
+		ctx := wf.Processed.ResolveContext(files, stack)
+		webFilesCtx[i] = webFileWithContext{file: &wf, context: ctx}
 	}
 	return webFilesCtx, nil
 }

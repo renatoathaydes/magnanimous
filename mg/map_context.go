@@ -9,6 +9,10 @@ func CreateContext() Context {
 	return &mapContext{ctx: m}
 }
 
+func ToContext(m map[string]interface{}) Context {
+	return &mapContext{ctx: m}
+}
+
 var _ Context = (*mapContext)(nil)
 
 func (m *mapContext) Get(name string) (interface{}, bool) {
