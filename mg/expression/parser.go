@@ -10,18 +10,24 @@ import (
 	"strings"
 )
 
+// Expression is a parsed Magnanimous expression.
+//
+// It can be evaluated with the [EvalExpr] function.
 type Expression struct {
 	expr ast.Expr
 }
 
+// Context contains the bindings available for an expression.
 type Context interface {
 	Get(name string) (interface{}, bool)
 }
 
+// MapContext is a simple implementation of [Context].
 type MapContext struct {
 	Map map[string]interface{}
 }
 
+// Get the value of a binding from the context.
 func (m *MapContext) Get(name string) (interface{}, bool) {
 	if m == nil {
 		return nil, false
@@ -30,6 +36,7 @@ func (m *MapContext) Get(name string) (interface{}, bool) {
 	return v, ok
 }
 
+// ParseExpr parses the given string as a Magnanimous expression.
 func ParseExpr(expr string) (Expression, error) {
 	e, err := parser.ParseExpr(expr)
 	if err != nil {
@@ -38,6 +45,8 @@ func ParseExpr(expr string) (Expression, error) {
 	return Expression{expr: e}, nil
 }
 
+// Eval evaluates the given string as a Magnanimous expression, making the context bindings
+// available to the expression.
 func Eval(expr string, context Context) (interface{}, error) {
 	e, err := ParseExpr(expr)
 	if err != nil {
@@ -46,6 +55,8 @@ func Eval(expr string, context Context) (interface{}, error) {
 	return EvalExpr(e, context)
 }
 
+// EvalExpr evaluates the given Magnanimous expression, making the context bindings
+//// available to the expression.
 func EvalExpr(e Expression, context Context) (interface{}, error) {
 	return eval(e.expr, context)
 }
@@ -184,6 +195,7 @@ func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error
 	return nil, errors.New(fmt.Sprintf("cannot access properties of object: %v", rcv))
 }
 
+// ToContext attempts to convert a variable to a [Context].
 func ToContext(ctx interface{}) (Context, bool) {
 	if v, ok := ctx.(Context); ok {
 		return v, true
