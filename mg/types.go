@@ -111,7 +111,7 @@ func (f *ProcessedFile) AppendContent(content Content) {
 // of the [ProcessedFile].
 func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Context {
 	ctx := make(map[string]interface{})
-	for _, c := range f.contents {
+	for _, c := range f.expandedContents() {
 		if content, ok := c.(*DefineContent); ok {
 			v, ok := content.Eval(files, stack)
 			if ok {
@@ -125,6 +125,14 @@ func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Co
 // Bytes returns the bytes of the processed file.
 func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, error) {
 	return body(f, files, stack)
+}
+
+func (f *ProcessedFile) expandedContents() []Content {
+	// expand contents in case this is markdown
+	if c, ok := unwrapMarkdownContent(f); ok {
+		return c
+	}
+	return f.contents
 }
 
 func body(c ContentContainer, files WebFilesMap, stack ContextStack) ([]byte, error) {

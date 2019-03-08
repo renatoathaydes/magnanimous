@@ -55,12 +55,23 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, sta
 	return err
 }
 
+func unwrapMarkdownContent(f *ProcessedFile) ([]Content, bool) {
+	if len(f.contents) == 1 {
+		if md, ok := f.contents[0].(*HtmlFromMarkdownContent); ok {
+			return md.MarkDownContent, true
+		}
+	}
+	return nil, false
+}
+
 func writeAsHtmlAndReset(contents []Content, writer io.Writer, content Content, files WebFilesMap,
 	stack ContextStack) ([]Content, error) {
+	// write contents, converting it to html
 	err := writeAsHtml(contents, writer, files, stack)
 	if err != nil {
 		return nil, err
 	}
+	// write content as it is, returning nil (or empty array)
 	return nil, content.Write(writer, files, stack)
 }
 
