@@ -24,7 +24,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 		markdown := mg.HtmlFromMarkdownContent{MarkDownContent: contents}
 		r := writeContentToString(&markdown)
 		if r != expectedResult {
-			t.Errorf("[%d] '%s' != %s", i, string(r), expectedResult)
+			t.Errorf("[%d] '%s' != '%s'", i, string(r), expectedResult)
 		}
 	}
 }
@@ -114,7 +114,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, m, processed, emptyContext, []string{"<h1>hello</h1>\n\n<h2>header</h2>\n"})
+	checkParsing(t, m, processed, emptyContext, []string{"<h1>hello</h1>\n<h2>header</h2>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {

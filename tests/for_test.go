@@ -176,7 +176,7 @@ func TestForArrayInMarkDown(t *testing.T) {
 	}
 
 	checkContents(t, emptyFilesMap, processed,
-		"\n<h2>Home</h2>\n\n"+
+		"<h2>Home</h2>\n\n"+
 			"<p>Something something</p>\n\n"+
 			"<h2>About</h2>\n\n"+
 			"<p>Something something\n"+

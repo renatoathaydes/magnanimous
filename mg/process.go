@@ -76,7 +76,7 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 }
 
 func WriteTo(dir string, filesMap WebFilesMap) error {
-	stack := ContextStack{}
+	stack := NewContextStack(CreateContext())
 	if globalCtx, ok := filesMap.WebFiles["source/_global_context"]; ok {
 		ctx := globalCtx.Processed.ResolveContext(filesMap, stack)
 		stack = NewContextStack(ctx)

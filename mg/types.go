@@ -74,7 +74,7 @@ type ContentContainer interface {
 // Implementations of Content define how Magnanimous instructions behave.
 // A Content may contain nested Content parts, in which case it implements ContentContainer.
 type Content interface {
-	// Write writes its contents using the given writer.
+	// Write contents using the given writer.
 	//
 	// The files argument contains all parsed source files.
 	//
