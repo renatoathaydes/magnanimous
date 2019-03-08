@@ -40,16 +40,8 @@ type Location struct {
 //
 // Used to keep state when writing nested Content.
 type ContextStack struct {
-	chain []ContextStackItem
-}
-
-// ContextStackItem is an object that contains the local Context and Location.
-//
-// It is used by Content implementations to write their contents using the given context to resolve data.
-// Content implementations that create new scopes must add an item to the ContextStack.
-type ContextStackItem struct {
-	Location *Location
-	Context  Context
+	locations []Location
+	contexts  []Context
 }
 
 // FileResolver defines how Magnanimous finds source files.
@@ -87,6 +79,7 @@ type Content interface {
 type Context interface {
 	Get(name string) (interface{}, bool)
 	Set(name string, value interface{})
+	Remove(name string)
 	IsEmpty() bool
 }
 

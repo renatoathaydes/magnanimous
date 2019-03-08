@@ -28,7 +28,7 @@ func NewSlotInstruction(arg string, location *Location, original string) Content
 
 func (s *SlotContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	// slot does not write anything, it must be evaluated to resolve its body
-	stack.Top().Context.Set(s.Name, s)
+	stack.Top().Set(s.Name, s)
 	return nil
 }
 

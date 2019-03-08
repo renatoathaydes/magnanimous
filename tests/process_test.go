@@ -11,7 +11,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 	contents := []mg.Content{&mg.StringContent{Text: "# hello\n## world"}}
 
 	writeContentToString := func(content mg.Content) string {
-		stack := mg.NewContextStack(mg.CreateContext())
+		stack := mg.NewContextStack(mg.NewContext())
 		var w strings.Builder
 		err := content.Write(&w, mg.WebFilesMap{}, stack)
 		check(err)
@@ -81,7 +81,7 @@ func TestMarkdownToHtml(t *testing.T) {
 
 	html := mg.MarkdownToHtml(file)
 
-	stack := mg.NewContextStack(mg.CreateContext())
+	stack := mg.NewContextStack(mg.NewContext())
 	result, err := html.Bytes(m, stack)
 
 	if err != nil {

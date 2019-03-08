@@ -1,31 +1,39 @@
 package mg
 
+// NewContextStack creates a stack with a single context in it.
 func NewContextStack(context Context) ContextStack {
-	items := make([]ContextStackItem, 1)
-	items[0] = ContextStackItem{Context: context}
-	return ContextStack{items}
+	ctxs := make([]Context, 1, 10)
+	ctxs[0] = context
+	return ContextStack{contexts: ctxs}
 }
 
 // Push a new item on the scope stack.
-// Only provide a location if this scope is including another file.
-func (c *ContextStack) Push(location *Location) ContextStack {
-	item := ContextStackItem{Location: location, Context: CreateContext()}
-	items := append(c.chain, item)
-	return ContextStack{items}
-}
-
-func (c *ContextStack) Top() *ContextStackItem {
-	if len(c.chain) == 0 {
-		return nil
+//
+// Only provide a location if this scope is including another file, otherwise provide nil.
+// If createScope is true, push a new [Context] onto the stack, otherwise just update the inclusion location stack.
+func (c *ContextStack) Push(location *Location, createScope bool) ContextStack {
+	if location != nil {
+		c.locations = append(c.locations, *location)
 	}
-	return &c.chain[len(c.chain)-1]
+	if createScope {
+		scopes := append(c.contexts, NewContext())
+		return ContextStack{locations: c.locations, contexts: scopes}
+	}
+	return *c
 }
 
+// Top gives the top element on the stack.
+func (c *ContextStack) Top() Context {
+	return c.contexts[len(c.contexts)-1]
+}
+
+// GetContextAt returns the [Context] at the given index on the stack (0 is the top of the stack).
 func (c *ContextStack) GetContextAt(index int) Context {
-	l := len(c.chain)
-	return c.chain[l-1-index].Context
+	l := len(c.contexts)
+	return c.contexts[l-1-index]
 }
 
+// Size of the stack.
 func (c *ContextStack) Size() int {
-	return len(c.chain)
+	return len(c.contexts)
 }

@@ -50,7 +50,7 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextSta
 
 	switch res {
 	case true:
-		stack = stack.Push(nil)
+		stack = stack.Push(nil, true)
 		err = writeContents(ic, writer, files, stack)
 		if err != nil {
 			return err

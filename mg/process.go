@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -75,9 +76,9 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	return &processed, nil
 }
 
-func WriteTo(dir string, filesMap WebFilesMap) error {
-	stack := NewContextStack(CreateContext())
-	if globalCtx, ok := filesMap.WebFiles["source/_global_context"]; ok {
+func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
+	var stack = NewContextStack(NewContext())
+	if globalCtx, ok := filesMap.WebFiles[path.Join(mag.SourcesDir, "processed", "_global_context")]; ok {
 		ctx := globalCtx.Processed.ResolveContext(filesMap, stack)
 		stack = NewContextStack(ctx)
 	}
@@ -110,6 +111,7 @@ func WriteTo(dir string, filesMap WebFilesMap) error {
 
 func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack ContextStack) error {
 	log.Printf("Creating file %s from %s", targetFile, file)
+	stack = stack.Push(nil, true)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -131,7 +133,6 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack 
 }
 
 func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	stack = stack.Push(nil)
 	return writeContents(wf.Processed, writer, files, stack)
 }
 
@@ -145,14 +146,12 @@ func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, sta
 	return nil
 }
 
-func inclusionChainToString(stackItems []ContextStackItem) string {
+func inclusionChainToString(inclusionChain []Location) string {
 	var b strings.Builder
 	b.WriteRune('[')
 	var includes []string
-	for _, loc := range stackItems {
-		if loc.Location != nil {
-			includes = append(includes, loc.Location.String())
-		}
+	for _, loc := range inclusionChain {
+		includes = append(includes, loc.String())
 	}
 	b.WriteString(strings.Join(includes, " -> "))
 	b.WriteRune(']')

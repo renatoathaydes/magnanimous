@@ -32,7 +32,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		stack = stack.Push(inc.Origin)
+		stack = stack.Push(inc.Origin, false)
 		err := detectCycle(stack, inc.Path, path, inc.Origin)
 		if err != nil {
 			return err
@@ -46,9 +46,9 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 }
 
 func detectCycle(stack ContextStack, includedPath, absPath string, location *Location) error {
-	for _, f := range stack.chain {
-		if f.Location != nil && f.Location.Origin == absPath {
-			chain := inclusionChainToString(stack.chain)
+	for _, loc := range stack.locations {
+		if loc.Origin == absPath {
+			chain := inclusionChainToString(stack.locations)
 			return &MagnanimousError{
 				Code: InclusionCycleError,
 				message: fmt.Sprintf(

@@ -41,7 +41,7 @@ func main() {
 		return
 	}
 
-	err = mg.WriteTo(filepath.Join(rootDir, TargetDir), webFiles)
+	err = mag.WriteTo(filepath.Join(rootDir, TargetDir), webFiles)
 	if err != nil {
 		log.Printf("ERROR: %s", err)
 		panic(err)

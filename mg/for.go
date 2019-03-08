@@ -92,17 +92,17 @@ func (f *ForLoop) AppendContent(content Content) {
 }
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	stack = stack.Push(nil)
+	stack = stack.Push(nil, true)
 	err := f.iter.forEach(files, stack, magParams{
 		webFiles: files,
 		stack:    stack,
 	}, func(file *webFileWithContext) error {
 		// use the file's context as the value of the bound variable
-		stack.Top().Context.Set(f.Variable, file.context)
+		stack.Top().Set(f.Variable, file.context)
 		return writeContents(f, writer, files, stack)
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
-		stack.Top().Context.Set(f.Variable, item)
+		stack.Top().Set(f.Variable, item)
 		return writeContents(f, writer, files, stack)
 	})
 

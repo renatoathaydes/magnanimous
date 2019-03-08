@@ -44,7 +44,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		stack = stack.Push(c.Location)
+		stack = stack.Push(c.Location, false)
 		err := detectCycle(stack, c.Path, path, c.Location)
 		if err != nil {
 			return err
@@ -53,7 +53,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 		if err != nil {
 			return err
 		}
-		stack.Top().Context.Set("__contents__", string(contents))
+		stack.Top().Set("__contents__", string(contents))
 		err = componentFile.Write(writer, files, stack)
 		if err != nil {
 			return err

@@ -85,7 +85,11 @@ var _ Content = (*DefineContent)(nil)
 func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	// DefineContent does not write anything!
 	if v, ok := d.Eval(files, stack); ok {
-		stack.Top().Context.Set(d.Name, v)
+		if v == nil {
+			stack.Top().Remove(d.Name)
+		} else {
+			stack.Top().Set(d.Name, v)
+		}
 	}
 	return nil
 }

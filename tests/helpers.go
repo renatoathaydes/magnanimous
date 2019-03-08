@@ -113,7 +113,7 @@ func checkParsing(t *testing.T,
 			len(expectedContents), len(contents), contents)
 	}
 
-	ctx := mg.CreateContext()
+	ctx := mg.NewContext()
 	stack := mg.NewContextStack(ctx)
 
 	for i, c := range contents {
@@ -153,7 +153,7 @@ func checkContents(t *testing.T,
 	m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedContent string) {
 
-	ctx := mg.CreateContext()
+	ctx := mg.NewContext()
 	stack := mg.NewContextStack(ctx)
 
 	content, err := pf.Bytes(m, stack)
@@ -179,7 +179,7 @@ func runMg(t *testing.T, project string) string {
 		t.Fatal(err)
 	}
 
-	err = mg.WriteTo(dir, webFiles)
+	err = mag.WriteTo(dir, webFiles)
 	if err != nil {
 		t.Fatal(err)
 	}
