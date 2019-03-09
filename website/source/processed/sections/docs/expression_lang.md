@@ -220,8 +220,8 @@ _where:_
 A `slot` instruction, like [`define`](#define), defines a variable and does not include any content at the location where it is
 declared. But unlike `define`, `slot` uses the body of its declaration as it value.
 
-That means that evaluating the `slot` with [`eval`](#eval) results in the body of the slot being inserted into the 
-processed document where the `eval` instruction was located.
+That means that evaluating the variable defined by `slot` with [`eval`](#eval) results in the body of the slot 
+being inserted into the processed document.
 
 Slots are commonly used together with [Components](components.html) (but may also be used on their own), so they are
 explained in more detail in the [Components](components.htlm) page.
@@ -317,12 +317,12 @@ If you need to pass in an expression, or just a variable instead of a hardcoded 
 \{{ end }}
 ```
 
+See [Iterables](#iterables) for details about what iterable types can be used with the `for` instruction.
+
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "doc" }}{{ define tag "h3" }}\
 doc
 {{ end }}
-
-See [Iterables](#iterables) for details about what iterable types can be used with the `for` instruction.
 
 #### Syntax:
 
@@ -351,7 +351,14 @@ It does not accept any argument.
 
 All scoped instructions must always be finalized with an `\{{ end }}`.
 
-The latest scoped instruction declared in a document is always the first to be terminated by `end`.
+Scoped instructions are:
+
+* `component`
+* `slot`
+* `if`
+* `for`
+
+Each `end` instruction always matches the nearest unclosed scoped instruction.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "expressions" }}\

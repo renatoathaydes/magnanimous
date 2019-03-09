@@ -11,7 +11,10 @@ footers.
 
 To avoid repeating the same code all over the place, you can use Magnanimous components.
 
-## Creating and using a component
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "creating-and-using-component" }}\
+Creating and using a component
+{{ end }}
 
 A component should normally be declared in a non-writable file (i.e. its name starts with underscore, as in `_example`)
 somewhere under the `source/processed/` directory.
@@ -61,21 +64,24 @@ Which should render like this:
 <div>More content</div>
 ```
 
-### Customizing components with variables
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "customizing-components-with-variables" }}\
+Customizing components with variables
+{{ end }}
 
 Components allow the user to declare variables that customize its contents. The variables may be declared before the
 component's declaration, but they can also be placed inside the component's body, making the variables "local" to the
 component (i.e. not visible in the surrounding scope).
 
 Let's look at an example to clarify what that means. This component expects 2 variables (`my_variable` and `other_var`)
-to be set for customizing it: 
+to be set for customizing it:
 
 ```html
 <h2>\{{ eval my_variable }}</h2>
 <div>
     <span>\{{ eval other_var }}</span>
 </div>
-``` 
+```
 
 {{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/components/_var_example.html" }}
@@ -102,7 +108,10 @@ Result:
 </div>
 ```
 
-### Customizing components with slots
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "customizing-components-with-slots" }}\
+Customizing components with slots
+{{ end }}
 
 `slot`s make components extremely powerful! They allow the creation of very modular components.
 
@@ -134,7 +143,10 @@ To use this component is pretty easy:
 \{{ end }}
 ```
 
-### A more advanced example
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "advanced-example" }}\
+A more advanced example
+{{ end }}
 
 To really understand what can be achieved with components, let's look at a more advanced example.
 
