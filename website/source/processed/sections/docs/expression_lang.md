@@ -345,7 +345,13 @@ be set for a [Component](components.html), for example.
 end
 {{ end }}
 
-`end` is not an independent instruction. It is used to end the scope of a previously started scoped instruction.
+#### Syntax:
+
+```
+\{{ end }}
+```
+
+`end` is not an independent instruction; it is used to end the scope of a previously started scoped instruction.
 
 It does not accept any argument.
 
@@ -359,6 +365,9 @@ Scoped instructions are:
 * `for`
 
 Each `end` instruction always matches the nearest unclosed scoped instruction.
+
+{{include /processed/components/_spacer.html }}\
+<hr>
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "expressions" }}\
