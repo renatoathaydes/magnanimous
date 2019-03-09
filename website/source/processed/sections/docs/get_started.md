@@ -40,10 +40,11 @@ The `source/` directory contains two sub-directories:
 * `static/` can be used for files that should be just copied to your website without modifications.
 * `processed/` is where **processed** files are placed.
 
-Only files within these two directories will be present in the final website.
+Only files within these two directories will be present in the final website (but files from
+other sub-directories may be included by those files).
 
-A **processed** file is one which contains [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which are 
-used to modify the actual contents of the file or provide metadata.
+A **processed** file is one that contains [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which in turn are 
+used to modify the actual contents of the file that will be deployed to the website (or to simply provide metadata).
 
 > **Metadata** is some information about a file, like its path, title, or the date it was created, which can be used 
   elsewhere (e.g. on the table of contents) or included in the visible file contents.
@@ -51,7 +52,82 @@ used to modify the actual contents of the file or provide metadata.
 Any file whose name starts with an underscore, like `_header.html`, will **not** be present in the final website.
 But they are useful to create [Components](components.html), or _fragments_ which can be included into other files.
 
-<img src="{{ eval baseURL + "/images/docs/transformation.jpg" }}" width="500em;" alt="Magnanimous transformation" />
+{{include _spacer.html }}\
+
+<img src="{{ eval baseURL + "/images/docs/magnanimous-transformation.svg" }}" width="500em;" alt="Magnanimous transformation" />
+
+{{include _spacer.html }}\
+
+In the above picture, we can see how Magnanimous processes the `source/processed/index.md` file, using the 
+`_header.html` and `_footer.html` fragments to generate a final `target/index.html` file.
+
+The contents of `source/processed/index.md` could look like this:
+
+```markdown
+\{{ define title "My Website" }}
+\{{ include _header.html }}
+# Main content
+
+This is a markdown file that will be converted to a full HTML file by Magnanimous!
+
+\{{ include _footer.html }} 
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/index.md" }}
+{{ end }}\
+
+The fragments for the HTML header and footer, which you probably will want to include in most MD files:
+
+> Notice the use of the `title` variable in this fragment to determine what to show in the browser's title bar.
+  This implies that any file including this fragment must first define a value for the `title` variable, as we
+  did above with `\{{ define title "My Website" }}`.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>\{{ eval title }}</title>
+</head>
+<body>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/_header.html" }}
+{{ end }}
+
+```html
+</body>
+</html>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/_footer.html" }}
+{{ end }}
+
+And finally, the result in `target/index.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>My Website</title>
+</head>
+<body>
+
+<h1>This is my website</h1>
+
+<p>How awesome is it?!</p>
+
+</body>
+</html>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "target/index.html" }}
+{{ end }}
 
 ## Building the website
 
@@ -69,7 +145,7 @@ as an argument:
 $ magnanimous path/to/my-website
 ```
 
-This will create a static website in the `target/` directory.
+This will create a static website in the `path/to/my-website/target/` directory.
 
 ## Testing the website
 
