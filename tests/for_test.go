@@ -176,7 +176,7 @@ func TestForArrayInMarkDown(t *testing.T) {
 	}
 
 	checkContents(t, emptyFilesMap, processed,
-		"\n<h2>Home</h2>\n\n"+
+		"<h2>Home</h2>\n\n"+
 			"<p>Something something</p>\n\n"+
 			"<h2>About</h2>\n\n"+
 			"<p>Something something\n"+
@@ -186,9 +186,9 @@ func TestForArrayInMarkDown(t *testing.T) {
 func TestForFiles(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "File 1"},
-		"processed/examples/f2.txt": {"title": "Second File"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{ define title \"File 1\" }}",
+		"processed/examples/f2.txt": "{{ define title \"Second File\" }}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -213,8 +213,8 @@ func TestForFiles(t *testing.T) {
 func TestForFilesScope(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "File 1"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{ define title \"File 1\" }}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -242,11 +242,11 @@ func TestForFilesScope(t *testing.T) {
 func TestForFilesWithUnwritableFiles(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "File 1"},
-		"processed/examples/_a.txt": {"title": "?"},
-		"processed/examples/f2.txt": {"title": "Second File"},
-		"processed/examples/_b.txt": {"title": "?"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{ define title \"File 1\" }}",
+		"processed/examples/_a.txt": "{{ define title \"?\" }}",
+		"processed/examples/f2.txt": "{{ define title \"Second File\" }}",
+		"processed/examples/_b.txt": "{{ define title \"?\" }}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -271,14 +271,14 @@ func TestForFilesWithUnwritableFiles(t *testing.T) {
 func TestForFilesReverse(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/a.txt": {"title": "A"},
-		"processed/b.txt": {"title": "B"},
-		"processed/g.txt": {"title": "G"},
-		"processed/f.txt": {"title": "F"},
-		"processed/c.txt": {"title": "C"},
-		"processed/e.txt": {"title": "E"},
-		"processed/d.txt": {"title": "D"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/a.txt": "{{ define title \"A\"}}",
+		"processed/b.txt": "{{ define title \"B\"}}",
+		"processed/g.txt": "{{ define title \"G\"}}",
+		"processed/f.txt": "{{ define title \"F\"}}",
+		"processed/c.txt": "{{ define title \"C\"}}",
+		"processed/e.txt": "{{ define title \"E\"}}",
+		"processed/d.txt": "{{ define title \"D\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -308,14 +308,14 @@ func TestForFilesReverse(t *testing.T) {
 func TestForFilesLimit(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/a.txt": {"title": "A"},
-		"processed/b.txt": {"title": "B"},
-		"processed/g.txt": {"title": "G"},
-		"processed/f.txt": {"title": "F"},
-		"processed/c.txt": {"title": "C"},
-		"processed/e.txt": {"title": "E"},
-		"processed/d.txt": {"title": "D"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/a.txt": "{{define title \"A\"}}",
+		"processed/b.txt": "{{define title \"B\"}}",
+		"processed/g.txt": "{{define title \"G\"}}",
+		"processed/f.txt": "{{define title \"F\"}}",
+		"processed/c.txt": "{{define title \"C\"}}",
+		"processed/e.txt": "{{define title \"E\"}}",
+		"processed/d.txt": "{{define title \"D\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -343,10 +343,10 @@ func TestForFilesLimit(t *testing.T) {
 func TestForFilesLimitTooMany(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/a.txt": {"title": "A"},
-		"processed/b.txt": {"title": "B"},
-		"processed/c.txt": {"title": "C"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/a.txt": "{{define title \"A\"}}",
+		"processed/b.txt": "{{define title \"B\"}}",
+		"processed/c.txt": "{{define title \"C\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -372,12 +372,12 @@ func TestForFilesLimitTooMany(t *testing.T) {
 func TestForFilesSortBy(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "Some file"},
-		"processed/examples/f2.txt": {"title": "Other file"},
-		"processed/examples/f3.txt": {"title": "A file"},
-		"processed/examples/f4.txt": {"title": "Z file"},
-		"processed/examples/f5.txt": {"title": "Final"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+		"processed/examples/f4.txt": "{{define title \"Z file\"}}",
+		"processed/examples/f5.txt": "{{define title \"Final\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -405,12 +405,12 @@ func TestForFilesSortBy(t *testing.T) {
 func TestForFilesSortByReverse(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "Some file"},
-		"processed/examples/f2.txt": {"title": "Other file"},
-		"processed/examples/f3.txt": {"title": "A file"},
-		"processed/examples/f4.txt": {"title": "Z file"},
-		"processed/examples/f5.txt": {"title": "Final"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+		"processed/examples/f4.txt": "{{define title \"Z file\"}}",
+		"processed/examples/f5.txt": "{{define title \"Final\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -438,12 +438,12 @@ func TestForFilesSortByReverse(t *testing.T) {
 func TestForFilesReverseSortBy(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "Some file"},
-		"processed/examples/f2.txt": {"title": "Other file"},
-		"processed/examples/f3.txt": {"title": "A file"},
-		"processed/examples/f4.txt": {"title": "Z file"},
-		"processed/examples/f5.txt": {"title": "Final"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+		"processed/examples/f4.txt": "{{define title \"Z file\"}}",
+		"processed/examples/f5.txt": "{{define title \"Final\"}}",
 	})
 	defer os.RemoveAll(dir)
 
@@ -471,12 +471,12 @@ func TestForFilesReverseSortBy(t *testing.T) {
 func TestForFilesLimitSortByReverse(t *testing.T) {
 
 	// create a bunch of files for testing
-	files, dir := CreateTempFiles(map[string]map[string]string{
-		"processed/examples/f1.txt": {"title": "Other file"},
-		"processed/examples/f2.txt": {"title": "Some file"},
-		"processed/examples/f3.txt": {"title": "A file"},
-		"processed/examples/f4.txt": {"title": "Z file"},
-		"processed/examples/f5.txt": {"title": "Final"},
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+		"processed/examples/f4.txt": "{{define title \"Z file\"}}",
+		"processed/examples/f5.txt": "{{define title \"Final\"}}",
 	})
 	defer os.RemoveAll(dir)
 

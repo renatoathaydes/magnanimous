@@ -14,10 +14,8 @@ type ForLoop struct {
 	Variable string
 	iter     iterable
 	Text     string
-	Location Location
+	Location *Location
 	contents []Content
-	context  map[string]interface{}
-	parent   Scope
 }
 
 type forLoopSubInstruction struct {
@@ -37,30 +35,34 @@ type limitSubInstruction struct {
 type reverseSubInstruction struct {
 }
 
-type fileConsumer func(file *WebFile) error
+type webFileWithContext struct {
+	file    *WebFile
+	context Context
+}
+
+type fileConsumer func(file *webFileWithContext) error
 
 type itemConsumer func(interface{}) error
 
 type iterable interface {
-	forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
+	forEach(files WebFilesMap, stack ContextStack,
 		parameters magParams, fc fileConsumer, ic itemConsumer) error
 }
 
 type arrayIterable struct {
 	array           *expression.Expression
-	location        Location
+	location        *Location
 	subInstructions []forLoopSubInstruction
 }
 
 type directoryIterable struct {
 	path            string
 	resolver        FileResolver
-	location        Location
+	location        *Location
 	subInstructions []forLoopSubInstruction
 }
 
-func NewForInstruction(arg string, location Location, original string,
-	scope Scope, resolver FileResolver) Content {
+func NewForInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	parts := strings.SplitN(arg, " ", 2)
 	switch len(parts) {
 	case 0:
@@ -75,12 +77,10 @@ func NewForInstruction(arg string, location Location, original string,
 			location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ForLoop{Variable: parts[0], iter: iter, parent: scope,
-		Text: original, Location: location, context: make(map[string]interface{}, 2)}
+	return &ForLoop{Variable: parts[0], iter: iter, Text: original, Location: location}
 }
 
 var _ Content = (*ForLoop)(nil)
-var _ Scope = (*ForLoop)(nil)
 var _ ContentContainer = (*ForLoop)(nil)
 
 func (f *ForLoop) GetContents() []Content {
@@ -91,28 +91,21 @@ func (f *ForLoop) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
-func (f *ForLoop) Context() Context {
-	return &MapContext{Map: f.context}
-}
-
-func (f *ForLoop) Parent() Scope {
-	return f.parent
-}
-
-func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	err := f.iter.forEach(files, inclusionChain, magParams{
-		webFiles:       &files,
-		inclusionChain: inclusionChain,
-		scope:          f,
-	}, func(webFile *WebFile) error {
+func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	stack = stack.Push(nil, true)
+	err := f.iter.forEach(files, stack, magParams{
+		webFiles: files,
+		stack:    stack,
+	}, func(file *webFileWithContext) error {
 		// use the file's context as the value of the bound variable
-		f.context[f.Variable] = webFile.Processed.Context()
-		return writeContents(f, writer, files, inclusionChain, false)
+		stack.Top().Set(f.Variable, file.context)
+		return writeContents(f, writer, files, stack)
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
-		f.Context().Set(f.Variable, item)
-		return writeContents(f, writer, files, inclusionChain, false)
+		stack.Top().Set(f.Variable, item)
+		return writeContents(f, writer, files, stack)
 	})
+
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
@@ -123,7 +116,7 @@ func (f *ForLoop) String() string {
 	return fmt.Sprintf("ForLoop{%s}", f.Text)
 }
 
-func asIterable(arg string, location Location, resolver FileResolver) (iterable, error) {
+func asIterable(arg string, location *Location, resolver FileResolver) (iterable, error) {
 	var forArg string
 	var subInstructions []forLoopSubInstruction
 	if strings.HasPrefix(arg, "(") {
@@ -139,7 +132,7 @@ func asIterable(arg string, location Location, resolver FileResolver) (iterable,
 }
 
 func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
-	location Location, resolver FileResolver) (iterable, error) {
+	location *Location, resolver FileResolver) (iterable, error) {
 
 	if strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]") {
 		expr, err := expression.ParseExpr(fmt.Sprintf("[]interface{}{%s}", forArg[1:len(forArg)-1]))
@@ -151,7 +144,7 @@ func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
 	return &directoryIterable{path: forArg, location: location, resolver: resolver, subInstructions: subInstructions}, nil
 }
 
-func (e *arrayIterable) forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
+func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
 	v, err := expression.EvalExpr(*e.array, parameters)
 	if err != nil {
@@ -185,9 +178,25 @@ func (e *arrayIterable) forEach(files WebFilesMap, inclusionChain []InclusionCha
 	return nil
 }
 
-func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []InclusionChainItem,
-	parameters magParams, fc fileConsumer, ic itemConsumer) error {
+func (e *directoryIterable) filesWithContext(files WebFilesMap, stack ContextStack) ([]webFileWithContext, error) {
 	_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
+	if err != nil {
+		return nil, err
+	}
+
+	webFilesCtx := make([]webFileWithContext, len(webFiles))
+	for i, wf := range webFiles {
+		ctx := wf.Processed.ResolveContext(files, stack)
+		// we must create a new ref here otherwise the file ref will point to the loop ref, which changes!
+		refToFile := wf
+		webFilesCtx[i] = webFileWithContext{file: &refToFile, context: ctx}
+	}
+	return webFilesCtx, nil
+}
+
+func (e *directoryIterable) forEach(files WebFilesMap, stack ContextStack,
+	parameters magParams, fc fileConsumer, ic itemConsumer) error {
+	webFilesCtx, err := e.filesWithContext(files, stack)
 	if err != nil {
 		return err
 	}
@@ -196,35 +205,31 @@ func (e *directoryIterable) forEach(files WebFilesMap, inclusionChain []Inclusio
 	sortByName := len(e.subInstructions) == 0 || e.subInstructions[0].sortBy == nil
 
 	if sortByName {
-		sort.Slice(webFiles, func(i, j int) bool {
-			return webFiles[i].Name < webFiles[j].Name
+		sort.Slice(webFilesCtx, func(i, j int) bool {
+			return webFilesCtx[i].file.Name < webFilesCtx[j].file.Name
 		})
-	}
-
-	for _, item := range webFiles {
-		item.runSideEffects(&files, inclusionChain)
 	}
 
 	for _, subInstruction := range e.subInstructions {
 		if subInstruction.sortBy != nil {
 			sortField := subInstruction.sortBy.field
-			sortFiles(webFiles, sortField)
+			sortFiles(webFilesCtx, sortField)
 		}
 
 		if subInstruction.reverse != nil {
-			reverseFiles(webFiles)
+			reverseFiles(webFilesCtx)
 		}
 
 		if subInstruction.limit != nil {
-			limit := len(webFiles)
+			limit := len(webFilesCtx)
 			if subInstruction.limit.max < limit {
 				limit = subInstruction.limit.max
 			}
-			webFiles = webFiles[0:limit]
+			webFilesCtx = webFilesCtx[:limit]
 		}
 	}
 
-	for _, item := range webFiles {
+	for _, item := range webFilesCtx {
 		err := fc(&item)
 		if err != nil {
 			return err
@@ -291,18 +296,18 @@ func sortArray(array []interface{}, instruction *sortBySubInstruction) {
 	})
 }
 
-func sortFiles(webFiles []WebFile, sortField string) {
+func sortFiles(webFiles []webFileWithContext, sortField string) {
 	sort.Slice(webFiles, func(i, j int) bool {
-		iv, ok := webFiles[i].Processed.Context().Get(sortField)
+		iv, ok := webFiles[i].context.Get(sortField)
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
-				sortField, webFiles[i].Name)
+				sortField, webFiles[i].file.Name)
 			return true
 		}
-		jv, ok := webFiles[j].Processed.Context().Get(sortField)
+		jv, ok := webFiles[j].context.Get(sortField)
 		if !ok {
 			log.Printf("WARN: cannot sortBy %s - file %s does not define such property",
-				sortField, webFiles[j].Name)
+				sortField, webFiles[j].file.Name)
 			return true
 		}
 		res, err := expression.Less(iv, jv)
@@ -314,7 +319,7 @@ func sortFiles(webFiles []WebFile, sortField string) {
 	})
 }
 
-func reverseFiles(webFiles []WebFile) {
+func reverseFiles(webFiles []webFileWithContext) {
 	for i := len(webFiles)/2 - 1; i >= 0; i-- {
 		opp := len(webFiles) - 1 - i
 		webFiles[i], webFiles[opp] = webFiles[opp], webFiles[i]

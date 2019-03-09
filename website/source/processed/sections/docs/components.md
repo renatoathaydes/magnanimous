@@ -11,69 +11,142 @@ footers.
 
 To avoid repeating the same code all over the place, you can use Magnanimous components.
 
-## Creating and using a component
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "creating-and-using-component" }}\
+Creating and using a component
+{{ end }}
 
-A component should be declared in a non-writable file (i.e. its name starts with underscore, as in `_example`)
-somewhere under the `source/processed/` directory. That's because components are not usually full HTML pages,
-but fragments which can be customized to display different content, sometimes even in a customizable shape
-(so you wouldn't want them served by the server by themselves).
+A component should normally be declared in a non-writable file (i.e. its name starts with underscore, as in `_example`)
+somewhere under the `source/processed/` directory.
+
+That's because components are not usually full HTML pages, but fragments which can be customized to display 
+customizable content (so you wouldn't want them served by the server by themselves, without "filling" it in).
 
 As an example, let's say we want to create a component to represent a simple _warning_ box.
 
 It could look like this:
 
 ```html
-\{{ doc This component takes a 'message' and displays it in a warning box }}\\
-<div class="warning">\{{ eval message }}</div>
+\{{ doc This component takes its contents and displays it in a warning box }}\\
+<div class="warning">\{{ eval __contents__ }}</div>
 ```
 
 {{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/components/_warning.html" }}
 {{ end }}
 
+> Notice that `__contents__` is a special variable that holds the contents of the component when it's used
+  (i.e. the content wrapped between \{{ component path }} and \{{ end }} as we'll see below).
+
 That's it!
 
-You could then use this component in other files like this:
+You could then use this component in other processed files like this:
 
 ```html
 <div>Some content</div>
 
 \{{ component /processed/components/_warning.html }}
-    Warning Box!! This text is ignored, only definitions in this scope are evaluated.
-    \{{ define message "This is a warning message!" }}
+    This is a warning message!
 \{{ end }}
 
 <div>More content</div>
 ```
 
-> Notice that all customizable components must go in the `source/processed/` directory (so they can receive
-  the customization via variables), but where under that directory does not matter for Magnanimous... they could
-  go under any sub-directory you wish. If you create static components that don't need to be customized,
-  you could even put them under `source/static`, which guarantees they will be included without changes.
-
-### Component scopes
-
-Notice that our example component expects a variable called `message` to exist in its scope. For that reason, 
-in the above example, we provide a `message` binding within the scope of the component itself, so that we don't
-mess with the surrounding scope.
-
-If that's not a concern, we could have just re-used an existing binding, as in this example:
+Which should render like this:
 
 ```html
-\{{ define message "This is a warning message!" }}\\
 <div>Some content</div>
 
-\{{ component /processed/components/_warning.html }}\{{ end }}
+<div class="warning">
+    This is a warning message!
+</div>
 
 <div>More content</div>
 ```
 
-Notice that the usual scope rules which apply to file inclusions also apply to components.
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "customizing-components-with-variables" }}\
+Customizing components with variables
+{{ end }}
 
-So, the `message` variable for the example component could even have come from another file which includes this file,
-or ultimately, from the `_global_context`.
+Components allow the user to declare variables that customize its contents. The variables may be declared before the
+component's declaration, but they can also be placed inside the component's body, making the variables "local" to the
+component (i.e. not visible in the surrounding scope).
 
-### A more advanced example
+Let's look at an example to clarify what that means. This component expects 2 variables (`my_variable` and `other_var`)
+to be set for customizing it:
+
+```html
+<h2>\{{ eval my_variable }}</h2>
+<div>
+    <span>\{{ eval other_var }}</span>
+</div>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/components/_var_example.html" }}
+{{ end }}
+
+When using it, we need to provide values for both variables, which we can do both from outside and from inside the
+component:
+
+```html
+\{{ define my_variable "This is available in the component's scope" }}\\
+
+\{{ component /processed/components/_var_example.html }}
+    \{{ define other_var "This also!" }}\\
+\{{ end }}
+```
+
+Result:
+
+```html
+
+<h2>This is available in the component's scope</h2>
+<div>
+    <span>This also!</span>
+</div>
+```
+
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "customizing-components-with-slots" }}\
+Customizing components with slots
+{{ end }}
+
+`slot`s make components extremely powerful! They allow the creation of very modular components.
+
+> Slots are inspired by the HTML5 
+  [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots) standard.
+
+For example, we can create a component that places its contents in 3 areas: top, middle and bottom
+(where both top and bottom are optional):
+
+```html
+<div class="top">\{{ eval top || "" }}</div>
+<div class="middle">\{{ eval middle }}</div>
+<div class="bottom">\{{ eval bottom || "" }}</div>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/components/_slots_example.html" }}
+{{ end }}
+
+To use this component is pretty easy:
+
+```html
+<h1>Hello world</h1>
+
+\{{ component /processed/components/_slots_example.html }}
+    \{{ slot top }}This goes at the top\{{ end }}
+    \{{ slot middle }}This goes in the middle\{{ end }}
+    \{{ slot bottom }}This goes at the bottom\{{ end }}
+\{{ end }}
+```
+
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "advanced-example" }}\
+A more advanced example
+{{ end }}
 
 To really understand what can be achieved with components, let's look at a more advanced example.
 

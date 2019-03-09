@@ -4,16 +4,34 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
 type parserState struct {
-	file    string
-	reader  *bufio.Reader
-	row     uint32
-	col     uint32
-	pf      *ProcessedFile
-	builder *strings.Builder
+	file   string
+	reader *bufio.Reader
+	row    uint32
+	col    uint32
+	//pf           *ProcessedFile
+	builder      *strings.Builder
+	contentStack []ContentContainer
+}
+
+func (state *parserState) append(content Content) {
+	container := state.contentStack[len(state.contentStack)-1]
+	container.AppendContent(content)
+	if c, ok := content.(ContentContainer); ok {
+		state.contentStack = append(state.contentStack, c)
+	}
+}
+
+func (state *parserState) dropStackItem() bool {
+	if len(state.contentStack) > 1 {
+		state.contentStack = state.contentStack[:len(state.contentStack)-1]
+		return true
+	}
+	return false
 }
 
 func parseText(state *parserState, resolver FileResolver) error {
@@ -30,7 +48,7 @@ begin:
 		includeContent = len(strings.TrimSpace(content)) > 0
 	}
 	if includeContent {
-		state.pf.AppendContent(&StringContent{Text: content})
+		state.append(&StringContent{Text: content})
 	}
 	if !eof {
 		err = parseInstruction(state, resolver)
@@ -56,8 +74,8 @@ func parseInstruction(state *parserState, resolver FileResolver) error {
 		state.builder.Reset()
 
 		if len(content) > 0 {
-			appendInstructionContent(state.pf, content,
-				Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
+			appendInstructionContent(state, content,
+				&Location{Origin: state.file, Row: instrFirstRow, Col: instrFirstCol},
 				resolver)
 		}
 		return nil
@@ -66,6 +84,55 @@ func parseInstruction(state *parserState, resolver FileResolver) error {
 	return NewError(Location{Origin: state.file, Row: state.row, Col: state.col}, ParseError,
 		fmt.Sprintf("instruction started at (%d:%d) was not properly closed with '}}'",
 			instrFirstRow, instrFirstCol))
+}
+
+func appendInstructionContent(state *parserState, text string, location *Location, resolver FileResolver) {
+	parts := strings.SplitN(strings.TrimSpace(text), " ", 2)
+	switch len(parts) {
+	case 0:
+		// nothing to do
+	case 1:
+		if parts[0] == "end" {
+			wasDropped := state.dropStackItem()
+			if !wasDropped {
+				log.Printf("WARNING: (%s) %s", location.String(), "end instruction does not match any open scope")
+				state.append(unevaluatedExpression(text))
+			}
+		} else {
+			log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
+			state.append(unevaluatedExpression(text))
+		}
+	case 2:
+		content := createInstruction(parts[0], parts[1], location, text, resolver)
+		if content != nil {
+			state.append(content)
+		}
+	}
+}
+
+func createInstruction(name, arg string, location *Location,
+	original string, resolver FileResolver) Content {
+	switch strings.TrimSpace(name) {
+	case "include":
+		return NewIncludeInstruction(arg, location, original, resolver)
+	case "define":
+		return NewVariable(arg, location, original)
+	case "eval":
+		return NewExpression(arg, location, original)
+	case "if":
+		return NewIfInstruction(arg, location, original)
+	case "for":
+		return NewForInstruction(arg, location, original, resolver)
+	case "doc":
+		return nil
+	case "component":
+		return NewComponentInstruction(arg, location, original, resolver)
+	case "slot":
+		return NewSlotInstruction(arg, location, original)
+	}
+
+	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)
+	return unevaluatedExpression(original)
 }
 
 func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {

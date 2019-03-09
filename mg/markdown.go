@@ -1,134 +1,94 @@
 package mg
 
 import (
-	"bytes"
 	"github.com/Depado/bfchroma"
 	"gopkg.in/russross/blackfriday.v2"
 	"io"
-	"path/filepath"
-	"strings"
 )
 
+// HtmlFromMarkdownContent wraps its contents so that it can convert that to HTML on write.
+//
+// Any included files are written without conversion. Hence, when a HTML file, for example, in included from a
+// markdown file, its contents will be written as they are rather than passed through the markdown-to-html engine.
 type HtmlFromMarkdownContent struct {
 	MarkDownContent []Content
 }
 
 var _ Content = (*HtmlFromMarkdownContent)(nil)
-var _ ContentContainer = (*HtmlFromMarkdownContent)(nil)
-var _ SideEffectContent = (*HtmlFromMarkdownContent)(nil)
 
-var chromaRenderer = blackfriday.WithRenderer(bfchroma.NewRenderer(
-	bfchroma.WithoutAutodetect(), bfchroma.Style("lovelace")))
+var mdStyle = bfchroma.Style("lovelace")
 
+// MarkdownToHtml wraps the contents of a [ProcessedFile] so that it will be converted from markdown
+// to HTML on write.
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{
+		Path:         file.Path,
 		contents:     []Content{&HtmlFromMarkdownContent{MarkDownContent: file.contents}},
-		context:      file.context,
-		rootScope:    file.rootScope,
-		scopeStack:   file.scopeStack,
 		NewExtension: ".html",
 	}
 }
 
-func (f *HtmlFromMarkdownContent) GetContents() []Content {
-	return f.MarkDownContent
-}
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	// accumulate all contents that do not include another file, then writeAsHtmlAndReset it...
+	// inclusions are written as they are, without translation from markdown to html.
+	var nonIncludedContent []Content
+	var err error
 
-func (f *HtmlFromMarkdownContent) Run(files *WebFilesMap, inclusionChain []InclusionChainItem) {
-	runSideEffects(f, files, inclusionChain)
-}
-
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, inclusionChain []InclusionChainItem) error {
-	htmlHead, main, htmlFooter, err := readMarkdownFileParts(f.MarkDownContent, files, inclusionChain)
-	if err != nil {
-		return err
-	}
-	if len(htmlHead) > 0 {
-		_, err = writer.Write(htmlHead)
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
+	for _, c := range f.MarkDownContent {
+		switch c.(type) {
+		case *IncludeInstruction:
+			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, files, stack)
+			if err != nil {
+				return err
+			}
+		case *Component:
+			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, files, stack)
+			if err != nil {
+				return err
+			}
+		default:
+			nonIncludedContent = append(nonIncludedContent, c)
 		}
 	}
 
-	md := blackfriday.Run(main, chromaRenderer)
+	err = writeAsHtml(nonIncludedContent, writer, files, stack)
+	return err
+}
 
-	// The Chroma renderer adds a spurious leading new-line "sometimes" that needs to be removed
-	if len(main) > 0 && main[0] != '\n' &&
-		len(md) > 0 && md[0] == '\n' {
-		md = md[1:]
+func unwrapMarkdownContent(f *ProcessedFile) ([]Content, bool) {
+	if len(f.contents) == 1 {
+		if md, ok := f.contents[0].(*HtmlFromMarkdownContent); ok {
+			return md.MarkDownContent, true
+		}
 	}
+	return nil, false
+}
+
+func writeAsHtmlAndReset(contents []Content, writer io.Writer, content Content, files WebFilesMap,
+	stack ContextStack) ([]Content, error) {
+	// write contents, converting it to html
+	err := writeAsHtml(contents, writer, files, stack)
+	if err != nil {
+		return nil, err
+	}
+	// write content as it is, returning nil (or empty array)
+	return nil, content.Write(writer, files, stack)
+}
+
+func writeAsHtml(c []Content, writer io.Writer, files WebFilesMap, stack ContextStack) error {
+	if len(c) == 0 {
+		return nil
+	}
+	mdBytes, err := asBytes(c, files, stack)
+
+	var chromaRenderer = blackfriday.WithRenderer(
+		bfchroma.NewRenderer(bfchroma.WithoutAutodetect(), mdStyle))
+
+	md := blackfriday.Run(mdBytes, chromaRenderer)
 
 	_, err = writer.Write(md)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
-
-	if len(htmlFooter) > 0 {
-		_, err = writer.Write(htmlFooter)
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-	}
-
 	return nil
-}
-
-func readMarkdownFileParts(c []Content, files WebFilesMap,
-	inclusionChain []InclusionChainItem) (head, body, foot []byte, err error) {
-	var header, main, footer bytes.Buffer
-	header.Grow(128)
-	main.Grow(1024)
-	footer.Grow(128)
-
-	inHeader := true
-	lastIndex := len(c) - 1
-
-	for i, content := range c {
-		var writer *bytes.Buffer = nil
-
-		if inHeader {
-			// we want to find the first actual content here, so we can avoid converting HTML to MD from
-			// any HTML inclusions that happen at the top of the file.. so skip empty content
-			skipFromHeader := false
-			switch cont := content.(type) {
-			case *StringContent:
-				if len(strings.TrimSpace(cont.Text)) == 0 {
-					skipFromHeader = true
-				}
-			case *DefineContent:
-				skipFromHeader = true
-			}
-			if skipFromHeader {
-				writer = &main
-			} else if isHtml(content) {
-				writer = &header
-			} else {
-				inHeader = false
-				writer = &main
-			}
-		} else {
-			if i == lastIndex && isHtml(content) {
-				writer = &footer
-			} else {
-				writer = &main
-			}
-		}
-		err = content.Write(writer, files, inclusionChain)
-		if err != nil {
-			return
-		}
-	}
-
-	head, body, foot = header.Bytes(), main.Bytes(), footer.Bytes()
-	return
-}
-
-func isHtml(c Content) bool {
-	switch comp := c.(type) {
-	case *Component:
-		return strings.ToLower(filepath.Ext(comp.Path)) == ".html"
-	case *IncludeInstruction:
-		return strings.ToLower(filepath.Ext(comp.Path)) == ".html"
-	}
-	return false
 }

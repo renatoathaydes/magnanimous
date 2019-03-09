@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
@@ -68,26 +69,27 @@ func shortDiff(actual, expected string) string {
 	return fmt.Sprintf("No differences found")
 }
 
-func CreateTempFiles(files map[string]map[string]string) (mg.WebFilesMap, string) {
+func CreateTempFiles(files map[string]string) (mg.WebFilesMap, string) {
 	dir, err := ioutil.TempDir("", "for_test")
 	check(err)
 	fmt.Printf("Temp dir at %s\n", dir)
 
 	// just create the directory structure with empty files, contents are not required
 	filesMap := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
-	for name, entry := range files {
+	for name, content := range files {
 		err = os.MkdirAll(filepath.Join(dir, filepath.Dir(name)), 0770)
 		check(err)
-		_, err = os.Create(filepath.Join(dir, name))
+		file, err := os.Create(filepath.Join(dir, name))
+		check(err)
+		_, err = file.Write([]byte(content))
+		check(err)
+		fileReader := bufio.NewReader(strings.NewReader(content))
+		pf, err := mg.ProcessReader(fileReader, name, len(content), nil)
 		check(err)
 		filesMap.WebFiles[filepath.Join(dir, name)] = mg.WebFile{
-			Processed:   &mg.ProcessedFile{},
+			Processed:   pf,
 			Name:        filepath.Base(name),
 			NonWritable: strings.HasPrefix(filepath.Base(name), "_"),
-		}
-		ctx := filesMap.WebFiles[filepath.Join(dir, name)].Processed.Context()
-		for k, v := range entry {
-			ctx.Set(k, v)
 		}
 	}
 
@@ -101,7 +103,7 @@ func check(e error) {
 }
 
 func checkParsing(t *testing.T,
-	ctx mg.Context, m mg.WebFilesMap, pf *mg.ProcessedFile,
+	m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
 	contents := pf.GetContents()
@@ -111,9 +113,13 @@ func checkParsing(t *testing.T,
 			len(expectedContents), len(contents), contents)
 	}
 
+	ctx := mg.NewContext()
+	stack := mg.NewContextStack(ctx)
+
 	for i, c := range contents {
 		var result strings.Builder
-		c.Write(&result, m, nil)
+		err := c.Write(&result, m, stack)
+		check(err)
 
 		if result.String() != expectedContents[i] {
 			t.Errorf("Unexpected Content[%d]\nExpected: '%s'\nActual  : '%s'",
@@ -147,7 +153,10 @@ func checkContents(t *testing.T,
 	m mg.WebFilesMap, pf *mg.ProcessedFile,
 	expectedContent string) {
 
-	content, err := pf.Bytes(m, nil)
+	ctx := mg.NewContext()
+	stack := mg.NewContextStack(ctx)
+
+	content, err := pf.Bytes(m, stack)
 
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +165,6 @@ func checkContents(t *testing.T,
 	if string(content) != expectedContent {
 		t.Errorf("Unexpected content. Expected:\n'%s'\nActual:\n'%s'", expectedContent, content)
 	}
-
 }
 
 func runMg(t *testing.T, project string) string {
@@ -171,7 +179,7 @@ func runMg(t *testing.T, project string) string {
 		t.Fatal(err)
 	}
 
-	err = mg.WriteTo(dir, webFiles)
+	err = mag.WriteTo(dir, webFiles)
 	if err != nil {
 		t.Fatal(err)
 	}
