@@ -98,6 +98,10 @@ component:
 \{{ end }}
 ```
 
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/example.html" }}
+{{ end }}
+
 Result:
 
 ```html
@@ -108,15 +112,21 @@ Result:
 </div>
 ```
 
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "target/example.html" }}
+{{ end }}
+
+
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "customizing-components-with-slots" }}\
 Customizing components with slots
 {{ end }}
 
-`slot`s make components extremely powerful! They allow the creation of very modular components.
+`slot`s make components extremely powerful! They allow the creation of very modular components because the parts
+of the component can be provided by slots defined elsewhere.
 
-> Slots are inspired by the HTML5 
-  [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots) standard.
+> Magnanimous slots were inspired by the HTML5 
+  [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots) standard.
 
 For example, we can create a component that places its contents in 3 areas: top, middle and bottom
 (where both top and bottom are optional):
@@ -135,13 +145,47 @@ To use this component is pretty easy:
 
 ```html
 <h1>Hello world</h1>
-
 \{{ component /processed/components/_slots_example.html }}
-    \{{ slot top }}This goes at the top\{{ end }}
-    \{{ slot middle }}This goes in the middle\{{ end }}
-    \{{ slot bottom }}This goes at the bottom\{{ end }}
+    \{{ slot top }}
+        <h1>Top</h1>
+        <p>This goes at the top</p>
+    \{{ end }}
+    \{{ slot middle }}
+        <h3>Middle</h3>
+        <p>This goes in the middle</p>
+    \{{ end }}
+    \{{ slot bottom }}
+        <h3>Bottom</h3>
+        <p>This goes at the bottom</p>
+    \{{ end }}
 \{{ end }}
 ```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "source/processed/example.html" }}
+{{ end }}
+
+Result:
+
+```html
+<div class="top">
+    <h1>Top</h1>
+    <p>This goes at the top</p>
+</div>
+<div class="middle">
+    <h3>Middle</h3>
+    <p>This goes in the middle</p>
+</div>
+<div class="bottom">
+    <h3>Bottom</h3>
+    <p>This goes at the bottom</p>
+</div>
+```
+
+{{ component /processed/components/_file-box.html }}\
+    {{ define file "target/example.html" }}
+{{ end }}
+
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "advanced-example" }}\

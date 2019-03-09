@@ -224,7 +224,7 @@ That means that evaluating the variable defined by `slot` with [`eval`](#eval) r
 being inserted into the processed document.
 
 Slots are commonly used together with [Components](components.html) (but may also be used on their own), so they are
-explained in more detail in the [Components](components.htlm) page.
+explained in more detail in the [Components](components.html) page.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "if" }}{{ define tag "h3" }}\

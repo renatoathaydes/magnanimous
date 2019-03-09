@@ -52,11 +52,11 @@ used to modify the actual contents of the file that will be deployed to the webs
 Any file whose name starts with an underscore, like `_header.html`, will **not** be present in the final website.
 But they are useful to create [Components](components.html), or _fragments_ which can be included into other files.
 
-{{include _spacer.html }}\
+{{include /processed/components/_spacer.html }}\
 
 <img src="{{ eval baseURL + "/images/docs/magnanimous-transformation.svg" }}" width="500em;" alt="Magnanimous transformation" />
 
-{{include _spacer.html }}\
+{{include /processed/components/_spacer.html }}\
 
 In the above picture, we can see how Magnanimous processes the `source/processed/index.md` file, using the 
 `_header.html` and `_footer.html` fragments to generate a final `target/index.html` file.
