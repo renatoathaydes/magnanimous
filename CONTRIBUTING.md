@@ -22,6 +22,9 @@ The `sample` directory contains sample projects using Magnanimous.
 
 Magnanimous is written in the Go Programming Language.
 
+It uses the new [Go module](https://github.com/golang/go/wiki/Modules) system (see [go.mod](go.mod))
+to manage dependencies.
+
 To compile it:
 
 ```bash
@@ -32,6 +35,12 @@ To test:
 
 ```bash
 go test ./...
+```
+
+To upgrade dependencies:
+
+```bash
+go get -u
 ```
 
 ### Tools
