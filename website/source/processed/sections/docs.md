@@ -8,18 +8,20 @@
 
 Here, you'll find all information you need to use Magnanimous effectively.
 
-{{ define getstartedlink baseURL + "/sections/docs/get_started.html" }}
+{{ define getstartedlink baseURL + "/sections/docs/get_started.html" }}\
 
 If you're new to Magnanimous, the best place to go first is the
 [Getting Started]({{ eval getstartedlink }}) page.
 
-To learn more once you've been there, follow one of the Tutorials listed below.
+{{ define tutoriallink baseURL + "/sections/docs/basic_tutorial.html" }}\
 
-{{ define referencelink baseURL + "/sections/docs/reference.html" }}
+To learn more once you've been there, follow the 
+[Basic Tutorial]({{ eval tutoriallink }}) and you should be ready to go!
 
-Once you've mastered Magnanimous (which should be really quick and easy), you can go directly to the
-[Reference]({{ eval referencelink }}) section when you just need to refresh your memory on
-how to achieve what you want, fast.
+{{ define langlink baseURL + "/sections/docs/expression_lang.html" }}\
+
+When you need help remembering Magnanimous syntax and instructions, head to the 
+[Expression Language]({{ eval langlink }}) page.
 
 ### Table Of Contents
 
