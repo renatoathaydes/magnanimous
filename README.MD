@@ -1,6 +1,10 @@
 # Magnanimous
 
-The simplest and fastest static website generator in the world!!
+![Magnanimous mascot](website/source/static/images/mag-mid-logo.jpg)
+
+[https://renatoathaydes.github.io/magnanimous](https://renatoathaydes.github.io/magnanimous)
+
+The simplest and nicest static website generator in the world!!
 
 Magnanimous has the following guiding principles:
 
@@ -9,285 +13,27 @@ Magnanimous has the following guiding principles:
 * explicit is better than implicit.
 * generate static websites well, nothing else.
 
-This project is currently in early development and is not ready to be used. But stay tuned!
+## Features
+
+* simple templating mechanism based on a tiny [expression language](https://renatoathaydes.github.io/magnanimous/sections/docs/expression_lang.html)
+ (simple as `<p>2 + 2 is {{ eval 2 + 2 }}</p>`).
+* include file into another (`{{ include other-file.html }}`).
+* define variables (`{{ define title "Hello world" }}`).
+* [components](https://renatoathaydes.github.io/magnanimous/sections/docs/components.html) and slots inspired by web components.
+* conditional content (`{{ if title == "Home" }}We are home{{ end }}`).
+* for loops over files and variables (`{{ for file /path/to/files }}* Post name: {{eval file.postName}} {{end}}`).
+
+## Documentation
+
+Visit [the website](https://renatoathaydes.github.io/magnanimous) for the full documentation.
 
 ## Basic Design
 
 Magnanimous reads source files from the `source/` directory, and generates a website in `target/`.
 
-The following `source` sub-directories are the only ones treated specially by Magnanimous:
+The following `source` sub-directories are the only ones treated _specially_ by Magnanimous:
 
 * `source/static`    - static files that should be served as-is.
 * `source/processed` - files that will be processed, as explained below.
 
 Any other files and sub-directories are ignored by default, but may be referred to from processed files.
-
-### Processed files
-
-Files meant to be processed by Magnanimous are placed inside the `source/processed` directory.
-
-Processed files may use the following processor instructions:
-
-* `{{ include <path> }}` - include the contents of the file in the given path into the current file.
-* `{{ define <varible_name> <expression> }}` - define a variable.
-* `{{ eval <expression> }}` - evaluates an expression.
-* `{{ if <expression> }}` (conditional content) `{{ end }}`.
-* `{{ for <item> (sub-instructions) <iterable> }}` (repeated content for each item) `{{ end }}`.
-
-Markdown files (`*.md`) will be converted to HTML, after Magnanimous instructions are processed, using
-[Blackfriday](https://github.com/russross/blackfriday).
-
-Files whose name starts with `_` will not be present in the output website, but may be included by other files.
-
-#### Inclusions
-
-`include` instructions must always have a path to a file as an argument.
-
-An inclusion may look like this: 
-
-```
-{{ include /static/header.html }}
-```
-
-This whole expression will be replaced with the contents of the file at `source/static/header.html`.
-If the file does not exist, a warning will be emitted
-during compilation and the expression will appear as it is in the compiled resource.
-
-#### Variables
-
-Variables can be defined with the `define` instruction.
- 
-For example:
-
-```
-{{ define title "My Website" }}
-```
-
-The above instructions defines a variable called `title` with the value `My Website`.
-
-To evaluate the value of a variable, the `eval` instruction is used:
-
-```
-{{ eval title }}
-```
-
-The variable may be either defined in the same file as the evaluation is happening,
-or in a file which includes that file.
-
-If the variable cannot be found, a warning will be emitted during compilation, and the expression will appear as it is
-in the compiled resource.
-
-> The value of a variable is evaluated as an *expression*. See the next section for more details.
-
-It's possible to write more advanced expressions with variables as in the following example:
-
-```
-< div class="header {{ eval pageName == "Home" ? "highlight" : "" }}">Home</div>
-```
-
-##### Global context
-
-For convenience, a global context can be defined which can define constants that will be available in all processed
-sources.
-
-Simply create a file at `source/processed/_global_context` and write as many `define` instructions as you wish to define
-the global constants you might need.
-
-This is useful, for example, to define a `baseURL` for a website, which can then be used to create absolute links:
-
-```
-{{ define baseURL "/my-website/root/" }}
-```  
-
-Then, in any file, you can get an absolute URL to some file like this:
-
-```html
-<a href="{{ eval baseURL + `current/page.html` }}">This page link</a>
-```
-
-#### Expressions
-
-Expressions may appear in several different locations:
-
-* as an argument to the `eval` instruction.
-* as the value of a new variable defined by the `define` instruction.
-* as an argument to the `if` instruction.
-* as items of an iterable (array), used with the `for` instruction.
-
-For example, an expression may be evaluated with `eval`, with the result being displayed in the page:
-
-```
-{{ eval 2 + 2 * 5 }}
-```
-
-This should result in `12` being displayed.
-
-> Notice that expressions use a syntax very similar to C-like languages.
-
-The value of a new variable may also be determined by an expression:
-
-```
-{{ define n 10 + 10 * (2 + 4) }}
-```
-
-This results in the variable `n` assuming the value `70`.
-
-When an expression is used as an argument to the `if` instruction, it must evaluate to a boolean value (`true` or `false`).
-
-For example, the following is valid (given variable `n` is defined):
-
-```
-{{ if n > 50 }}N is large{{ end }}
-```
-
-Finally, it's possible to use expressions within arrays declared with the `for` instruction:
-
-```
-{{ for x [1 + 1, 2 + 2] }}
-X is {{ eval x }}
-{{ end }}
-```
-
-#### Conditional content
-
-The `if` instruction allows processed files to include content conditionally.
-
-Its argument is a single expression that is expected to evaluate to a boolean value.
-
-> Expressions that evaluate to any non-boolean value emit a warning and evaluate to `false`.
-
-For example:
-
-```
-{{ if title == "Home" }}
-<h1>Welcome Home!</h1>
-{{ end }}
-```
-
-In this example, the content `<h1>Welcome Home!</h1>` will only be displayed if the `title` variable has the
-value `"Home"`, otherwise, nothing would be displayed.
-
-#### Repeated content (for loops)
-
-The `for` instruction has the following arguments:
-
-* `item`       - a variable name to associate with each item of `iterable`.
-* `(sub-instructions)` - optional sub-instructions to modify how iteration is performed.
-* `iterable`   - an iterable object. 
-
-Two kinds of objects are iterable:
-
-* array expressions (e.g. `[1 2 3]`, `["Home", "About"]`).
-* file references to directories.
-
-Sub-instructions are optional and may take one of the following forms:
-
-* `sort`           - sorts the iterable.
-* `sortBy <field>` - sorts files by the given field (must be defined within each file).
-* `limit <n>`      - limit the number of items to iterate over.
-* `reverse`        - iterate in reverse order
-
-When multiple sub-instructions are provided, they are applied in the order they are declared, one at a time.
-
-Example iterating over an array:
-
-```
-{{ for title ["Home", "About", "FAQ"] }}
-<div>{{ eval title }}</div>
-{{ end for }}
-```
-
-The above, after processing, should look like this:
-
-```html
-<div>Home</div>
-<div>About</div>
-<div>FAQ</div>
-```
-
-See the section on iterables for details on how to work with iterables.
-
-File references are discussed in the next section.
-
-### File references
-
-References to other files, both from processed files and from HTML files that link to css or images, for example,
-may be relative or absolute.
-
-Absolute references start with a `/` and are always resolved with relation to `source/`.
-
-Examples:
-
-* `/images/ico.png` ---> `source/images/ico.png` (no processing).
-* `/processed/template.html` ---> `source/processed/template.html` (file contents will be processed).
-
-Relative references are resolved relative to the file declaring the reference.
-
-For example, within the `source/processed/template.html` file:
-
-* `about/index.html` ---> `source/processed/about/index.html` (file contents will be processed).
-* `../images/ico.png` ---> `source/images/ico.png` (no processing).
-
-Notice that referring to parent directories with `../` only works up to the `source/` directory:
-
-* `../../images/ico.png` --> `source/images/ico.png` (no processing).
-
-#### Iterating over file references
-
-File references pointing to a directory can be used with the `for` instruction as iterables over each file
-inside the directory.
-
-For example, to create a HTML menu containing links to each file under the `source/processed/posts/` directory:
-
-```
-{{ for post /processed/posts }}
-    <div>
-        <a href="/processed/posts/{{ eval post.name }}">
-        {{ eval post.date }} - {{ eval post.description }}
-        </a>
-    </div>
-{{ end }}
-```
-
-### Working with iterables
-
-Iterables are object that can be iterated over with the `for` instruction.
-
-As we've seen before, only arrays and file references to directories can be iterable.
-
-Examples:
-
-```
-<tr>
-{{ define columns ["ABC", "GHI", "DEF"] }}
-{{ for col (sort reverse) columns }}
-<th>{{ eval col }}</th>
-{{ end }}
-</tr>
-```
-
-Results in:
-
-```html
-<tr>
-<th>GHI</th>
-<th>DEF</th>
-<th>ABC</th>
-</tr>
-```
-
-Given a directory `source/processed/posts/` containing 10 files called `p1.md`, `p2.md`, and so on, each of which
-defining the `date` and `title` variables as in this example:
-
-```md
-{{ define date "2014-01-01 23:59:59" }}
-{{ define title "Example post" }}
-```
-
-We could display the 5 most recent posts' titles using the following snippet:
-
-```
-{{ for post (sortBy date reverse limit 5) "/processed/posts" }}
-  <div>{{ eval post.title }}</div>
-{{ end }}
-```
