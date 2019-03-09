@@ -18,21 +18,13 @@ const (
 func main() {
 	start := time.Now()
 
-	var rootDir string
-	switch len(os.Args) {
-	case 0:
-		fallthrough
-	case 1:
-		rootDir = ""
-	case 2:
-		rootDir = os.Args[1]
-	default:
-		log.Printf("ERROR: too many arguments provided")
+	rootDir, globalCtx, ok := parseOptions()
+
+	if !ok {
+		return
 	}
 
-	globalCtx := parseOptions()
-
-	mag := mg.Magnanimous{SourcesDir: filepath.Join(rootDir, SourceDir), GlobalContex: *globalCtx}
+	mag := mg.Magnanimous{SourcesDir: filepath.Join(*rootDir, SourceDir), GlobalContex: *globalCtx}
 	webFiles, err := mag.ReadAll()
 	if err != nil {
 		log.Printf("ERROR: %s", err)
@@ -44,7 +36,7 @@ func main() {
 		return
 	}
 
-	err = mag.WriteTo(filepath.Join(rootDir, TargetDir), webFiles)
+	err = mag.WriteTo(filepath.Join(*rootDir, TargetDir), webFiles)
 	if err != nil {
 		log.Printf("ERROR: %s", err)
 		panic(err)
@@ -53,11 +45,41 @@ func main() {
 	log.Printf("Magnanimous generated website in %s\n", time.Since(start))
 }
 
-func parseOptions() (globalContext *string) {
+func parseOptions() (rootDir, globalContext *string, ok bool) {
 	globalContext = flag.String("globalctx", "",
-		"Path to the global context file relative to the processed/ dir")
+		"Path to the global context file relative to the 'processed' directory.")
+
+	help := flag.Bool("help", false, "Print usage help.")
+
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n\n  %s [options...] [root-directory]\n\nOptions:\n",
+			os.Args[0], os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
+
+	otherArgs := flag.Args()
+
+	if *help {
+		flag.Usage()
+		return nil, nil, false
+	}
+
+	var rootDirValue string
+	switch len(otherArgs) {
+	case 0:
+		rootDirValue = ""
+	case 1:
+		rootDirValue = otherArgs[0]
+	default:
+		log.Printf("ERROR: too many arguments provided")
+		flag.Usage()
+		return nil, nil, false
+	}
+	rootDir = &rootDirValue
+
+	ok = true
 
 	return
 }
