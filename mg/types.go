@@ -13,6 +13,8 @@ import (
 type Magnanimous struct {
 	// SourcesDir is the directory containing Magnanimous' source code.
 	SourcesDir string
+	// Location of the global context relative to the "processed" directory.
+	GlobalContex string
 }
 
 // WebFilesMap contains the result of reading a source directory with ReadAll().

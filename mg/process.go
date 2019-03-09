@@ -76,12 +76,28 @@ func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver Fil
 	return &processed, nil
 }
 
-func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
+func (mag *Magnanimous) newContextStack(filesMap WebFilesMap) ContextStack {
 	var stack = NewContextStack(NewContext())
-	if globalCtx, ok := filesMap.WebFiles[path.Join(mag.SourcesDir, "processed", "_global_context")]; ok {
+	var globalCtxPath string
+	if mag.GlobalContex != "" {
+		globalCtxPath = path.Join(mag.SourcesDir, "processed", mag.GlobalContex)
+	} else {
+		globalCtxPath = path.Join(mag.SourcesDir, "processed", "_global_context")
+	}
+	if globalCtx, ok := filesMap.WebFiles[globalCtxPath]; ok {
+		log.Printf("Using global context file: %s", globalCtxPath)
 		ctx := globalCtx.Processed.ResolveContext(filesMap, stack)
 		stack = NewContextStack(ctx)
+	} else if mag.GlobalContex != "" {
+		log.Printf("WARNING: global context file was not found: %s", globalCtxPath)
+	} else {
+		log.Println("No global context file defined.")
 	}
+	return stack
+}
+
+func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
+	stack := mag.newContextStack(filesMap)
 
 	err := os.MkdirAll(dir, 0770)
 	if err != nil {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/renatoathaydes/magnanimous/mg"
 	"log"
@@ -29,7 +30,9 @@ func main() {
 		log.Printf("ERROR: too many arguments provided")
 	}
 
-	mag := mg.Magnanimous{SourcesDir: filepath.Join(rootDir, SourceDir)}
+	globalCtx := parseOptions()
+
+	mag := mg.Magnanimous{SourcesDir: filepath.Join(rootDir, SourceDir), GlobalContex: *globalCtx}
 	webFiles, err := mag.ReadAll()
 	if err != nil {
 		log.Printf("ERROR: %s", err)
@@ -48,4 +51,13 @@ func main() {
 	}
 
 	log.Printf("Magnanimous generated website in %s\n", time.Since(start))
+}
+
+func parseOptions() (globalContext *string) {
+	globalContext = flag.String("globalctx", "",
+		"Path to the global context file relative to the processed/ dir")
+
+	flag.Parse()
+
+	return
 }
