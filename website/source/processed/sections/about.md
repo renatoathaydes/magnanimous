@@ -5,14 +5,16 @@
 {{ include /processed/_header.html }}
 # About Magnanimous
 
-Magnanimous is the simplest and fastest static website generator in the world.
+Magnanimous is the fastest and nicest static website generator in the world _(according to me)_.
 
 It was created out of frustration with other existing website generators. They all start simple...
 But then, they start adding features until there's so much going on that you need to read a thick book
 to fully understand how they work!
 
-All I wanted was a small, fast binary that could just stitch together some files and put them in a directory,
-which I could then deploy to my web server without ceremony.
+I won't let that happen to Magnanimous!
+
+All I really need is a small, fast binary that I can use to stitch together some files and put them in a directory 
+my web server can serve without ceremony.
 
 For that to work, a very small set of things need to be available:
 

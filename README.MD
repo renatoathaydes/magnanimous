@@ -22,6 +22,7 @@ Magnanimous has the following guiding principles:
 * [components](https://renatoathaydes.github.io/magnanimous/sections/docs/components.html) and slots inspired by web components.
 * conditional content (`{{ if title == "Home" }}We are home{{ end }}`).
 * for loops over files and variables (`{{ for file /path/to/files }}* Post name: {{eval file.postName}} {{end}}`).
+* markdown content automatically converted to HTML.
 
 ## Documentation
 

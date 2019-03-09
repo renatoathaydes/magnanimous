@@ -6,13 +6,13 @@
 
 # Magnanimous
 
-> The best and fastest static website generator in the world!
+> The fastest and nicest static website generator in the world!
 
 {{ include /processed/components/_spacer.html }}
 
 <hr />
 
-Magnanimous generates static websites from source files at the speed of light.
+Magnanimous generates static websites from source files really fast.
 
 And it's incredibly simple to use!
 
@@ -23,6 +23,8 @@ $ curl <url-will-go-here>
 ```
 
 ### 2. Write some sources
+
+How about some HTML fragments?! 
 
 ```html
 <!DOCTYPE html>
@@ -47,6 +49,8 @@ $ curl <url-will-go-here>
     {{ define file "source/_footer.html" }}
 {{ end }}
 
+Add some [markdown](https://en.wikipedia.org/wiki/Markdown) content for comfort. 
+
 ```markdown
 \{{ define title "My Website" }}
 \{{ include /processed/_header.html }}
@@ -61,7 +65,7 @@ How awesome is it?!
     {{ define file "source/processed/index.md" }}
 {{ end }}
 
-### 3. Profit
+### 3. Run magnanimous
 
 ```
 $ magnanimous
@@ -90,12 +94,14 @@ Your website is ready on the `target` directory!
     {{ define file "target/index.html" }}
 {{ end }}
 
-You might have noticed some funny contents like `\{{ eval title }}` were _translated_ into something else...
+You might have noticed how some funny contents like `\{{ eval title }}` were _translated_ into something else...
 
 These are [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which let Magnanimous know when you want 
 to do things like include a file into another, or declare values to be used somewhere else... the text inside the
 `\{{` and `}}` braces are evaluated using the Magnanimous expression language. But don't worry!
 You can learn that in about 5 minutes!
+
+Also notice that all markdown content is converted automatically to HTML!
 
 Head to the [Documentation]({{ eval baseURL + "/sections/docs.html" }}) to learn more.
 
