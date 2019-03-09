@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// ReadAll source files, creating a mapping from file paths to [WebFile] instances.
 func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	processedDir := filepath.Join(mag.SourcesDir, "processed")
 	staticDir := filepath.Join(mag.SourcesDir, "static")
@@ -29,6 +30,7 @@ func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	return webFiles, nil
 }
 
+// ProcessAll given files, putting the results in the given webFiles map.
 func ProcessAll(files []string, basePath, sourcesDir string, webFiles *WebFilesMap) error {
 	resolver := DefaultFileResolver{BasePath: sourcesDir, Files: webFiles}
 	for _, file := range files {
@@ -41,6 +43,7 @@ func ProcessAll(files []string, basePath, sourcesDir string, webFiles *WebFilesM
 	return nil
 }
 
+// ProcessFile processes the given file.
 func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -59,6 +62,7 @@ func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error)
 	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: processed, NonWritable: nonWritable}, nil
 }
 
+// ProcessReader processes the contents provided by the given reader.
 func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver FileResolver) (*ProcessedFile, error) {
 	var builder strings.Builder
 	builder.Grow(sizeHint)
@@ -96,6 +100,7 @@ func (mag *Magnanimous) newContextStack(filesMap WebFilesMap) ContextStack {
 	return stack
 }
 
+// WriteTo writes all files in the given map on the given directory.
 func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
 	stack := mag.newContextStack(filesMap)
 
