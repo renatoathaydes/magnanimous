@@ -95,7 +95,7 @@ func appendInstructionContent(state *parserState, text string, location *Locatio
 		if parts[0] == "end" {
 			wasDropped := state.dropStackItem()
 			if !wasDropped {
-				log.Printf("WARNING: (%s) %s", location.String(), "end instruction does not match any open scope")
+				log.Printf("WARNING: (%s) %s", location, "end instruction does not match any open scope")
 				state.append(unevaluatedExpression(text))
 			}
 		} else {
@@ -193,6 +193,8 @@ func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {
 			state.col++
 			return nil, err
 		case '\n':
+			state.row++
+			state.col = 1
 			// forget the new line
 			return nil, nil
 		case '\r':
