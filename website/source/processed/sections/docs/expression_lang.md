@@ -249,7 +249,7 @@ The `if` instruction can be used to include some content in a document only if s
 For example, you may want to include a certain CSS class on an element only if it's the currently active element:
 
 ```html
-<div class="\{{ if currentPage == page }}active{{ end }}"></div>
+<div class="\{{ if currentPage == page }}active\{{ end }}"></div>
 ```
 
 {{ component /processed/components/_linked_header.html }}\
