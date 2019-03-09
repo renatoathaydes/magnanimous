@@ -305,6 +305,9 @@ Number: 23</p>
 // 768579 ns/op
 // 766237 ns/op
 //
+// After stack refactoring:
+// 789229 ns/op
+//
 func BenchmarkProject4(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		benchmarkProject(b, "test_proj_4")
