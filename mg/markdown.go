@@ -24,7 +24,7 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{
 		Path:         file.Path,
 		contents:     []Content{&HtmlFromMarkdownContent{MarkDownContent: file.contents}},
-		NewExtension: ".html",
+		NewExtension: "html",
 	}
 }
 

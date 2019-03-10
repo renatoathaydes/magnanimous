@@ -119,8 +119,7 @@ func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
 		}
 		targetFile := filepath.Join(dir, targetPath)
 		if wf.Processed.NewExtension != "" {
-			ext := filepath.Ext(targetFile)
-			targetFile = targetFile[0:len(targetFile)-len(ext)] + wf.Processed.NewExtension
+			targetFile = changeFileExt(targetFile, wf.Processed.NewExtension)
 		}
 		magErr := writeFile(file, targetFile, wf, filesMap, stack)
 		if magErr != nil {

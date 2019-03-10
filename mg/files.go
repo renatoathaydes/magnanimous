@@ -93,3 +93,8 @@ func Resolve(path, basePath string, from *Location) string {
 func isMd(file string) bool {
 	return strings.ToLower(filepath.Ext(file)) == ".md"
 }
+
+func changeFileExt(path, extension string) string {
+	ext := filepath.Ext(path)
+	return path[0:len(path)-len(ext)] + "." + extension
+}
