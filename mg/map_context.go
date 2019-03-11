@@ -1,6 +1,9 @@
 package mg
 
-import "path/filepath"
+import (
+	"fmt"
+	"path/filepath"
+)
 
 type mapContext struct {
 	ctx map[string]interface{}
@@ -57,5 +60,5 @@ func (m *mapContext) String() string {
 	if m.str != nil {
 		return *m.str
 	}
-	return m.String()
+	return fmt.Sprint(m.ctx)
 }
