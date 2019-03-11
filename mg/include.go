@@ -2,8 +2,10 @@ package mg
 
 import (
 	"fmt"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
+	"strings"
 )
 
 type IncludeInstruction struct {
@@ -22,18 +24,19 @@ func (inc *IncludeInstruction) String() string {
 }
 
 func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	path := inc.Resolver.Resolve(inc.Path, inc.Origin)
+	actualPath := maybeEvalPath(inc.Path, magParams{stack: stack, webFiles: files})
+	path := inc.Resolver.Resolve(actualPath, inc.Origin)
 	//fmt.Printf("Including %s from %v : %s\n", inc.Path, inc.Origin, path)
 	webFile, ok := files.WebFiles[path]
 	if !ok {
-		log.Printf("WARNING: (%s) include non-existent resource: %s", inc.Origin.String(), inc.Path)
+		log.Printf("WARNING: (%s) include non-existent resource: %s", inc.Origin.String(), actualPath)
 		_, err := writer.Write([]byte(inc.Text))
 		if err != nil {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
 		stack = stack.Push(inc.Origin, false)
-		err := detectCycle(stack, inc.Path, path, inc.Origin)
+		err := detectCycle(stack, actualPath, path, inc.Origin)
 		if err != nil {
 			return err
 		}
@@ -43,6 +46,27 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 		}
 	}
 	return nil
+}
+
+func maybeEvalPath(path string, params magParams) string {
+	startIndex := -1
+	if strings.HasPrefix(path, "eval ") {
+		startIndex = 5
+	}
+	if strings.HasPrefix(path, "\"") ||
+		strings.HasPrefix(path, "`") {
+		startIndex = 0
+	}
+	if startIndex != -1 {
+		// treat rest of argument as an expression that evaluates to a path
+		res, err := expression.Eval(path[startIndex:], params)
+		if err != nil {
+			log.Printf("WARNING: eval path expression error: %v\n", err)
+		} else {
+			return fmt.Sprint(res)
+		}
+	}
+	return path
 }
 
 func detectCycle(stack ContextStack, includedPath, absPath string, location *Location) error {
