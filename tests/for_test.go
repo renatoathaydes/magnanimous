@@ -498,3 +498,66 @@ func TestForFilesLimitSortByReverse(t *testing.T) {
 			"Other file\n\n"+
 			"A file\n")
 }
+
+func TestForFilesEval(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ define dir `examples` }}" +
+		"{{ for path eval `/processed/` + dir }}\n" +
+		"{{ eval path.title }}\n" +
+		"{{ end }}"))
+
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
+			"Some file\n\n"+
+			"Other file\n\n"+
+			"A file\n")
+}
+
+func TestForFilesEvalSortBy(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"Some file\"}}",
+		"processed/examples/f2.txt": "{{define title \"Other file\"}}",
+		"processed/examples/f3.txt": "{{define title \"A file\"}}",
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
+
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ define top `/processed` }}" +
+		"{{ define dir `/examples` }}" + // intentional double-slash below
+		"{{ for path (sortBy title) eval top + `/` + dir }}\n" +
+		"{{ eval path.title }}\n" +
+		"{{ end }}"))
+
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, files, processed,
+		"Loop Sample:\n\n"+
+			"A file\n\n"+
+			"Other file\n\n"+
+			"Some file\n")
+}

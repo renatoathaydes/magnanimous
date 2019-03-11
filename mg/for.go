@@ -178,8 +178,21 @@ func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
 	return nil
 }
 
-func (e *directoryIterable) filesWithContext(files WebFilesMap, stack ContextStack) ([]webFileWithContext, error) {
-	_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
+func (e *directoryIterable) filesWithContext(files WebFilesMap,
+	stack ContextStack, parameters magParams) ([]webFileWithContext, error) {
+	path := e.path
+
+	if strings.HasPrefix(path, "eval ") {
+		// treat rest of argument as an expression that evaluates to a path
+		res, err := expression.Eval(path[5:], parameters)
+		if err != nil {
+			log.Printf("WARNING: for loop eval expression error: %v\n", err)
+		} else {
+			path = fmt.Sprint(res)
+		}
+	}
+
+	_, webFiles, err := e.resolver.FilesIn(path, e.location)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +209,7 @@ func (e *directoryIterable) filesWithContext(files WebFilesMap, stack ContextSta
 
 func (e *directoryIterable) forEach(files WebFilesMap, stack ContextStack,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
-	webFilesCtx, err := e.filesWithContext(files, stack)
+	webFilesCtx, err := e.filesWithContext(files, stack, parameters)
 	if err != nil {
 		return err
 	}
