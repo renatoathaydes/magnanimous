@@ -20,7 +20,7 @@ type ExpressionContent struct {
 	Location *Location
 }
 
-func NewExpression(arg string, location *Location, original string) Content {
+func NewEvalInstruction(arg string, location *Location, original string) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
@@ -29,7 +29,7 @@ func NewExpression(arg string, location *Location, original string) Content {
 	return &ExpressionContent{Expr: &expr, Location: location, Text: original}
 }
 
-func NewVariable(arg string, location *Location, original string) Content {
+func NewDefineInstruction(arg string, location *Location, original string) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 2 {
 		variable, rawExpr := parts[0], parts[1]

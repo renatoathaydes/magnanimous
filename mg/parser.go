@@ -116,9 +116,9 @@ func createInstruction(name, arg string, location *Location,
 	case "include":
 		return NewIncludeInstruction(arg, location, original, resolver)
 	case "define":
-		return NewVariable(arg, location, original)
+		return NewDefineInstruction(arg, location, original)
 	case "eval":
-		return NewExpression(arg, location, original)
+		return NewEvalInstruction(arg, location, original)
 	case "if":
 		return NewIfInstruction(arg, location, original)
 	case "for":
