@@ -34,18 +34,19 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 }
 
 func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	path := c.Resolver.Resolve(c.Path, c.Location)
+	actualPath := maybeEvalPath(c.Path, magParams{stack: stack, webFiles: files})
+	path := c.Resolver.Resolve(actualPath, c.Location)
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	componentFile, ok := files.WebFiles[path]
 	if !ok {
-		log.Printf("WARNING: (%s) refers to a non-existent Component: %s", c.Location, c.Path)
+		log.Printf("WARNING: (%s) refers to a non-existent Component: %s", c.Location, actualPath)
 		_, err := writer.Write([]byte(c.Text))
 		if err != nil {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
 		stack = stack.Push(c.Location, false)
-		err := detectCycle(stack, c.Path, path, c.Location)
+		err := detectCycle(stack, actualPath, path, c.Location)
 		if err != nil {
 			return err
 		}
