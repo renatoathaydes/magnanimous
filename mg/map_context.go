@@ -16,10 +16,7 @@ func NewContext() Context {
 	return &mapContext{ctx: m}
 }
 
-// ToContext converts the given map into a [Context].
-//
-// If given, the file is used in the String() representation of the Context.
-func ToContext(m map[string]interface{}, file *ProcessedFile) Context {
+func fileContext(file *ProcessedFile) Context {
 	var str string
 	if file != nil {
 		path := file.Path
@@ -34,7 +31,7 @@ func ToContext(m map[string]interface{}, file *ProcessedFile) Context {
 			str = path
 		}
 	}
-	return &mapContext{ctx: m, str: &str}
+	return &mapContext{ctx: make(map[string]interface{}, 10), str: &str}
 }
 
 var _ Context = (*mapContext)(nil)
@@ -44,8 +41,10 @@ func (m *mapContext) Get(name string) (interface{}, bool) {
 	return v, ok
 }
 
-func (m *mapContext) Remove(name string) {
+func (m *mapContext) Remove(name string) interface{} {
+	v, _ := m.ctx[name]
 	delete(m.ctx, name)
+	return v
 }
 
 func (m *mapContext) Set(name string, value interface{}) {

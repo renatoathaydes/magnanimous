@@ -16,10 +16,15 @@ func (c *ContextStack) Push(location *Location, createScope bool) ContextStack {
 		c.locations = append(c.locations, *location)
 	}
 	if createScope {
-		scopes := append(c.contexts, NewContext())
-		return ContextStack{locations: c.locations, contexts: scopes}
+		return c.PushContext(NewContext())
 	}
 	return *c
+}
+
+// PushContext pushes a context on the scope stack.
+func (c *ContextStack) PushContext(ctx Context) ContextStack {
+	scopes := append(c.contexts, ctx)
+	return ContextStack{locations: c.locations, contexts: scopes}
 }
 
 // Top gives the top element on the stack.

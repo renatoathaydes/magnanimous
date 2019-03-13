@@ -78,7 +78,7 @@ type Content interface {
 type Context interface {
 	Get(name string) (interface{}, bool)
 	Set(name string, value interface{})
-	Remove(name string)
+	Remove(name string) interface{}
 	IsEmpty() bool
 }
 

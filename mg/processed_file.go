@@ -17,16 +17,17 @@ func (f *ProcessedFile) AppendContent(content Content) {
 // ResolveContext evaluates all of the [DefineContent] instructions at the top-level scope
 // of the [ProcessedFile].
 func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Context {
-	ctx := make(map[string]interface{})
+	ctx := fileContext(f)
+	stack = stack.PushContext(ctx)
 	for _, c := range f.expandedContents() {
 		if content, ok := c.(*DefineContent); ok {
 			v, ok := content.Eval(files, stack)
 			if ok {
-				ctx[content.Name] = v
+				ctx.Set(content.Name, v)
 			}
 		}
 	}
-	return ToContext(ctx, f)
+	return ctx
 }
 
 // Bytes returns the bytes of the processed file.
