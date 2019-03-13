@@ -139,5 +139,5 @@ func TestIfScope(t *testing.T) {
 	checkContents(t, emptyFilesMap, processed, "\nBefore IF, X = 10\n\n"+
 		"  Inside IF, X = 20\n\n"+
 		"  Inside IF, Y = 2\n\n"+
-		"After IF, X = 10 and Y = <nil>")
+		"After IF, X = 10 and Y = ")
 }

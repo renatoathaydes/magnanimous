@@ -64,6 +64,9 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 				return err
 			}
 		} else {
+			if r == nil {
+				r = ""
+			}
 			_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
 		}
 	} else {

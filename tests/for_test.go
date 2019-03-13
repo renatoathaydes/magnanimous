@@ -233,10 +233,10 @@ func TestForFilesScope(t *testing.T) {
 	}
 
 	checkContents(t, files, processed,
-		"Title is <nil>\n\n"+
+		"Title is \n\n"+
 			"  path.title: File 1\n"+
-			"  title: <nil>\n\n"+
-			"Title is <nil>")
+			"  title: \n\n"+
+			"Title is ")
 }
 
 func TestForFilesWithUnwritableFiles(t *testing.T) {

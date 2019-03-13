@@ -96,6 +96,23 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{"", "", ""})
 }
 
+func TestDefineBasedOnPreviousEmptyStringDefine(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader(
+		"{{ define baseURL \"\" }}" +
+			"{{ define INSTRUCTIONS_PATH baseURL + \"/hello\" }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["baseURL"] = ""
+	expectedCtx["INSTRUCTIONS_PATH"] = "/hello"
+
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{"", ""})
+}
+
 func TestMalformedDefine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
