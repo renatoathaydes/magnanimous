@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// DefaultFileResolver is the default implementation of [FileResolver].
+//
+// It can resolve absolute and relative paths given its BasePath and the Files map.
 type DefaultFileResolver struct {
 	BasePath string
 	Files    *WebFilesMap
