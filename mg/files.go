@@ -9,6 +9,9 @@ import (
 // DefaultFileResolver is the default implementation of [FileResolver].
 //
 // It can resolve absolute and relative paths given its BasePath and the Files map.
+//
+// It can also resolve up-paths, i.e. paths starting with '.../', which resolve to a existing file in
+// the current directory or a parent directory, up until the file is found, or the BasePath is reached.
 type DefaultFileResolver struct {
 	BasePath string
 	Files    *WebFilesMap
@@ -76,6 +79,10 @@ func (r *DefaultFileResolver) Resolve(path string, from *Location) string {
 		return filepath.Join(r.BasePath, path)
 	}
 
+	if strings.HasPrefix(path, ".../") {
+		return r.searchUp(path[4:], from)
+	}
+
 	// relative path
 	p := filepath.Join(filepath.Dir(from.Origin), path)
 
@@ -87,6 +94,19 @@ func (r *DefaultFileResolver) Resolve(path string, from *Location) string {
 		return filepath.Join(r.BasePath, p)
 	}
 	return p
+}
+
+func (r *DefaultFileResolver) searchUp(path string, from *Location) string {
+	dir := filepath.Dir(from.Origin)
+	for dir != "." {
+		name := filepath.Join(dir, path)
+		if _, ok := r.Files.WebFiles[name]; ok {
+			return name
+		}
+		dir = filepath.Dir(dir)
+	}
+	// can't find it
+	return path
 }
 
 func isMd(file string) bool {
