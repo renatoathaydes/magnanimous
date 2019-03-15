@@ -47,7 +47,8 @@ func TestIncludeEvalFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r = bufio.NewReader(strings.NewReader("{{define p `/processed`}}" +
+	// let 'p' and the appended String contain `/` to cause common double-slash problem (magnanimous should accept it)
+	r = bufio.NewReader(strings.NewReader("{{define p `/processed/`}}" +
 		"OUTER\n{{ include eval p + `/hi.txt` }}\nEND"))
 
 	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
@@ -60,7 +61,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	files["source/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
 
 	expectedCtx := make(map[string]interface{})
-	expectedCtx["p"] = "/processed"
+	expectedCtx["p"] = "/processed/"
 
 	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
 		"",
