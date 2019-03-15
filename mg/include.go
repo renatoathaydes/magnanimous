@@ -25,7 +25,7 @@ func (inc *IncludeInstruction) String() string {
 
 func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	actualPath := maybeEvalPath(inc.Path, magParams{stack: stack, webFiles: files})
-	path := inc.Resolver.Resolve(actualPath, inc.Origin)
+	path := inc.Resolver.Resolve(actualPath, inc.Origin, stack.NearestLocation())
 	//fmt.Printf("Including %s from %v : %s\n", inc.Path, inc.Origin, path)
 	webFile, ok := files.WebFiles[path]
 	if !ok {

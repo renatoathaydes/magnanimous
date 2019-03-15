@@ -35,7 +35,7 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 
 func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	actualPath := maybeEvalPath(c.Path, magParams{stack: stack, webFiles: files})
-	path := c.Resolver.Resolve(actualPath, c.Location)
+	path := c.Resolver.Resolve(actualPath, c.Location, stack.NearestLocation())
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	componentFile, ok := files.WebFiles[path]
 	if !ok {

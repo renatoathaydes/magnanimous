@@ -49,7 +49,9 @@ type FileResolver interface {
 	FilesIn(dir string, from *Location) (dirPath string, f []WebFile, e error)
 	// Resolve resolves a path given a location to resolve it from.
 	// It allows Magnanimous to resolve relative paths correctly.
-	Resolve(path string, from *Location) string
+	// To support up-paths, the [at] location calling the resolution (which can be different from [from])
+	// is also needed.
+	Resolve(path string, from *Location, at *Location) string
 }
 
 // ContentContainer is a collection of Content.

@@ -64,7 +64,7 @@ func getFilesAt(root string, exclusions ...string) ([]string, error) {
 }
 
 func (r *DefaultFileResolver) FilesIn(dir string, from *Location) (dirPath string, webFiles []WebFile, e error) {
-	dirPath = r.Resolve(dir, from)
+	dirPath = r.Resolve(dir, from, nil)
 	for path, wf := range r.Files.WebFiles {
 		if !wf.NonWritable && filepath.Dir(path) == dirPath {
 			webFiles = append(webFiles, wf)
@@ -73,14 +73,14 @@ func (r *DefaultFileResolver) FilesIn(dir string, from *Location) (dirPath strin
 	return
 }
 
-func (r *DefaultFileResolver) Resolve(path string, from *Location) string {
+func (r *DefaultFileResolver) Resolve(path string, from, at *Location) string {
 	if strings.HasPrefix(path, "/") {
 		// absolute path
 		return filepath.Join(r.BasePath, path)
 	}
 
 	if strings.HasPrefix(path, ".../") {
-		return r.searchUp(path[4:], from)
+		return r.searchUp(path[4:], from, at)
 	}
 
 	// relative path
@@ -96,8 +96,13 @@ func (r *DefaultFileResolver) Resolve(path string, from *Location) string {
 	return p
 }
 
-func (r *DefaultFileResolver) searchUp(path string, from *Location) string {
-	dir := filepath.Dir(from.Origin)
+func (r *DefaultFileResolver) searchUp(path string, from, at *Location) string {
+	var dir string
+	if at == nil {
+		dir = filepath.Dir(from.Origin)
+	} else {
+		dir = filepath.Dir(at.Origin)
+	}
 	for dir != "." {
 		name := filepath.Join(dir, path)
 		if _, ok := r.Files.WebFiles[name]; ok {

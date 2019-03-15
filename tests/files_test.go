@@ -21,7 +21,11 @@ func init() {
 }
 
 func ResolveFile(file, origin string) string {
-	return resolver.Resolve(file, &mg.Location{Origin: origin})
+	return resolver.Resolve(file, &mg.Location{Origin: origin}, nil)
+}
+
+func ResolveFileAt(file, origin, at string) string {
+	return resolver.Resolve(file, &mg.Location{Origin: origin}, &mg.Location{Origin: at})
 }
 
 func TestResolveFile(t *testing.T) {
@@ -65,12 +69,37 @@ func TestResolveUpPath(t *testing.T) {
 		"source/123.n")
 	verifyEqual(5, t, ResolveFile(".../yyy.zzz", "source/xxx/yyy.zzz"),
 		"source/xxx/yyy.zzz")
+	verifyEqual(6, t, ResolveFile(".../xxx/yyy.zzz", "source/abc/def/123.n"),
+		"source/xxx/yyy.zzz")
 
 	// cannot resolve non-existing file
-	verifyEqual(6, t, ResolveFile(".../not_exists", "source/xxx/yyy.zzz"),
+	verifyEqual(7, t, ResolveFile(".../not_exists", "source/xxx/yyy.zzz"),
 		"not_exists")
 
 	// cannot find empty filename
-	verifyEqual(6, t, ResolveFile(".../", "source/xxx/yyy.zzz"),
+	verifyEqual(8, t, ResolveFile(".../", "source/xxx/yyy.zzz"),
+		"")
+}
+
+func TestResolveUpPathAt(t *testing.T) {
+	verifyEqual(1, t, ResolveFileAt(".../other.md", "source/abc/def/ghi/file.txt", "source/abc/def/ghi/file.txt"),
+		"source/abc/def/ghi/other.md")
+	verifyEqual(2, t, ResolveFileAt(".../123.n", "source/abc/def/ghi/file.txt", "source/abc/def/123.n"),
+		"source/abc/def/123.n")
+	verifyEqual(3, t, ResolveFileAt(".../123.n", "source/abc/def/ghi/file.txt", "source/xxx/yyy.zzz"),
+		"source/123.n")
+	verifyEqual(4, t, ResolveFileAt(".../123.n", "source/abc/def/ghi/file.txt", "source/123.n"),
+		"source/123.n")
+	verifyEqual(5, t, ResolveFileAt(".../yyy.zzz", "source/abc/def/ghi/file.txt", "source/xxx/yyy.zzz"),
+		"source/xxx/yyy.zzz")
+	verifyEqual(6, t, ResolveFileAt(".../xxx/yyy.zzz", "source/abc/def/123.n", "source/xxx/yyy.zzz"),
+		"source/xxx/yyy.zzz")
+
+	// cannot resolve non-existing file
+	verifyEqual(7, t, ResolveFileAt(".../not_exists", "source/xxx/yyy.zzz", "source/123.n"),
+		"not_exists")
+
+	// cannot find empty filename
+	verifyEqual(8, t, ResolveFileAt(".../", "source/xxx/yyy.zzz", "source/123.n"),
 		"")
 }

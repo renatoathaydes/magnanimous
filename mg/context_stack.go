@@ -32,6 +32,14 @@ func (c *ContextStack) Top() Context {
 	return c.contexts[len(c.contexts)-1]
 }
 
+func (c *ContextStack) NearestLocation() *Location {
+	l := len(c.locations)
+	if l == 0 {
+		return nil
+	}
+	return &c.locations[l-1]
+}
+
 // GetContextAt returns the [Context] at the given index on the stack (0 is the top of the stack).
 func (c *ContextStack) GetContextAt(index int) Context {
 	l := len(c.contexts)

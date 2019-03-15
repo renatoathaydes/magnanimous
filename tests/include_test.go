@@ -140,3 +140,40 @@ func TestIncludeFileNested(t *testing.T) {
 		"A2\nA1",
 		"\nEND"})
 }
+
+func TestIncludeUpPath(t *testing.T) {
+	files := make(map[string]mg.WebFile)
+	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
+
+	r := bufio.NewReader(strings.NewReader("A1{{include .../_msg}}A1"))
+	processed1, err := mg.ProcessReader(r, "source/processed/en/a1.txt", 12, &resolver)
+	check(err)
+
+	r = bufio.NewReader(strings.NewReader("A2{{include .../_msg}}A2"))
+	processed2, err := mg.ProcessReader(r, "source/processed/pt/abc/a2.txt", 12, &resolver)
+	check(err)
+
+	r = bufio.NewReader(strings.NewReader("English"))
+	english, err := mg.ProcessReader(r, "source/_msg", 7, &resolver)
+	check(err)
+
+	r = bufio.NewReader(strings.NewReader("Portuguese"))
+	portuguese, err := mg.ProcessReader(r, "source/processed/pt/_msg", 7, &resolver)
+	check(err)
+
+	files["source/processed/en/a1.txt"] = mg.WebFile{Processed: processed1}
+	files["source/processed/pt/abc/a2.txt"] = mg.WebFile{Processed: processed2}
+	files["source/_msg"] = mg.WebFile{Processed: english}
+	files["source/processed/pt/_msg"] = mg.WebFile{Processed: portuguese}
+
+	expectedCtx := make(map[string]interface{})
+
+	checkParsing(t, *resolver.Files, processed1, expectedCtx, []string{
+		"A1",
+		"English",
+		"A1"})
+	checkParsing(t, *resolver.Files, processed2, expectedCtx, []string{
+		"A2",
+		"Portuguese",
+		"A2"})
+}
