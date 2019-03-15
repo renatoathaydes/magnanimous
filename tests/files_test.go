@@ -5,8 +5,10 @@ import (
 	"testing"
 )
 
+var resolver = mg.DefaultFileResolver{BasePath: "source"}
+
 func ResolveFile(file, origin string) string {
-	return mg.Resolve(file, "source", &mg.Location{Origin: origin})
+	return resolver.Resolve(file, &mg.Location{Origin: origin})
 }
 
 func TestResolveFile(t *testing.T) {
@@ -24,9 +26,17 @@ func TestResolveFile(t *testing.T) {
 func TestResolveRelativePath(t *testing.T) {
 	verifyEqual(1, t, ResolveFile("example.html", "source/processed/hello.html"),
 		"source/processed/example.html")
+	verifyEqual(1, t, ResolveFile("example.html", "source/hello.html"),
+		"source/example.html")
+	verifyEqual(1, t, ResolveFile("example.html", "hello.html"),
+		"source/example.html")
 }
 
 func TestResolveAbsolutePath(t *testing.T) {
 	verifyEqual(1, t, ResolveFile("/site/example.html", "source/processed/hello.html"),
+		"source/site/example.html")
+	verifyEqual(1, t, ResolveFile("/site/example.html", "source/hello.html"),
+		"source/site/example.html")
+	verifyEqual(1, t, ResolveFile("/site/example.html", "hello.html"),
 		"source/site/example.html")
 }
