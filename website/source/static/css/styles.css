@@ -8,8 +8,12 @@ body {
     font-family: Helvetica, sans-serif;
 }
 
-h1, h2, h3 {
-    line-height: 1.2
+h1 {
+    line-height: 3.8;
+}
+
+h2, h3 {
+    line-height: 2.5;
 }
 
 .top-menu {
@@ -29,14 +33,21 @@ code {
     background-color: #EEE;
 }
 
+p {
+    margin-bottom: 2em;
+}
+
 pre {
     padding: 0.6em;
     border-left: 1px black dotted;
     overflow: scroll;
+    margin-bottom: 2em;
+    margin-top: 2em;
 }
 
 .file-box {
-    margin-top: -1em;
+    margin-top: -3em;
+    margin-bottom: 3em;
     padding: 0.4em;
     width: 100%;
     background: linear-gradient(to bottom, white, #EEE);

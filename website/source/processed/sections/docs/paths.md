@@ -138,7 +138,7 @@ Notice that paths are a compile-time concept, which means that they are only use
 compilation, to resolve the contents of the files that will be part of the website. For this reason, paths can
 point to _no-writable_ files (whose file names start with `_`, which are not copied to the final website).
 
-Once the website is created, instructions and paths simply do not exist anymore! All you have if a bunch of static
+Once the website is created, instructions and paths simply do not exist anymore! All you have is a bunch of static
 files ready to be served by a _dumb_ web server.
 
 For this reason, paths should always point to other source files, not to generated files.

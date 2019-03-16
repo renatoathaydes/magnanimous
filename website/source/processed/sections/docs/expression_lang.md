@@ -189,7 +189,7 @@ component
 
 _where:_
 
-* `path` is a [path](#path) to another file.
+* `path` is a [path](paths.html) to another file.
 * `content` the body of the component.
 
 The `component` instruction is quite similar to `include`. It also includes the contents of another file, 
