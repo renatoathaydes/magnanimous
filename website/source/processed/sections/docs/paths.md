@@ -21,7 +21,7 @@ does not point where you thought it ought to, or a path does not resolve correct
 ## Paths
 
 [Components](components.html), the [for](expression_lang.html#for) and the [include](expression_lang.html#include)
-instructions all need to declare a reference to some file, or directory in the case of [for](#for).
+instructions all need to declare a reference to some file, or directory in the case of [for](expression_lang.html#for).
 
 They need to know where to find the information necessary to do their job: the contents of a file, in the case of
 the `include` and `component` instructions, and the directory containing the files to be iterated over, in the case of 
@@ -114,18 +114,34 @@ include that.
 
 Simple, but effective.
 
+### Expression paths
+
+Paths can also be given by [expressions](expression_lang.html#expressions) if starting with `"` or <code>\`</code>,
+or explicitly with `eval <expr>`.
+
+For example, the paths in these [include](expression_lang.html#include) instructions all evaluate to 
+`/hello/world/file.html`:
+
+```
+\{{ include /hello/world/file.html }}
+\{{ include "/hello" + "/world" + "/file.html" }}
+
+\{{ define dir "/hello/world/" }}
+\{{ include eval dir + "file.html }}
+```
+
 ### When are paths resolved?
 
 Paths are resolved when Magnanimous is writing the generated website files.
 
 Notice that paths are a compile-time concept, which means that they are only used by Magnanimous instructions, during
 compilation, to resolve the contents of the files that will be part of the website. For this reason, paths can
-point to _hidden_ files (whose file names start with `_`, which are not copied to the final website).
+point to _no-writable_ files (whose file names start with `_`, which are not copied to the final website).
 
 Once the website is created, instructions and paths simply do not exist anymore! All you have if a bunch of static
 files ready to be served by a _dumb_ web server.
 
-For this reason, paths should always point to other source files, not to generated files. 
+For this reason, paths should always point to other source files, not to generated files.
 
 Links, on the other hand, are a different story, as we'll see.
 
