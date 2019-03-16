@@ -152,17 +152,56 @@ This will create a static website in the `path/to/my-website/target/` directory.
 Now that your website is ready, you can run any web server to serve the `target/` directory so you can see what
 the website looks like.
 
-For example, if you have Python installed, simply run this command:
+Here are a few simple HTTP servers you could use to server your website locally!
 
-```
-$ cd target/ && python -m SimpleHTTPServer 8082
-```
-
+Choose your favourite language:
+  
 > [Click here](https://gist.github.com/willurd/5720255) for many other web server one-liners.
 
-Then, open `http://localhost:8082` on your browser. If you have a file called `index.html`, that page should be shown
+#### Python HTTP Server
+
+```
+$ cd target && python -m SimpleHTTPServer 8080
+```
+
+Docs: [https://docs.python.org/2/library/simplehttpserver.html](https://docs.python.org/2/library/simplehttpserver.html)
+
+#### NodeJS HTTP Server
+
+```
+$ npm install -g http-server
+$ http-server target
+```
+
+Docs: [https://www.npmjs.com/package/http-server](https://www.npmjs.com/package/http-server)
+
+#### Java HTTP Server
+
+> Disclaimer: I'm the author of RawHTTP.
+
+```
+$ curl https://jcenter.bintray.com/com/athaydes/rawhttp/rawhttp-cli/1.0/rawhttp-cli-1.0-all.jar -o rawhttp.jar
+$ java -jar ./rawhttp.jar serve .
+```
+
+Docs: [https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/](https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/)
+
+#### Go HTTP Server
+
+```
+$ go get github.com/vwochnik/gost
+$ gost target
+```
+
+Docs: [https://github.com/vwochnik/gost](https://github.com/vwochnik/gost)
+
+<hr/>
+
+Open `http://localhost:8082` on your browser. If you have a file called `index.html`, that page should be shown
 in the browser... otherwise, just add the path to one of your files to the URL (e.g. if you have a source file under 
 `source/processed/blog/blog1.html`, try opening `http://localhost:8082/blog/blog1.html`).
+
+## Publishing the website
 
 To publish the website publicly so everyone can visit it, you can use one of many available static website hosts:
 

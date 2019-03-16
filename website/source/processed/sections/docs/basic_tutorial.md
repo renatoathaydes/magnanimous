@@ -155,48 +155,8 @@ To serve the website locally during development, we'll need a simple HTTP server
 
 There's [a lot of choices](https://gist.github.com/willurd/5720255) available!
 
-Here are a few of them, choose your favourite language:
+Check also the [Getting Started](get_started.html) guide section on 
 
-> all of the commands below will serve the `target/` directory on port 8080.
-  These web servers are recommended for debugging only. See the [Publishing your website](#deploying) section for
-  more robust hosting alternatives.
-
-#### Python HTTP Server
-
-```
-$ cd target && python -m SimpleHTTPServer 8080
-```
-
-Docs: [https://docs.python.org/2/library/simplehttpserver.html](https://docs.python.org/2/library/simplehttpserver.html)
-
-#### NodeJS HTTP Server
-
-```
-$ npm install -g http-server
-$ http-server target
-```
-
-Docs: [https://www.npmjs.com/package/http-server](https://www.npmjs.com/package/http-server)
-
-#### Java HTTP Server
-
-> Disclaimer: I'm the author of RawHTTP.
-
-```
-$ curl https://jcenter.bintray.com/com/athaydes/rawhttp/rawhttp-cli/1.0/rawhttp-cli-1.0-all.jar -o rawhttp.jar
-$ java -jar ./rawhttp.jar serve .
-```
-
-Docs: [https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/](https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/)
-
-#### Go HTTP Server
-
-```
-$ go get github.com/vwochnik/gost
-$ gost target
-```
-
-Docs: [https://github.com/vwochnik/gost](https://github.com/vwochnik/gost)
 
 ## Part 2 - Solving common problems
 
@@ -428,7 +388,7 @@ look like this:
 <nav class="navigation">
     <section class="container">
         <a href="/index.html" 
-            class="button\{{if name != `Home`}} button-outline{{end}}">Home</a>
+            class="button\{{if name != `Home`}} button-outline\{{end}}">Home</a>
         \{{ for section /processed/sections/ }}\\
         <a href="\{{ eval section }}" 
             class="button\{{if name != section.name}} button-outline\{{end}}">\{{ eval section.name }}</a>
@@ -474,29 +434,31 @@ When your website is not going to be served from the root path `/`, you will run
 
 That's because absolute links will point to the server's root path, but your website will not be there!
 
-For example, if you deploy your website to GitHub Pages, the URL to your website will look like this:
+For example, if you deploy your website to [GitHub Pages](https://pages.github.com/)
+(as we're going to do soon!), the URL to your website will look like this:
 
 ```
 https://username.github.io/projectname/
 ```
 
-> This website is at [https://renatoathaydes.github.io/magnanimous/](https://renatoathaydes.github.io/magnanimous/).
+> This website itself, by the way, is hosted on Github!!
+  [https://renatoathaydes.github.io/magnanimous/](https://renatoathaydes.github.io/magnanimous/).
 
 Notice that the root path is `/projectname`, so absolute links to a page under `source/processed/example/file.html`
 need to look like `/projectname/example/file.html`, not just `/example/file.html` as you in your local machine!
 
-To fix this, you can use the global context to define the `baseURL` of your website, which may be different depending
+To fix this, you can use the global context to define the `basePath` of your website, which may be different depending
 on where you deploy it to.
 
 Let's say we want to be able to both deploy the website locally, as we've been doing, and to 
-[GitHub pages](https://pages.github.com/), and that our
+[GitHub Pages](https://pages.github.com/), and that our
 project name on GitHub is `magnanimous-tutorial`.
 
 Then, we could define the following 2 global context files:
 
 ```
 Global context for local deployment: the website will be under the web server's root path
-\{{ define baseURL "" }}
+\{{ define basePath "" }}
 ```
 
 {{ component /processed/components/_file-box.html }}\
@@ -507,56 +469,59 @@ And:
 
 ```
 GitHub Pages context file
-\{{ define baseURL "/magnanimous-tutorial" }}
+\{{ define basePath "/magnanimous-tutorial" }}
 ```
 
 {{ component /processed/components/_file-box.html }}\
     {{ define file "source/processed/_github_global_context" }}
 {{ end }}
 
-Now, we need to change every absolute link in the website to take into consideration the `baseURL` variable.
+Now, we need to change every **link** in the website to take into consideration the `basePath` variable.
 
-There's a whole chapter on [Paths and Links](paths.md) as it's easy to confuse the two. But suffice to say that links
-are things you want the browser to resolve, and paths are things you want Magnanimous to resolve at "compile" time.
+There's a whole chapter on [Paths and Links](paths.html) as it's easy to confuse the two. But suffice it to say that
+links are things you want the browser to resolve, and paths are things you want Magnanimous to resolve.
 
-Given this knowledge, things like `include` instructions will work fine as they are, but things like links to the
-stylesheet will not.
+Given this knowledge, it's easy to understand why things like `include` instructions work without the base path,
+but things like links to stylesheets require it.
 
-Every link we've added to the demo website so far is in the header page, so it's pretty easy to change them as follows:
+Every link we've added to the demo website so far is in the header page, so it's pretty easy to change them:
 
 * stylesheet import:
 
 ```html
-<link rel="stylesheet" href="\{{eval baseURL}}/css/milligram.min.css">
+<link rel="stylesheet" href="\{{eval basePath}}/css/milligram.min.css">
 ```
 
 * section links:
 
 ```html
-<a href="\{{eval baseURL}}/index.html" 
+<a href="\{{eval basePath}}/index.html" 
     class="button\{{if name != `Home`}} button-outline\{{end}}">Home</a>
 \{{ for section /processed/sections/ }}\\
-<a href="\{{ eval baseURL + section }}" 
+<a href="\{{ eval basePath + section }}" 
     class="button\{{if name != section.name}} button-outline\{{end}}">\{{ eval section.name }}</a>
-{{ end }}\\
+\{{ end }}\\
 ```
 
 And that's it!
 
-Now, to deploy locally you just do as you've been doing so far:
+## Part 3 - Publishing the website on GitHub Pages
+
+At this point, you have two ways of building your website:
+
+* to deploy locally, you just do as you've been doing so far:
 
 ```
 $ magnanimous
 ```
 
-But when you want to deploy the website to GitHub, let Magnanimous know you want to use the `_github_global_context`
-file as your global context:
+* to build it with the Github project name as the base path, for publication on GitHub Pages:
 
 ```
 $ magnanimous -globalctx _github_global_context
 ```
 
-Reading the output, you can make sure Magnanimous picked up the right file:
+Reading the output, you can make sure Magnanimous picked up the right global context file:
 
 ```
 2019/03/10 20:23:44 Using global context file: source/processed/_github_global_context
@@ -567,28 +532,24 @@ Reading the output, you can make sure Magnanimous picked up the right file:
 2019/03/10 20:23:44 Magnanimous generated website in 5.581399ms
 ```
 
-One last thing: GitHub Pages lets you use the master branch as the deployment branch, but you want only the files in the
-`target` directory to be deployed... luckily they also let you configure a folder as the root of your website, but the
-directory must be called `docs` for some reason!
+We are now almost ready to publish the website on GitHub Pages.
+
+Just one last thing: GitHub Pages lets you use the master branch as the deployment branch, but you want only
+the files in the `target` directory to be deployed... luckily they also let you configure a directory as the root of
+your website, but the directory must be called `docs` for some reason!
 
 So just make sure to move the files there when you want to deploy:
 
 ```
 $ mv target docs
-``` 
+```
 
 And then `git push`! Your website should now be available online!
 
 [Here's the one](https://renatoathaydes.github.io/magnanimous-tutorial/) we've created in this Tutorial!
 
-#### 2.4.2 Internationalization
-
-The way Magnanimous supports internationalization is via the global context.
-
-For pages that you want to re-use across different languages, you can define a set of messages in the different 
-global contexts for each language, then refer to those messages rather than hardcode the messages in the pages.
-
-### 2.5 Creating re-usable components
-
+In the next Tutorial, we're going to add internationalization to our website (so that users who speak other languages
+can also read it in their own languages) and learn how to use Magnanimous [components and slots](components.html),
+which will allow us to re-use template snippets very effectively.
 
 {{ include _docs_footer.html }}

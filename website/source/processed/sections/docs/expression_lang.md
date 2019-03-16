@@ -152,7 +152,27 @@ Example:
 </div>
 ```
 
-See [Paths and Links](paths.html) for details on how to refer to other files by their paths.
+Notice that paths can be [expressions](#expressions) if starting with `"` or <code>\`</code>,
+or explicitly with `eval <expr>`:
+
+```html
+<!-- Include expression path -->
+\{{ include "other/" + fileName }}
+
+<!-- Include evaluated path -->
+\{{ include eval fileName + "2" }}
+```
+
+Paths may be absolute, relative or _up-paths_ (i.e. paths that refer to a file at the same directory, or a directory
+up the source tree from the current file being written).
+
+Absolute path example: `/processed/partials/_header.html`
+
+Relative path example: `partials/_header.html`
+
+Up-path example: `.../_header.html`
+
+See [Paths and Links](paths.html) for more details.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "component" }}{{ define tag "h3" }}\
