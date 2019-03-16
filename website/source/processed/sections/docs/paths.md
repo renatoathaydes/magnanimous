@@ -11,7 +11,7 @@ which need to point to another source file. They do that by telling Magnanimous 
 You'll also likely add **links** to other files in your pages, so that users can easily navigate between the pages 
 of your website.
 
-The two concepts are similar, but not quite the same.
+The two concepts are somewhat similar, but definitely not the same.
 
 A **path** is a compilation-time concept and doesn't exist at runtime, while **links** only exist at runtime.
 
@@ -27,25 +27,99 @@ They need to know where to find the information necessary to do their job: the c
 the `include` and `component` instructions, and the directory containing the files to be iterated over, in the case of 
 the `for` instruction.
 
-Paths can be of two types:
+Paths can be of three types:
 
 * Absolute paths
 * Relative paths
+* Up paths
+
+### Absolute paths
 
 **Absolute paths** start with a `/`, and are always interpreted as being under the
 [`source/`](get_started.html#magnanimous-directories) directory.
 
+Example:
+
+```
+\{{ include /processed/_header.html }}
+```
+
+### Relative paths
+
 **Relative paths**, unlike absolute paths, do not start with a `/` and are resolved by the location of the file they
 are declared in.
 
-As an example, if within the file `/processed/components/_comp1.html`, you have a instruction that uses the path
-`example/_comp2.html`, then `example/_comp2.html` points to the absolute path `/processed/components/example/_comp2.html`.
+Example:
 
-Paths can refer to a parent directory with `../`, just like in most file systems. However, trying to access anything
-above the `source/` directory is forbidden and will result in the `../` part being ignored.
+```
+\{{ include _header.html }}
+```
+
+If the above inclusion is done from the file `/processed/components/_comp1.html`, then the path, `_header.html`, will point to the file at `/processed/components/_header.html`.
+
+If the inclusion is from `/processed/_comp2.html`, then it points to `/processed/_header.html`.
+
+Relative paths can also refer to a parent directory if they start with `../`, just like in most file systems.
+
+However, trying to access anything above the `source/` directory is forbidden and will result in the `../` part
+being ignored.
+
+### Up paths
+
+**Up paths** refer to a file located at the same location of the **file currently being written** by Magnanimous (not necessarily the location of the file the `include` statement is declared in, as with absolute and relative paths),
+or any parent directory **up to** the `source` directory. 
+
+Example:
+
+```
+\{{ include .../_messages }}
+```
+
+_Up paths_ are special in that the file they point to depends on the context. They are commonly used to allow overriding which file should be used, which is useful for things like internationalization.
+
+For example, given this file structure:
+
+```
+source
+└── processed
+    ├── _header.html
+    ├── index.html
+    ├── _messages
+    └── pt
+    |   ├── _messages
+    |   └── index.html
+    └── sv
+        └── index.html
+```
+
+Assuming `source/processed/_header.html` has the following contents:
+
+```html
+\{{ include .../_messages }}
+<html>
+<head>
+<title>\{{ eval title }}</title>
+</head>
+<body>
+```
+
+> Notice that the header file uses an _up path_, `.../_messages`.
+
+If the `source/processed/index.html` file `include`s this header, it will get messages from `source/processed/_messages` because that's the nearest `_messages` file looking up the directory tree.
+
+If the `source/processed/pt/index.html` file `include`s the header, its messages will come from `source/processed/pt/_messages` instead!
+
+If the `source/processed/sv/index.html` file `include`s the header, because there's no `_messages` file on the same directory, Magnanimous will look up the directory tree, and find the `source/processed/_messages` file, so it will
+include that.
+
+Simple, but effective.
+
+### When are paths resolved?
+
+Paths are resolved when Magnanimous is writing the generated website files.
 
 Notice that paths are a compile-time concept, which means that they are only used by Magnanimous instructions, during
-compilation, to resolve the contents of the final files that will be part of the website. For this reason, paths can
+compilation, to resolve the contents of the files that will be part of the website. For this reason, paths can
 point to _hidden_ files (whose file names start with `_`, which are not copied to the final website).
 
 Once the website is created, instructions and paths simply do not exist anymore! All you have if a bunch of static
@@ -58,18 +132,39 @@ Links, on the other hand, are a different story, as we'll see.
 ## Links
 
 Links are not really a Magnanimous concept, but a _Markdown_ and _HTML_ concept. But because, like paths, they point
-to another file, they can be confused with paths, so some explanation of what's different between them is warranted.
+to another file (or website), they can be confused with paths, so some explanation of what's different between them
+is warranted.
 
-The big difference is simple: links are used at runtime by users of your website, while paths are used by Magnanimous
-at compile time, to resolve [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}).
+Example:
+
+#### Markdown
+
+```markdown
+My favourite site is [Wikipedia](https://www.wikipedia.org/).
+```
+
+#### HTML
+
+```html
+<p>My favourite site is <a href="https://www.wikipedia.org/">Wikipedia</a>.</p>
+```
+
+The big difference between links and paths is simple: links are only ever used at runtime,
+while paths are used by Magnanimous at compile time to resolve [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}).
 
 This has an important implication: while paths point to source files, links point to generated files (or other websites).
 
 So, if you want to add a link to some content you wrote in a markdown file, say `/processed/blog/post.md`, the link to it
-should point to `/blog/post.html`, the generated file, not the source file.
+should point to `/processed/blog/post.html`, the generated file, not the source file.
 
 > Notice that all processed `.md` files are converted to `.html` files by Magnanimous.
   See the [Markdown Guide](markdown_guide.html) for details.
+
+### When are links resolved?
+
+Links are resolved by the browser when users click on links on your HTML pages.
+
+They are part of the language you're using to write content, be it HTML or Markdown, and are not used by Magnanimous.
 
 ### Consider the base path in your links
 
@@ -91,7 +186,7 @@ example:
 {{ define file "source/processed/_global_context" }}\
 {{ end }}
 
-Now, from anywhere, a link can be safely created as follows:
+Now, from any other processed file, a link can be safely created as follows:
 
 ```html
 <a href="\{{ eval basePath + `blog/post.html` }}">A link</a>
