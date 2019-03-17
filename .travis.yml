@@ -1,0 +1,25 @@
+language: go
+sudo: false
+notifications:
+  email: false
+go:
+- 1.11.x
+install:
+- go get -u
+skip_cleanup: true
+repo: renatoathaydes/magnanimous
+before_deploy:
+  - make release
+deploy:
+  provider: releases
+  api_key:
+    secure: jO0PPi2ykTbOyXnfg13NIjJ2PgcemJZgYa0TNFxFvPC+njz4MbzU1lpJGEOxAsTck3Uaz2620CThsbREmxDFc6L7sOruruBA1ivof1bMdRcuuPp12GKUF5o3eVy4M0+40Ew64c6Mtocmx7nhFtgDNc5l9vnHT8Lmu1tx8FmoGQutvYtpKl0+tq0eaKn7Y9fEf1N5SKa95eEqSMRKq104uLObYbUrWrJArUF5WJFG+/usIG0XAzsje/uNEW2O4lGs6+p/nqYQopUICDEuzGwKTw42BI/FIiYAHazVn9+r01GcM65FcRZkE8da6r9MdgbU1f9G1cjKAZjw9bxmZIgaFyHZ4wP+vYQ+gsXwKRLEmQvHdSF/ic/Vmjq3bWgZ8RAFT1qteF6D18I0p8zYeeYzxP2xbYr9jtYD7aSlYJFpYFlioj76B/yV3cQ0SKvf3lMRJoGZg1rM2WfOJt/8Kl9Y0jIzi0ADkyDnlA0cQpGXzG5j0lAK38lmJxvmDZDA6c3yTh2cC6ocHNhyI/XIz8ptelBi3bmS7uD2Cnx0AODSzot0NnadEJi6OnH+iOuytAPw8RdhkuAxTg78nvGUrElfF/TvoD1IByRH9ItYxB3NAtY78ekfMfroQtOjnmVY52JElrK9dLhlxnCh+pjHN5NCg+bGpWlqc013OMmDKA9heDc=
+  file: 
+    - releases/magananimous-darwin-64
+    - releases/magnanimous-linux-amd64
+    - releases/magnanimous-linux-386
+    - releases/magnanimous-windows-amd64
+    - releases/magnanimous-windows-386
+  on:
+    tag: true
+    repo: renatoathaydes/magnanimous
