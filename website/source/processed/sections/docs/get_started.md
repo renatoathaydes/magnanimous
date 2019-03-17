@@ -11,13 +11,15 @@ It's intentionally light on details! Check the next chapters to learn more.
 
 ## Downloading
 
-Magnanimous is a single executable file. To download it using the command line, type the following:
+Magnanimous is a single executable file. 
+
+You can download the appropriate executable for your OS from [the Releases Page](https://github.com/renatoathaydes/magnanimous/releases).
+
+If you have Go installed, just run:
 
 ```
-$ curl <url-will-go-here>
+go get -u github.com/renatoathaydes/magnanimous
 ```
-
-You can also download it manually from [this page](link-will-go-here).
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "magnanimous-directories" }}\

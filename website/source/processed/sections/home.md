@@ -34,9 +34,7 @@ Features:
 
 ### 1. Download the binary
 
-```
-$ curl <url-will-go-here>
-```
+Go to the [releases page](https://github.com/renatoathaydes/magnanimous/releases) and download the binary for your OS.
 
 ### 2. Write some sources
 
@@ -65,7 +63,7 @@ How about some HTML fragments?!
     {{ define file "source/_footer.html" }}
 {{ end }}
 
-Add some [markdown](https://en.wikipedia.org/wiki/Markdown) content for comfort. 
+Add some [markdown](https://en.wikipedia.org/wiki/Markdown) for comfortably writing content. 
 
 ```markdown
 \{{ define title "My Website" }}
@@ -110,14 +108,22 @@ Your website is ready on the `target` directory!
     {{ define file "target/index.html" }}
 {{ end }}
 
-You might have noticed how some funny contents like `\{{ eval title }}` were _translated_ into something else...
+You might have noticed how some funny contents like `\{{ eval title }}`, in the `title` tag, and 
+`\{{ define title "My Website" }}`, in the markdown file...
 
-These are [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which let Magnanimous know when you want 
-to do things like include a file into another, or declare values to be used somewhere else... the text inside the
+These are [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which let Magnanimous know when you want **process** files,
+which mean doing things like include a file into another, or declare values to be used somewhere else... the text inside the
 `\{{` and `}}` braces are evaluated using the Magnanimous expression language. But don't worry!
-You can learn that in about 5 minutes!
+You can learn that in about 15 minutes!
 
-Also notice that all markdown content is converted automatically to HTML!
+Also notice that all markdown content is converted automatically to HTML! Magnanimous will even highlight source code blocks in pretty much
+[any language](https://github.com/alecthomas/chroma#supported-languages), just provide the block language as you do on GitHub markdown:
+
+````markdown
+```javascript
+const magnanimous = () => "Awesome";
+```
+````
 
 Head to the [Documentation]({{ eval baseURL + "/sections/docs.html" }}) to learn more.
 
