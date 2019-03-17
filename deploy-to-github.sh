@@ -1,11 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR=$(dirname "$0")
 TARGET=$DIR/website/target
 
-if [[ $(git status -s) ]]
+git diff-index --quiet HEAD
+
+if [ $? != 0 ]
 then
-    echo "The working directory is dirty. Please commit any pending changes."
+    echo "Git worktree is dirty. Commit or stash changes before proceeding."
     exit 1;
 fi
 
@@ -25,4 +27,4 @@ echo "Generating website"
 magnanimous website
 
 echo "Updating gh-pages branch"
-#cd $TARGET && git add --all && git commit -m "Publishing website"
+cd $TARGET && git add --all && git commit -m "Publishing website" && git push
