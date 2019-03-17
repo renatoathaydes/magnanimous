@@ -35,6 +35,13 @@ Magnanimous reads source files from the `source/` directory, and generates a web
 The following `source` sub-directories are the only ones treated _specially_ by Magnanimous:
 
 * `source/static`    - static files that should be served as-is.
-* `source/processed` - files that will be processed, as explained below.
+* `source/processed` - files that will be processed with [Magnanimous instructions](https://renatoathaydes.github.io/magnanimous/sections/docs/expression_lang.html).
 
 Any other files and sub-directories are ignored by default, but may be referred to from processed files.
+
+[Magnanimous instructions](https://renatoathaydes.github.io/magnanimous/sections/docs/expression_lang.html) allow the inclusion of files within
+templates, the use of variables and [slots](https://renatoathaydes.github.io/magnanimous/sections/docs/expression_lang.html#slot)
+to customize inclusions and [components](https://renatoathaydes.github.io/magnanimous/sections/docs/components.html), the addition of
+conditional and repeated content, and much more!
+
+Check the [Documentation](https://renatoathaydes.github.io/magnanimous/sections/docs) for more information.
