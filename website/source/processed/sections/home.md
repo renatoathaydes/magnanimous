@@ -4,9 +4,13 @@
 {{ define index 0 }}\
 {{ include /processed/_header.html }}\
 
+<div id="top-mag-title"></div>
+
 # Magnanimous
 
-> The fastest and nicest static website generator in the world!
+<div id="bottom-mag-title"></div>
+
+> The fastest and easiest static website generator in the world!
 
 {{ include /processed/components/_spacer.html }}
 
@@ -15,6 +19,18 @@
 Magnanimous generates static websites from source files really fast.
 
 And it's incredibly simple to use!
+
+Features:
+
+* simple templating mechanism based on a tiny [expression language]({{eval INSTRUCTIONS_PATH}})
+ (simple as `2 + 2 is \{{ eval 2 + 2 }}`).
+* include file into another (`\{{ include other-file.html }}`).
+* define variables (`\{{ define title "Hello world" }}`).
+* [components]({{eval baseURL + "/sections/docs/components.html"}}) and slots inspired by web components.
+* [conditional content]({{eval INSTRUCTIONS_PATH + "#if"}}) (`\{{ if title == "Home" }}We are home\{{ end }}`).
+* [for loops]({{eval INSTRUCTIONS_PATH + "#for"}}) over files and variables (`\{{ for file /path/to/files }}* Post name: \{{eval file.postName}} \{{end}}`).
+* [markdown content]({{eval baseURL + "/sections/docs/markdown_guide.html"}}) automatically converted to HTML.
+* [source code highlighting]({{eval baseURL + "/sections/docs/markdown_guide.html#source-code"}}) in markdown.
 
 ### 1. Download the binary
 

@@ -23,6 +23,7 @@ Magnanimous has the following guiding principles:
 * conditional content (`{{ if title == "Home" }}We are home{{ end }}`).
 * for loops over files and variables (`{{ for file /path/to/files }}* Post name: {{eval file.postName}} {{end}}`).
 * markdown content automatically converted to HTML.
+* [source code highlighting](https://renatoathaydes.github.io/magnanimous/sections/docs/markdown_guide.html#source-code) in markdown.
 
 ## Documentation
 
