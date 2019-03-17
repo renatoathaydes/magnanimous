@@ -66,8 +66,9 @@
 </ul>
 
 <h3>1. Download the binary</h3>
-<pre style="background-color:#fff">$ curl &lt;url-will-go-here&gt;
-</pre>
+
+<p>Go to the <a href="https://github.com/renatoathaydes/magnanimous/releases">releases page</a> and download the binary for your OS.</p>
+
 <h3>2. Write some sources</h3>
 
 <p>How about some HTML fragments?!</p>
@@ -80,7 +81,7 @@
 <span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </pre><div class="file-box">source/processed/_header.html</div><pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/_footer.html</div><p>Add some <a href="https://en.wikipedia.org/wiki/Markdown">markdown</a> content for comfort.</p>
+</pre><div class="file-box">source/_footer.html</div><p>Add some <a href="https://en.wikipedia.org/wiki/Markdown">markdown</a> for comfortably writing content.</p>
 <pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ include /processed/_header.html }}<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> This is my website
@@ -106,15 +107,20 @@
 
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">target/index.html</div><p>You might have noticed how some funny contents like <code>{{ eval title }}</code> were <em>translated</em> into something else&hellip;</p>
+</pre><div class="file-box">target/index.html</div><p>You might have noticed how some funny contents like <code>{{ eval title }}</code>, in the <code>title</code> tag, and
+<code>{{ define title &quot;My Website&quot; }}</code>, in the markdown file&hellip;</p>
 
-<p>These are <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which let Magnanimous know when you want
-to do things like include a file into another, or declare values to be used somewhere else&hellip; the text inside the
+<p>These are <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which let Magnanimous know when you want <strong>process</strong> files,
+which mean doing things like include a file into another, or declare values to be used somewhere else&hellip; the text inside the
 <code>{{</code> and <code>}}</code> braces are evaluated using the Magnanimous expression language. But don&rsquo;t worry!
-You can learn that in about 5 minutes!</p>
+You can learn that in about 15 minutes!</p>
 
-<p>Also notice that all markdown content is converted automatically to HTML!</p>
-
+<p>Also notice that all markdown content is converted automatically to HTML! Magnanimous will even highlight source code blocks in pretty much
+<a href="https://github.com/alecthomas/chroma#supported-languages">any language</a>, just provide the block language as you do on GitHub markdown:</p>
+<pre style="background-color:#fff"><span style="color:#b83838">```</span><span style="color:#b83838">javascript</span><span style="color:#b83838">
+</span><span style="color:#b83838"></span><span style="color:#2838b0">const</span> magnanimous <span style="color:#666">=</span> <span style="color:#888">(</span><span style="color:#888">)</span> <span style="color:#888">=&gt;</span> <span style="color:#b83838">&#34;Awesome&#34;</span><span style="color:#888">;</span>
+<span style="color:#b83838">```</span><span style="background-color:#a848a8">
+</span></pre>
 <p>Head to the <a href="/magnanimous/sections/docs.html">Documentation</a> to learn more.</p>
 </div>
 <div class="footer">
