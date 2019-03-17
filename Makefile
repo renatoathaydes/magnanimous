@@ -30,6 +30,17 @@ website: install
 website-github: install
 	magnanimous website
 
+# serve the website locally
+.PHONY: serve
+serve: website
+	go get -u github.com/vwochnik/gost
+	gost website/target
+
+# deploy to GitHub
+.PHONY: deploy
+deploy: website-github
+	./deploy-to-github.sh
+
 # build a smaller executable without symbols and debug info for all supported OSs and ARCHs
 .PHONY: release release-linux release-windows release-darwin
 
@@ -42,7 +53,7 @@ release-windows:
 	env GOOS=windows env GOARCH=386 go build -ldflags "-s -w" -o releases/magnanimous-windows-386
 
 release-darwin:
-	env GOOS=darwin env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-amd64
+	env GOOS=darwin env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-amd64	
 
 release: test release-linux release-windows release-darwin
 
