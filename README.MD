@@ -17,7 +17,7 @@ Magnanimous has the following guiding principles:
 
 * simple templating mechanism based on a tiny [expression language](https://renatoathaydes.github.io/magnanimous/sections/docs/expression_lang.html)
  (simple as `2 + 2 is {{ eval 2 + 2 }}`).
-* include file into another (`{{ include other-file.html }}`).
+* include a file into another (`{{ include other-file.html }}`).
 * define variables (`{{ define title "Hello world" }}`).
 * [components](https://renatoathaydes.github.io/magnanimous/sections/docs/components.html) and slots inspired by web components.
 * conditional content (`{{ if title == "Home" }}We are home{{ end }}`).

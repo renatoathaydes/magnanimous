@@ -24,7 +24,7 @@ Features:
 
 * simple templating mechanism based on a tiny [expression language]({{eval INSTRUCTIONS_PATH}})
  (simple as `2 + 2 is \{{ eval 2 + 2 }}`).
-* include file into another (`\{{ include other-file.html }}`).
+* include a file into another (`\{{ include other-file.html }}`).
 * define variables (`\{{ define title "Hello world" }}`).
 * [components]({{eval baseURL + "/sections/docs/components.html"}}) and slots inspired by web components.
 * [conditional content]({{eval INSTRUCTIONS_PATH + "#if"}}) (`\{{ if title == "Home" }}We are home\{{ end }}`).
@@ -111,8 +111,8 @@ Your website is ready on the `target` directory!
 You might have noticed how some funny contents like `\{{ eval title }}`, in the `title` tag, and 
 `\{{ define title "My Website" }}`, in the markdown file...
 
-These are [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which let Magnanimous know when you want **process** files,
-which mean doing things like include a file into another, or declare values to be used somewhere else... the text inside the
+These are [Magnanimous instructions]({{ eval INSTRUCTIONS_PATH }}), which let Magnanimous know when you want it to **process** files,
+which means doing things like including a file into another, or declaring values to be used elsewhere... the text inside the
 `\{{` and `}}` braces are evaluated using the Magnanimous expression language. But don't worry!
 You can learn that in about 15 minutes!
 
