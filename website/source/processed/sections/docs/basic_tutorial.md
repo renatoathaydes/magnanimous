@@ -5,9 +5,12 @@
 
 # 6. Basic Tutorial
 
-This is the official Magnanimous Tutorial. The intention of this tutorial is to make you capable of
+This is a basic tutorial of Magnanimous. The intention of this tutorial is to make you able of
 using Magnanimous to create awesome website in the least amount of time possible, so let's get right
 to the action!
+
+> At the end of each section, a link to the relevant commit in the [GitHub Repo](https://github.com/renatoathaydes/magnanimous-tutorial)
+  containing the code written during this tutorial will be provided.
 
 ## Part 1 - Website header, footer and home page
 
@@ -121,6 +124,8 @@ We're ready to create the `index.html` page now!
 {{ end }}
 
 Done!
+
+[GitHub Commit](https://github.com/renatoathaydes/magnanimous-tutorial/commit/ed8032fd372de2998aadf3627d17186c7a0d8eeb)
 
 ### 1.3. Build the website
 
@@ -277,6 +282,7 @@ With the new page header, the new `About` page now looks like this:
 <iframe src="demo/demo-website-part-2.html"
     title="Demo Website V1" width="90%" height="360"></iframe>
 
+[GitHub Commit](https://github.com/renatoathaydes/magnanimous-tutorial/commit/cece958b6a4cf5b7b707c915292c296f6f693757)
 
 ### 2.2 Adding Content Summary
 
@@ -343,6 +349,8 @@ The [`for`](expression_lang.html#for) instructions supports sorting and limits:
 \{{ end }}
 ```
 
+[GitHub Commit](https://github.com/renatoathaydes/magnanimous-tutorial/commit/ab3003ce72267ee2e7c6de1a6185785e22a4de66)
+
 ### 2.3 Customizing included content 
 
 The navigation bar on our current website now correctly displays the names of the sections and links to the right
@@ -406,6 +414,8 @@ The navigation buttons will now look highlighted only on the page they refer to:
 
 <iframe src="demo/demo-website-part-2-3-home.html"
     title="Demo Website V1" width="90%" height="250"></iframe>
+
+[GitHub Commit](https://github.com/renatoathaydes/magnanimous-tutorial/commit/cc325b4350967d786f223f36b8328248e9e03b14)
 
 ### 2.4 The global context
 
@@ -505,6 +515,8 @@ Every link we've added to the demo website so far is in the header page, so it's
 
 And that's it!
 
+[GitHub Commit](https://github.com/renatoathaydes/magnanimous-tutorial/commit/1550af30a6da9f09c1e8b09c3f7d4a7cb45ea12b)
+
 ## Part 3 - Publishing the website on GitHub Pages
 
 At this point, you have two ways of building your website:
@@ -547,6 +559,8 @@ $ mv target docs
 And then `git push`! Your website should now be available online!
 
 [Here's the one](https://renatoathaydes.github.io/magnanimous-tutorial/) we've created in this Tutorial!
+
+And of course, all the code written in this Tutorial is [available on GitHub](https://github.com/renatoathaydes/magnanimous-tutorial).
 
 In the next Tutorial, we're going to add internationalization to our website (so that users who speak other languages
 can also read it in their own languages) and learn how to use Magnanimous [components and slots](components.html),
