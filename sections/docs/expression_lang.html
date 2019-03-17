@@ -16,7 +16,6 @@
     </span>
 </div>
 <div class="main-body">
-
 <h1>2. Expression Language</h1>
 
 <p>Magnanimous defines a very simple <em>expression language</em> that is used to <strong>process</strong> documents in the <code>source/processed</code>
@@ -41,28 +40,25 @@ directory.</p>
 <li><a href="#eval"><code>eval</code></a>            - evaluates an <a href="#expressions">expression</a> and inserts the result into the current position.</li>
 <li><a href="#include"><code>include</code></a>      - includes another file into the current position.</li>
 <li><a href="#component"><code>component</code></a>  - includes a <a href="components.html">Component</a> into the current position.</li>
+<li><a href="#slot"><code>slot</code></a>            - defines a variable whose content is the body of the instruction.</li>
 <li><a href="#if"><code>if</code></a>                - conditionally includes some content into the current position.</li>
 <li><a href="#for"><code>for</code></a>              - repeats some content for each item in an <a href="#iterables">iterable</a>.</li>
 <li><a href="#doc"><code>doc</code></a>              - allows documentation to be added to sources (not included in the resource).</li>
-<li><a href="#end"><code>end</code></a>              - ends a scoped instruction (<code>component</code>, <code>if</code> and <code>for</code>).</li>
+<li><a href="#end"><code>end</code></a>              - ends a scoped instruction (<code>component</code>, <code>slot</code>, <code>if</code> and <code>for</code>).</li>
 </ul>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h2 id="instructions" class="link-header-component">
 <a href="#instructions"><img src="/magnanimous/images/link.svg"></a>
-Instructions</p>
+Instructions
 
-<p></h2></p>
-
+</h2>
 <p>In this section, we&rsquo;ll see details about every available instruction in Magnanimous, and how to use them.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="define" class="link-header-component">
 <a href="#define"><img src="/magnanimous/images/link.svg"></a>
-define</p>
+define
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ define &lt;variable-name&gt; &lt;expression&gt; }}
 </pre>
@@ -88,14 +84,12 @@ used upon evaluation.</p>
 <code>Hello Magnanimous, this is great!</code>!</p>
 
 <p>See <a href="#expressions">Expressions</a> for more details about the kind of expressions you can use.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="eval" class="link-header-component">
 <a href="#eval"><img src="/magnanimous/images/link.svg"></a>
-eval</p>
+eval
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ eval &lt;expression&gt; }}
 </pre>
@@ -115,7 +109,7 @@ processed document instead of being set to a variable.</p>
 content:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>The dog is big<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
 </pre>
-<p>Of course, <code>eval</code> is mostly useful when combined with variables and expressions.</p>
+<p>Of course, <code>eval</code> is mostly useful when combined with variables, <a href="#slot">slots</a> and expressions.</p>
 
 <p>For example, you could define a number of variables beforehand, to be used later in several other places
 (so you could change them in only one place if you ever changed your mind about their values):</p>
@@ -126,19 +120,17 @@ content:</p>
 </span><span style="background-color:#a848a8"></span>{{ eval visitorsPerMonth / 30 }} visitors per day!<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>Many people love {{ eval title }} because it is so great!  <span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span></pre>
+</span></pre>
 <blockquote>
 <p>You may have noticed that instructions often end with a <code>\</code> character. That&rsquo;s to avoid a new-line
   character being inserted where the instructions were in the source file, as the <code>\</code> can escape new lines.</p>
 </blockquote>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="include" class="link-header-component">
 <a href="#include"><img src="/magnanimous/images/link.svg"></a>
-include</p>
+include
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ include &lt;path&gt; }}
 </pre>
@@ -152,18 +144,33 @@ include</p>
 
 <p>Example:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;other-file-contents&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
- include path/to/other/file.md 
+{{ include path/to/other/file.md }}
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
-<p>See <a href="paths.html">Paths and Links</a> for details on how to refer to other files by their paths.</p>
+<p>Notice that paths can be <a href="#expressions">expressions</a> if starting with <code>&quot;</code> or <code>`</code>,
+or explicitly with <code>eval &lt;expr&gt;</code>:</p>
+<pre style="background-color:#fff"><span style="color:#888;font-style:italic">&lt;!--</span><span style="color:#888;font-style:italic"> Include expression path </span><span style="color:#888;font-style:italic">--&gt;</span>
+{{ include &#34;other/&#34; + fileName }}
 
-<p><div style="height: 1em;"></div>
+<span style="color:#888;font-style:italic">&lt;!--</span><span style="color:#888;font-style:italic"> Include evaluated path </span><span style="color:#888;font-style:italic">--&gt;</span>
+{{ include eval fileName + &#34;2&#34; }}
+</pre>
+<p>Paths may be absolute, relative or <em>up-paths</em> (i.e. paths that refer to a file at the same directory, or a directory
+up the source tree from the current file being written).</p>
+
+<p>Absolute path example: <code>/processed/partials/_header.html</code></p>
+
+<p>Relative path example: <code>partials/_header.html</code></p>
+
+<p>Up-path example: <code>.../_header.html</code></p>
+
+<p>See <a href="paths.html">Paths and Links</a> for more details.</p>
+<div style="height: 1em;"></div>
 <h3 id="component" class="link-header-component">
 <a href="#component"><img src="/magnanimous/images/link.svg"></a>
-component</p>
+component
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ component &lt;path&gt; }}
 &lt;content&gt;
@@ -172,15 +179,15 @@ component</p>
 <p><em>where:</em></p>
 
 <ul>
-<li><code>path</code> is a <a href="#path">path</a> to another file.</li>
-<li><code>content</code> is some content that might be used by the component via the <code>__contents__</code> implicit variable.</li>
+<li><code>path</code> is a <a href="paths.html">path</a> to another file.</li>
+<li><code>content</code> the body of the component.</li>
 </ul>
 
 <p>The <code>component</code> instruction is quite similar to <code>include</code>. It also includes the contents of another file,
-the component (which is usually designed specifically for this purpose), into another file.</p>
+the component file (which is usually designed specifically for this purpose), into the file using it.</p>
 
-<p>However, components are more powerful as they may include some content which can be placed anywhere inside the
-component, or just <code>define</code> instructions which can set values that are used to customize the component.</p>
+<p>However, components are more powerful as they may also declare some content which can be placed anywhere inside the
+component (typically using <code>slot</code>s).</p>
 
 <p>Example:</p>
 
@@ -196,14 +203,38 @@ Include this in my component.
 {{ end }}
 </pre>
 <p>See <a href="components.html">Components</a> for more details about using components.</p>
+<div style="height: 1em;"></div>
+<h3 id="slot" class="link-header-component">
+<a href="#slot"><img src="/magnanimous/images/link.svg"></a>
+slot
 
-<p><div style="height: 1em;"></div>
+</h3>
+<h4>Syntax:</h4>
+<pre style="background-color:#fff">{{ slot &lt;slot-name&gt; }}
+&lt;content&gt;
+{{ end }}
+</pre>
+<p><em>where:</em></p>
+
+<ul>
+<li><code>slot-name</code> the name of this slot.</li>
+<li><code>content</code> the content the slot evaluates to.</li>
+</ul>
+
+<p>A <code>slot</code> instruction, like <a href="#define"><code>define</code></a>, defines a variable and does not include any content at the location where it is
+declared. But unlike <code>define</code>, <code>slot</code> uses the body of its declaration as it value.</p>
+
+<p>That means that evaluating the variable defined by <code>slot</code> with <a href="#eval"><code>eval</code></a> results in the body of the slot
+being inserted into the processed document.</p>
+
+<p>Slots are commonly used together with <a href="components.html">Components</a> (but may also be used on their own), so they are
+explained in more detail in the <a href="components.html">Components</a> page.</p>
+<div style="height: 1em;"></div>
 <h3 id="if" class="link-header-component">
 <a href="#if"><img src="/magnanimous/images/link.svg"></a>
-if</p>
+if
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ if &lt;expression&gt; }}
 &lt;content&gt;
@@ -220,14 +251,12 @@ if</p>
 
 <p>For example, you may want to include a certain CSS class on an element only if it&rsquo;s the currently active element:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ if currentPage == page }}active{{ end }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre>
-<p><div style="height: 1em;"></div>
+</pre><div style="height: 1em;"></div>
 <h3 id="for" class="link-header-component">
 <a href="#for"><img src="/magnanimous/images/link.svg"></a>
-for</p>
+for
 
-<p></h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ for &lt;variable-name&gt; [ (&lt;for-instruction&gt;...) ] &lt;iterable&gt; }}
 &lt;content&gt;
@@ -241,14 +270,12 @@ for</p>
 <li><code>iterable</code> is an <a href="#iterables">iterable</a>.</li>
 <li><code>content</code> is some content to be repeatedly included in the document, once for each item.</li>
 </ul>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h4 id="for-instructions" class="link-header-component">
 <a href="#for-instructions"><img src="/magnanimous/images/link.svg"></a>
-for sub-instructions</p>
+for sub-instructions
 
-<p></h4></p>
-
+</h4>
 <ul>
 <li><code>sort</code>            - sort the elements alphabetically.</li>
 <li><code>sortBy &lt;field&gt;</code>  - sort the file items by the value of some property.</li>
@@ -282,15 +309,13 @@ If you need to pass in an expression, or just a variable instead of a hardcoded 
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post name: {{ eval name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 {{ end }}
 </pre>
-<p><div style="height: 1em;"></div>
+<p>See <a href="#iterables">Iterables</a> for details about what iterable types can be used with the <code>for</code> instruction.</p>
+<div style="height: 1em;"></div>
 <h3 id="doc" class="link-header-component">
 <a href="#doc"><img src="/magnanimous/images/link.svg"></a>
-doc</p>
+doc
 
-<p></h3></p>
-
-<p>See <a href="#iterables">Iterables</a> for details about what iterable types can be used with the <code>for</code> instruction.</p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ doc &lt;text&gt; }}
 </pre>
@@ -305,29 +330,38 @@ documents.</p>
 
 <p>You can use it to make clear what some complex parts of your templates work, or document the variables expected to
 be set for a <a href="components.html">Component</a>, for example.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="end" class="link-header-component">
 <a href="#end"><img src="/magnanimous/images/link.svg"></a>
-end</p>
+end
 
-<p></h3></p>
-
-<p><code>end</code> is not an independent instruction. It is used to end the scope of a previously started scoped instruction.</p>
+</h3>
+<h4>Syntax:</h4>
+<pre style="background-color:#fff">{{ end }}
+</pre>
+<p><code>end</code> is not an independent instruction; it is used to end the scope of a previously started scoped instruction.</p>
 
 <p>It does not accept any argument.</p>
 
 <p>All scoped instructions must always be finalized with an <code>{{ end }}</code>.</p>
 
-<p>The latest scoped instruction declared in a document is always the first to be terminated by <code>end</code>.</p>
+<p>Scoped instructions are:</p>
 
-<p><div style="height: 1em;"></div>
-<h2 id="expressions" class="link-header-component">
+<ul>
+<li><code>component</code></li>
+<li><code>slot</code></li>
+<li><code>if</code></li>
+<li><code>for</code></li>
+</ul>
+
+<p>Each <code>end</code> instruction always matches the nearest unclosed scoped instruction.</p>
+<div style="height: 1em;"></div><hr>
+<div style="height: 1em;"></div>
+<h3 id="expressions" class="link-header-component">
 <a href="#expressions"><img src="/magnanimous/images/link.svg"></a>
-Expressions</p>
+Expressions
 
-<p></h2></p>
-
+</h3>
 <p>Magnanimous expressions use a syntax that&rsquo;s similar to C-like languages, including Java, JavaScript and Go.</p>
 
 <p>For example, the following are all valid expressions:</p>
@@ -355,14 +389,12 @@ thing <span style="color:#666">==</span> <span style="color:#444;font-style:ital
 <a href="#define">define</a> instruction.</p>
 
 <p>The names of the variables must be valid <em>identifiers</em>, as we&rsquo;ll see below.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="identifiers" class="link-header-component">
 <a href="#identifiers"><img src="/magnanimous/images/link.svg"></a>
-Identifiers</p>
+Identifiers
 
-<p></h3></p>
-
+</h3>
 <p><em>Identifiers</em> are used to name variables declared with the <a href="#define">define</a> instruction.</p>
 
 <p>They must start with a letter or <code>_</code>, but may contain any of the following characters:</p>
@@ -379,14 +411,12 @@ Identifiers</p>
 _first_character
 abs123
 CONSTANT_1
-</pre>
-<p><div style="height: 1em;"></div>
+</pre><div style="height: 1em;"></div>
 <h3 id="operators" class="link-header-component">
 <a href="#operators"><img src="/magnanimous/images/link.svg"></a>
-Operators</p>
+Operators
 
-<p></h3></p>
-
+</h3>
 <p>As shown above, expressions may comprise identifiers, numbers, Strings and also operators.</p>
 
 <p>The following operators are supported:</p>
@@ -425,14 +455,12 @@ Operators</p>
 <p>For example, in the following <a href="#eval">eval</a> declaration, the document should get the value of the <code>example_var</code>
 if it&rsquo;s been defined, <em>or</em> the default value, <code>Not here</code>, otherwise.</p>
 <pre style="background-color:#fff">{{ eval example_var || &#34;Not here&#34; }}
-</pre>
-<p><div style="height: 1em;"></div>
-<h2 id="iterables" class="link-header-component">
+</pre><div style="height: 1em;"></div>
+<h3 id="iterables" class="link-header-component">
 <a href="#iterables"><img src="/magnanimous/images/link.svg"></a>
-Iterables</p>
+Iterables
 
-<p></h2></p>
-
+</h3>
 <p>Iterables are part of the syntax of the <a href="#for">for</a> instruction, and may only be declared within them.</p>
 
 <p>They can be of two types:</p>

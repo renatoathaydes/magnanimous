@@ -16,7 +16,6 @@
     </span>
 </div>
 <div class="main-body">
-
 <h1>1. Getting Started</h1>
 
 <p>This section briefly describes how you can get Magnanimous and quickly get a simple static website built using it.</p>
@@ -29,14 +28,12 @@
 <pre style="background-color:#fff">$ curl &lt;url-will-go-here&gt;
 </pre>
 <p>You can also download it manually from <a href="link-will-go-here">this page</a>.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h2 id="magnanimous-directories" class="link-header-component">
 <a href="#magnanimous-directories"><img src="/magnanimous/images/link.svg"></a>
-Magnanimous directories</p>
+Magnanimous directories
 
-<p></h2></p>
-
+</h2>
 <p>Magnanimous expects you to have a simple directory structure like this:</p>
 
 <p><img src="/magnanimous/images/docs/my-website.jpg" width="500em;" alt="Magnanimous directories" /></p>
@@ -57,10 +54,11 @@ Magnanimous directories</p>
 <li><code>processed/</code> is where <strong>processed</strong> files are placed.</li>
 </ul>
 
-<p>Only files within these two directories will be present in the final website.</p>
+<p>Only files within these two directories will be present in the final website (but files from
+other sub-directories may be included by those files).</p>
 
-<p>A <strong>processed</strong> file is one which contains <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which are
-used to modify the actual contents of the file or provide metadata.</p>
+<p>A <strong>processed</strong> file is one that contains <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which in turn are
+used to modify the actual contents of the file that will be deployed to the website (or to simply provide metadata).</p>
 
 <blockquote>
 <p><strong>Metadata</strong> is some information about a file, like its path, title, or the date it was created, which can be used
@@ -69,10 +67,50 @@ used to modify the actual contents of the file or provide metadata.</p>
 
 <p>Any file whose name starts with an underscore, like <code>_header.html</code>, will <strong>not</strong> be present in the final website.
 But they are useful to create <a href="components.html">Components</a>, or <em>fragments</em> which can be included into other files.</p>
+<div style="height: 1em;"></div><p><img src="/magnanimous/images/docs/magnanimous-transformation.svg" width="500em;" alt="Magnanimous transformation" /></p>
+<div style="height: 1em;"></div><p>In the above picture, we can see how Magnanimous processes the <code>source/processed/index.md</code> file, using the
+<code>_header.html</code> and <code>_footer.html</code> fragments to generate a final <code>target/index.html</code> file.</p>
 
-<p><img src="/magnanimous/images/docs/transformation.jpg" width="500em;" alt="Magnanimous transformation" /></p>
+<p>The contents of <code>source/processed/index.md</code> could look like this:</p>
+<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>{{ include _header.html }}<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> Main content
+<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>This is a markdown file that will be converted to a full HTML file by Magnanimous!<span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
+</span><span style="background-color:#a848a8"></span>{{ include _footer.html }} <span style="background-color:#a848a8">
+</span></pre><div class="file-box">source/processed/index.md</div><p>The fragments for the HTML header and footer, which you probably will want to include in most MD files:</p>
 
-<h2>Building the website</h2>
+<blockquote>
+<p>Notice the use of the <code>title</code> variable in this fragment to determine what to show in the browser&rsquo;s title bar.
+  This implies that any file including this fragment must first define a value for the <code>title</code> variable, as we
+  did above with <code>{{ define title &quot;My Website&quot; }}</code>.</p>
+</blockquote>
+<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">source/processed/_header.html</div><pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">source/processed/_footer.html</div><p>And finally, the result in <code>target/index.html</code>:</p>
+<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+
+<span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is my website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+
+<span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>How awesome is it?!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">target/index.html</div><h2>Building the website</h2>
 
 <p>After creating a few source files, from inside the root directory (<code>my-website/</code>, in the above example), just run the
 Magnanimous executable from the command line:</p>
@@ -82,23 +120,55 @@ Magnanimous executable from the command line:</p>
 as an argument:</p>
 <pre style="background-color:#fff">$ magnanimous path/to/my-website
 </pre>
-<p>This will create a static website in the <code>target/</code> directory.</p>
+<p>This will create a static website in the <code>path/to/my-website/target/</code> directory.</p>
 
 <h2>Testing the website</h2>
 
 <p>Now that your website is ready, you can run any web server to serve the <code>target/</code> directory so you can see what
 the website looks like.</p>
 
-<p>For example, if you have Python installed, simply run this command:</p>
-<pre style="background-color:#fff">$ cd target/ &amp;&amp; python -m SimpleHTTPServer 8082
-</pre>
+<p>Here are a few simple HTTP servers you could use to server your website locally!</p>
+
+<p>Choose your favourite language:</p>
+
 <blockquote>
 <p><a href="https://gist.github.com/willurd/5720255">Click here</a> for many other web server one-liners.</p>
 </blockquote>
 
-<p>Then, open <code>http://localhost:8082</code> on your browser. If you have a file called <code>index.html</code>, that page should be shown
+<h4>Python HTTP Server</h4>
+<pre style="background-color:#fff">$ cd target &amp;&amp; python -m SimpleHTTPServer 8080
+</pre>
+<p>Docs: <a href="https://docs.python.org/2/library/simplehttpserver.html">https://docs.python.org/2/library/simplehttpserver.html</a></p>
+
+<h4>NodeJS HTTP Server</h4>
+<pre style="background-color:#fff">$ npm install -g http-server
+$ http-server target
+</pre>
+<p>Docs: <a href="https://www.npmjs.com/package/http-server">https://www.npmjs.com/package/http-server</a></p>
+
+<h4>Java HTTP Server</h4>
+
+<blockquote>
+<p>Disclaimer: I&rsquo;m the author of RawHTTP.</p>
+</blockquote>
+<pre style="background-color:#fff">$ curl https://jcenter.bintray.com/com/athaydes/rawhttp/rawhttp-cli/1.0/rawhttp-cli-1.0-all.jar -o rawhttp.jar
+$ java -jar ./rawhttp.jar serve .
+</pre>
+<p>Docs: <a href="https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/">https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/</a></p>
+
+<h4>Go HTTP Server</h4>
+<pre style="background-color:#fff">$ go get github.com/vwochnik/gost
+$ gost target
+</pre>
+<p>Docs: <a href="https://github.com/vwochnik/gost">https://github.com/vwochnik/gost</a></p>
+
+<hr/>
+
+<p>Open <code>http://localhost:8082</code> on your browser. If you have a file called <code>index.html</code>, that page should be shown
 in the browser&hellip; otherwise, just add the path to one of your files to the URL (e.g. if you have a source file under
 <code>source/processed/blog/blog1.html</code>, try opening <code>http://localhost:8082/blog/blog1.html</code>).</p>
+
+<h2>Publishing the website</h2>
 
 <p>To publish the website publicly so everyone can visit it, you can use one of many available static website hosts:</p>
 

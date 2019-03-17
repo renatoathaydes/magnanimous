@@ -16,7 +16,6 @@
     </span>
 </div>
 <div class="main-body">
-
 <h1>3. Paths and Links</h1>
 
 <p>When writing your website, you&rsquo;ll probably want to make use of several <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>
@@ -25,7 +24,7 @@ which need to point to another source file. They do that by telling Magnanimous 
 <p>You&rsquo;ll also likely add <strong>links</strong> to other files in your pages, so that users can easily navigate between the pages
 of your website.</p>
 
-<p>The two concepts are similar, but not quite the same.</p>
+<p>The two concepts are somewhat similar, but definitely not the same.</p>
 
 <p>A <strong>path</strong> is a compilation-time concept and doesn&rsquo;t exist at runtime, while <strong>links</strong> only exist at runtime.</p>
 
@@ -35,36 +34,110 @@ does not point where you thought it ought to, or a path does not resolve correct
 <h2>Paths</h2>
 
 <p><a href="components.html">Components</a>, the <a href="expression_lang.html#for">for</a> and the <a href="expression_lang.html#include">include</a>
-instructions all need to declare a reference to some file, or directory in the case of <a href="#for">for</a>.</p>
+instructions all need to declare a reference to some file, or directory in the case of <a href="expression_lang.html#for">for</a>.</p>
 
 <p>They need to know where to find the information necessary to do their job: the contents of a file, in the case of
 the <code>include</code> and <code>component</code> instructions, and the directory containing the files to be iterated over, in the case of
 the <code>for</code> instruction.</p>
 
-<p>Paths can be of two types:</p>
+<p>Paths can be of three types:</p>
 
 <ul>
 <li>Absolute paths</li>
 <li>Relative paths</li>
+<li>Up paths</li>
 </ul>
+
+<h3>Absolute paths</h3>
 
 <p><strong>Absolute paths</strong> start with a <code>/</code>, and are always interpreted as being under the
 <a href="get_started.html#magnanimous-directories"><code>source/</code></a> directory.</p>
 
+<p>Example:</p>
+<pre style="background-color:#fff">{{ include /processed/_header.html }}
+</pre>
+<h3>Relative paths</h3>
+
 <p><strong>Relative paths</strong>, unlike absolute paths, do not start with a <code>/</code> and are resolved by the location of the file they
 are declared in.</p>
 
-<p>As an example, if within the file <code>/processed/components/_comp1.html</code>, you have a instruction that uses the path
-<code>example/_comp2.html</code>, then <code>example/_comp2.html</code> points to the absolute path <code>/processed/components/example/_comp2.html</code>.</p>
+<p>Example:</p>
+<pre style="background-color:#fff">{{ include _header.html }}
+</pre>
+<p>If the above inclusion is done from the file <code>/processed/components/_comp1.html</code>, then the path, <code>_header.html</code>, will point to the file at <code>/processed/components/_header.html</code>.</p>
 
-<p>Paths can refer to a parent directory with <code>../</code>, just like in most file systems. However, trying to access anything
-above the <code>source/</code> directory is forbidden and will result in the <code>../</code> part being ignored.</p>
+<p>If the inclusion is from <code>/processed/_comp2.html</code>, then it points to <code>/processed/_header.html</code>.</p>
+
+<p>Relative paths can also refer to a parent directory if they start with <code>../</code>, just like in most file systems.</p>
+
+<p>However, trying to access anything above the <code>source/</code> directory is forbidden and will result in the <code>../</code> part
+being ignored.</p>
+
+<h3>Up paths</h3>
+
+<p><strong>Up paths</strong> refer to a file located at the same location of the <strong>file currently being written</strong> by Magnanimous (not necessarily the location of the file the <code>include</code> statement is declared in, as with absolute and relative paths),
+or any parent directory <strong>up to</strong> the <code>source</code> directory.</p>
+
+<p>Example:</p>
+<pre style="background-color:#fff">{{ include .../_messages }}
+</pre>
+<p><em>Up paths</em> are special in that the file they point to depends on the context. They are commonly used to allow overriding which file should be used, which is useful for things like internationalization.</p>
+
+<p>For example, given this file structure:</p>
+<pre style="background-color:#fff">source
+└── processed
+    ├── _header.html
+    ├── index.html
+    ├── _messages
+    └── pt
+    |   ├── _messages
+    |   └── index.html
+    └── sv
+        └── index.html
+</pre>
+<p>Assuming <code>source/processed/_header.html</code> has the following contents:</p>
+<pre style="background-color:#fff">{{ include .../_messages }}
+<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</pre>
+<blockquote>
+<p>Notice that the header file uses an <em>up path</em>, <code>.../_messages</code>.</p>
+</blockquote>
+
+<p>If the <code>source/processed/index.html</code> file <code>include</code>s this header, it will get messages from <code>source/processed/_messages</code> because that&rsquo;s the nearest <code>_messages</code> file looking up the directory tree.</p>
+
+<p>If the <code>source/processed/pt/index.html</code> file <code>include</code>s the header, its messages will come from <code>source/processed/pt/_messages</code> instead!</p>
+
+<p>If the <code>source/processed/sv/index.html</code> file <code>include</code>s the header, because there&rsquo;s no <code>_messages</code> file on the same directory, Magnanimous will look up the directory tree, and find the <code>source/processed/_messages</code> file, so it will
+include that.</p>
+
+<p>Simple, but effective.</p>
+
+<h3>Expression paths</h3>
+
+<p>Paths can also be given by <a href="expression_lang.html#expressions">expressions</a> if starting with <code>&quot;</code> or <code>`</code>,
+or explicitly with <code>eval &lt;expr&gt;</code>.</p>
+
+<p>For example, the paths in these <a href="expression_lang.html#include">include</a> instructions all evaluate to
+<code>/hello/world/file.html</code>:</p>
+<pre style="background-color:#fff">{{ include /hello/world/file.html }}
+{{ include &#34;/hello&#34; + &#34;/world&#34; + &#34;/file.html&#34; }}
+
+{{ define dir &#34;/hello/world/&#34; }}
+{{ include eval dir + &#34;file.html }}
+</pre>
+<h3>When are paths resolved?</h3>
+
+<p>Paths are resolved when Magnanimous is writing the generated website files.</p>
 
 <p>Notice that paths are a compile-time concept, which means that they are only used by Magnanimous instructions, during
-compilation, to resolve the contents of the final files that will be part of the website. For this reason, paths can
-point to <em>hidden</em> files (whose file names start with <code>_</code>, which are not copied to the final website).</p>
+compilation, to resolve the contents of the files that will be part of the website. For this reason, paths can
+point to <em>no-writable</em> files (whose file names start with <code>_</code>, which are not copied to the final website).</p>
 
-<p>Once the website is created, instructions and paths simply do not exist anymore! All you have if a bunch of static
+<p>Once the website is created, instructions and paths simply do not exist anymore! All you have is a bunch of static
 files ready to be served by a <em>dumb</em> web server.</p>
 
 <p>For this reason, paths should always point to other source files, not to generated files.</p>
@@ -74,20 +147,35 @@ files ready to be served by a <em>dumb</em> web server.</p>
 <h2>Links</h2>
 
 <p>Links are not really a Magnanimous concept, but a <em>Markdown</em> and <em>HTML</em> concept. But because, like paths, they point
-to another file, they can be confused with paths, so some explanation of what&rsquo;s different between them is warranted.</p>
+to another file (or website), they can be confused with paths, so some explanation of what&rsquo;s different between them
+is warranted.</p>
 
-<p>The big difference is simple: links are used at runtime by users of your website, while paths are used by Magnanimous
-at compile time, to resolve <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>.</p>
+<p>Example:</p>
+
+<h4>Markdown</h4>
+<pre style="background-color:#fff">My favourite site is [<span style="color:#2838b0">Wikipedia</span>](<span style="color:#388038">https://www.wikipedia.org/</span>).<span style="background-color:#a848a8">
+</span></pre>
+<h4>HTML</h4>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My favourite site is <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;https://www.wikipedia.org/&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Wikipedia<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>.<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</pre>
+<p>The big difference between links and paths is simple: links are only ever used at runtime,
+while paths are used by Magnanimous at compile time to resolve <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>.</p>
 
 <p>This has an important implication: while paths point to source files, links point to generated files (or other websites).</p>
 
 <p>So, if you want to add a link to some content you wrote in a markdown file, say <code>/processed/blog/post.md</code>, the link to it
-should point to <code>/blog/post.html</code>, the generated file, not the source file.</p>
+should point to <code>/processed/blog/post.html</code>, the generated file, not the source file.</p>
 
 <blockquote>
 <p>Notice that all processed <code>.md</code> files are converted to <code>.html</code> files by Magnanimous.
   See the <a href="markdown_guide.html">Markdown Guide</a> for details.</p>
 </blockquote>
+
+<h3>When are links resolved?</h3>
+
+<p>Links are resolved by the browser when users click on links on your HTML pages.</p>
+
+<p>They are part of the language you&rsquo;re using to write content, be it HTML or Markdown, and are not used by Magnanimous.</p>
 
 <h3>Consider the base path in your links</h3>
 
@@ -101,15 +189,12 @@ should actually point to <code>/my-project/blog/post.html</code>.</p>
 <p>A good way to approach this is to define a <code>basePath</code> variable in the <code>/processed/_global_context</code> file, as in this
 example:</p>
 <pre style="background-color:#fff">{{ define basePath &#34;/my-project/&#34; }}
-</pre>
-<div class="file-box">source/processed/_global_context</div>
-
-<p>Now, from anywhere, a link can be safely created as follows:</p>
+</pre><div class="file-box">source/processed/_global_context</div><p>Now, from any other processed file, a link can be safely created as follows:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + `blog/post.html` }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A link<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
 </pre>
 <p>Or, in markdown:</p>
 <pre style="background-color:#fff">[<span style="color:#2838b0">A link</span>](<span style="color:#388038">{{ eval basePath + &#34;blog/post.html&#34; }}</span>)<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span></pre></div>
+</span></pre></div>
 <div class="footer">
     <div>
         <small>

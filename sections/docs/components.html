@@ -16,7 +16,6 @@
     </span>
 </div>
 <div class="main-body">
-
 <h1>4. Using Components</h1>
 
 <p>As you develop your website, you will notice that you will keep using similar patterns again and again
@@ -24,62 +23,130 @@ to create things like text boxes, data tables, dividers, and more obvious things
 footers.</p>
 
 <p>To avoid repeating the same code all over the place, you can use Magnanimous components.</p>
+<div style="height: 1em;"></div>
+<h2 id="creating-and-using-component" class="link-header-component">
+<a href="#creating-and-using-component"><img src="/magnanimous/images/link.svg"></a>
+Creating and using a component
 
-<h2>Creating and using a component</h2>
+</h2>
+<p>A component should normally be declared in a non-writable file (i.e. its name starts with underscore, as in <code>_example</code>)
+somewhere under the <code>source/processed/</code> directory.</p>
 
-<p>A component should be declared in a non-writable file (i.e. its name starts with underscore, as in <code>_example</code>)
-somewhere under the <code>source/processed/</code> directory. That&rsquo;s because components are not usually full HTML pages,
-but fragments which can be customized to display different content, sometimes even in a customizable shape
-(so you wouldn&rsquo;t want them served by the server by themselves).</p>
+<p>That&rsquo;s because components are not usually full HTML pages, but fragments which can be customized to display
+customizable content (so you wouldn&rsquo;t want them served by the server by themselves, without &ldquo;filling&rdquo; it in).</p>
 
 <p>As an example, let&rsquo;s say we want to create a component to represent a simple <em>warning</em> box.</p>
 
 <p>It could look like this:</p>
-<pre style="background-color:#fff">{{ doc This component takes a &#39;message&#39; and displays it in a warning box }}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval message }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre>
-<div class="file-box">source/processed/components/_warning.html</div>
+<pre style="background-color:#fff">{{ doc This component takes its contents and displays it in a warning box }}\
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval __contents__ }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">source/processed/components/_warning.html</div><blockquote>
+<p>Notice that <code>__contents__</code> is a special variable that holds the contents of the component when it&rsquo;s used
+  (i.e. the content wrapped between {{ component path }} and {{ end }} as we&rsquo;ll see below).</p>
+</blockquote>
 
 <p>That&rsquo;s it!</p>
 
-<p>You could then use this component in other files like this:</p>
+<p>You could then use this component in other processed files like this:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 
 {{ component /processed/components/_warning.html }}
-    Warning Box!! This text is ignored, only definitions in this scope are evaluated.
-    {{ define message &#34;This is a warning message!&#34; }}
+    This is a warning message!
 {{ end }}
 
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
-<blockquote>
-<p>Notice that all customizable components must go in the <code>source/processed/</code> directory (so they can receive
-  the customization via variables), but where under that directory does not matter for Magnanimous&hellip; they could
-  go under any sub-directory you wish. If you create static components that don&rsquo;t need to be customized,
-  you could even put them under <code>source/static</code>, which guarantees they will be included without changes.</p>
-</blockquote>
+<p>Which should render like this:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 
-<h3>Component scopes</h3>
-
-<p>Notice that our example component expects a variable called <code>message</code> to exist in its scope. For that reason,
-in the above example, we provide a <code>message</code> binding within the scope of the component itself, so that we don&rsquo;t
-mess with the surrounding scope.</p>
-
-<p>If that&rsquo;s not a concern, we could have just re-used an existing binding, as in this example:</p>
-<pre style="background-color:#fff">{{ define message &#34;This is a warning message!&#34; }}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-
-{{ component /processed/components/_warning.html }}{{ end }}
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    This is a warning message!
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 
 <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre>
-<p>Notice that the usual scope rules which apply to file inclusions also apply to components.</p>
+</pre><div style="height: 1em;"></div>
+<h2 id="customizing-components-with-variables" class="link-header-component">
+<a href="#customizing-components-with-variables"><img src="/magnanimous/images/link.svg"></a>
+Customizing components with variables
 
-<p>So, the <code>message</code> variable for the example component could even have come from another file which includes this file,
-or ultimately, from the <code>_global_context</code>.</p>
+</h2>
+<p>Components allow the user to declare variables that customize its contents. The variables may be declared before the
+component&rsquo;s declaration, but they can also be placed inside the component&rsquo;s body, making the variables &ldquo;local&rdquo; to the
+component (i.e. not visible in the surrounding scope).</p>
 
-<h3>A more advanced example</h3>
+<p>Let&rsquo;s look at an example to clarify what that means. This component expects 2 variables (<code>my_variable</code> and <code>other_var</code>)
+to be set for customizing it:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval my_variable }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval other_var }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">source/processed/components/_var_example.html</div><p>When using it, we need to provide values for both variables, which we can do both from outside and from inside the
+component:</p>
+<pre style="background-color:#fff">{{ define my_variable &#34;This is available in the component&#39;s scope&#34; }}\
 
+{{ component /processed/components/_var_example.html }}
+    {{ define other_var &#34;This also!&#34; }}\
+{{ end }}
+</pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
+<pre style="background-color:#fff">
+<span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is available in the component&#39;s scope<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This also!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
+<h2 id="customizing-components-with-slots" class="link-header-component">
+<a href="#customizing-components-with-slots"><img src="/magnanimous/images/link.svg"></a>
+Customizing components with slots
+
+</h2>
+<p><code>slot</code>s make components extremely powerful! They allow the creation of very modular components because the parts
+of the component can be provided by slots defined elsewhere.</p>
+
+<blockquote>
+<p>Magnanimous slots were inspired by the HTML5
+  <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots">Web Components</a> standard.</p>
+</blockquote>
+
+<p>For example, we can create a component that places its contents in 3 areas: top, middle and bottom
+(where both top and bottom are optional):</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval top || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval middle }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval bottom || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">source/processed/components/_slots_example.html</div><p>To use this component is pretty easy:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Hello world<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+{{ component /processed/components/_slots_example.html }}
+    {{ slot top }}
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+    {{ end }}
+    {{ slot middle }}
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+    {{ end }}
+    {{ slot bottom }}
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+    {{ end }}
+{{ end }}
+</pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
+<h2 id="advanced-example" class="link-header-component">
+<a href="#advanced-example"><img src="/magnanimous/images/link.svg"></a>
+A more advanced example
+
+</h2>
 <p>To really understand what can be achieved with components, let&rsquo;s look at a more advanced example.</p>
 
 <p>Let&rsquo;s create a data table which will contain a summary of the metadata for each file in a given directory.</p>
@@ -102,19 +169,14 @@ or ultimately, from the <code>_global_context</code>.</p>
 </span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> My first post
 <span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span></pre>
-<div class="file-box">source/processed/posts/first_post.md</div>
-<pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\<span style="background-color:#a848a8">
+</span></pre><div class="file-box">source/processed/posts/first_post.md</div><pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>{{ define date &#34;2018-06-07&#34; }}\<span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> My second post
 <span style="background-color:#a848a8">
 </span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span></pre>
-<div class="file-box">source/processed/posts/second_post.md</div>
-
-<p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
+</span></pre><div class="file-box">source/processed/posts/second_post.md</div><p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
 <pre style="background-color:#fff">{{ doc
     Arguments:
       * dataDirectory - path to a directory containing files with the following properties:
@@ -136,10 +198,7 @@ or ultimately, from the <code>_global_context</code>.</p>
     {{ end }}\
     <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
-</pre>
-<div class="file-box">source/processed/components/_data_table.html</div>
-
-<p>Finally, we can add the component to our index page (and any other pages we want!):</p>
+</pre><div class="file-box">source/processed/components/_data_table.html</div><p>Finally, we can add the component to our index page (and any other pages we want!):</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
@@ -148,10 +207,7 @@ or ultimately, from the <code>_global_context</code>.</p>
 {{ end }}\
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre>
-<div class="file-box">source/processed/index.html</div>
-
-<p>And we&rsquo;re done!</p>
+</pre><div class="file-box">source/processed/index.html</div><p>And we&rsquo;re done!</p>
 
 <p>Here&rsquo;s what the result should look like:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -175,10 +231,7 @@ or ultimately, from the <code>_global_context</code>.</p>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre>
-<div class="file-box">target/index.html</div>
-
-<p>Now, go on and create your own awesome components!</p>
+</pre><div class="file-box">target/index.html</div><p>Now, go on and create your own awesome components!</p>
 </div>
 <div class="footer">
     <div>
