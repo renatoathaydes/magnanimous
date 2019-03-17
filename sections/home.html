@@ -56,7 +56,7 @@
 <ul>
 <li>simple templating mechanism based on a tiny <a href="/magnanimous/sections/docs/expression_lang.html">expression language</a>
 (simple as <code>2 + 2 is {{ eval 2 + 2 }}</code>).</li>
-<li>include file into another (<code>{{ include other-file.html }}</code>).</li>
+<li>include a file into another (<code>{{ include other-file.html }}</code>).</li>
 <li>define variables (<code>{{ define title &quot;Hello world&quot; }}</code>).</li>
 <li><a href="/magnanimous/sections/docs/components.html">components</a> and slots inspired by web components.</li>
 <li><a href="/magnanimous/sections/docs/expression_lang.html#if">conditional content</a> (<code>{{ if title == &quot;Home&quot; }}We are home{{ end }}</code>).</li>
@@ -110,8 +110,8 @@
 </pre><div class="file-box">target/index.html</div><p>You might have noticed how some funny contents like <code>{{ eval title }}</code>, in the <code>title</code> tag, and
 <code>{{ define title &quot;My Website&quot; }}</code>, in the markdown file&hellip;</p>
 
-<p>These are <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which let Magnanimous know when you want <strong>process</strong> files,
-which mean doing things like include a file into another, or declare values to be used somewhere else&hellip; the text inside the
+<p>These are <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>, which let Magnanimous know when you want it to <strong>process</strong> files,
+which means doing things like including a file into another, or declaring values to be used elsewhere&hellip; the text inside the
 <code>{{</code> and <code>}}</code> braces are evaluated using the Magnanimous expression language. But don&rsquo;t worry!
 You can learn that in about 15 minutes!</p>
 
