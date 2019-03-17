@@ -8,17 +8,32 @@ body {
     font-family: Helvetica, sans-serif;
 }
 
+#top-mag-title {
+    /* TODO */
+}
+
+#bottom-mag-title {
+    /* TODO */
+}
+
 h1 {
-    line-height: 3.8;
+    line-height: 1.4;
 }
 
 h2, h3 {
-    line-height: 2.5;
+    line-height: 1.2;
+    margin-top: 3em;
+    margin-bottom: 3em;
 }
 
 .top-menu {
     display: flex;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+
+.top-menu >span {
+    margin: 2px;
 }
 
 blockquote {

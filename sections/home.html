@@ -36,16 +36,34 @@
 
 </div>
 </nav>
-<div style="height: 1em;"></div><h1>Magnanimous</h1>
+<div style="height: 1em;"></div><div id="top-mag-title"></div>
+
+<h1>Magnanimous</h1>
+
+<div id="bottom-mag-title"></div>
 
 <blockquote>
-<p>The fastest and nicest static website generator in the world!</p>
+<p>The fastest and easiest static website generator in the world!</p>
 </blockquote>
 <div style="height: 1em;"></div><hr />
 
 <p>Magnanimous generates static websites from source files really fast.</p>
 
 <p>And it&rsquo;s incredibly simple to use!</p>
+
+<p>Features:</p>
+
+<ul>
+<li>simple templating mechanism based on a tiny <a href="/magnanimous/sections/docs/expression_lang.html">expression language</a>
+(simple as <code>2 + 2 is {{ eval 2 + 2 }}</code>).</li>
+<li>include file into another (<code>{{ include other-file.html }}</code>).</li>
+<li>define variables (<code>{{ define title &quot;Hello world&quot; }}</code>).</li>
+<li><a href="/magnanimous/sections/docs/components.html">components</a> and slots inspired by web components.</li>
+<li><a href="/magnanimous/sections/docs/expression_lang.html#if">conditional content</a> (<code>{{ if title == &quot;Home&quot; }}We are home{{ end }}</code>).</li>
+<li><a href="/magnanimous/sections/docs/expression_lang.html#for">for loops</a> over files and variables (<code>{{ for file /path/to/files }}* Post name: {{eval file.postName}} {{end}}</code>).</li>
+<li><a href="/magnanimous/sections/docs/markdown_guide.html">markdown content</a> automatically converted to HTML.</li>
+<li><a href="/magnanimous/sections/docs/markdown_guide.html#source-code">source code highlighting</a> in markdown.</li>
+</ul>
 
 <h3>1. Download the binary</h3>
 <pre style="background-color:#fff">$ curl &lt;url-will-go-here&gt;

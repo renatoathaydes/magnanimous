@@ -23,18 +23,24 @@ into HTML, changing the resulting file&rsquo;s extension from <code>.md</code> t
 
 <p>In this guide, you&rsquo;ll learn details about how this conversion is performed and how you can use markdown
 to make writing your website easier.</p>
+<div style="height: 1em;"></div>
+<h2 id="technologies" class="link-header-component">
+<a href="#technologies"><img src="/magnanimous/images/link.svg"></a>
+Technologies used
 
-<h2>Technologies used</h2>
-
+</h2>
 <p>The conversion markdown-HTML is done via a <a href="https://golang.org/">Go</a> library called
 <a href="https://github.com/russross/blackfriday">Blackfriday</a>.</p>
 
 <p>Source code within markdown (content found between 3 back-ticks) is color-highlighted via
 <a href="https://github.com/alecthomas/chroma">Chroma</a>, which supports a large number of
 <a href="https://github.com/alecthomas/chroma#supported-languages">languages</a>.</p>
+<div style="height: 1em;"></div>
+<h2 id="why" class="link-header-component">
+<a href="#why"><img src="/magnanimous/images/link.svg"></a>
+Why write markdown
 
-<h2>Why write markdown</h2>
-
+</h2>
 <p>Markdown is much easier to write by hand than HTML, especially if the content being created is mostly composed of
 text, images and a simple layout.</p>
 
@@ -59,9 +65,12 @@ text, images and a simple layout.</p>
 </span></pre>
 <p>To learn more about markdown, check out the <a href="https://guides.github.com/features/mastering-markdown/">GitHub Guide</a>
 which briefly describes all you&rsquo;ll need to know!</p>
+<div style="height: 1em;"></div>
+<h2 id="full-html-pages" class="link-header-component">
+<a href="#full-html-pages"><img src="/magnanimous/images/link.svg"></a>
+Writing full HTML pages via markdown
 
-<h2>Writing full HTML pages via markdown</h2>
-
+</h2>
 <p>Magnanimous, in order to stay simple and easy to learn, does not do anything very &ldquo;magical&rdquo;!</p>
 
 <p>When you put a markdown file into <code>source/processed/</code>, all Magnanimous will do is:</p>
@@ -131,9 +140,12 @@ Check the <a href="components.html">Components</a> chapter to learn more about t
 
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre>
-<h2>Including source code</h2>
+</pre><div style="height: 1em;"></div>
+<h2 id="source-code" class="link-header-component">
+<a href="#source-code"><img src="/magnanimous/images/link.svg"></a>
+Including source code
 
+</h2>
 <p>Markdown files may contain sample source code which gets automatically highlighted.</p>
 
 <p>To use that, wrap the code sample within three back-ticks, with the name of the language right after the first ticks,
