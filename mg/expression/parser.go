@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Expression is a parsed Magnanimous expression.
@@ -77,6 +78,8 @@ func eval(e ast.Expr, context Context) (interface{}, error) {
 		return resolveUnary(ex, context)
 	case *ast.SelectorExpr:
 		return resolveAccessField(ex, context)
+	case *ast.IndexExpr:
+		return resolveIndexExpr(ex, context)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
@@ -193,6 +196,51 @@ func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error
 		return eval(expr.Sel, v)
 	}
 	return nil, errors.New(fmt.Sprintf("cannot access properties of object: %v", rcv))
+}
+
+func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
+	// the only supported index expression is of form 'date["2016-05-04"]'
+	var rcvName string
+	switch rcv := expr.X.(type) {
+	case *ast.Ident:
+		rcvName = rcv.Name
+	default:
+		return nil, errors.New(fmt.Sprintf("Malformed index expression (only date[] is supported): %v", rcv))
+	}
+
+	if rcvName == "date" {
+		idx, err := eval(expr.Index, ctx)
+		if err != nil {
+			return nil, err
+		}
+		switch date := idx.(type) {
+		case string:
+			return parseDate(date)
+		default:
+			// format: Mon Jan 2 15:04:05 -0700 MST 2006
+			return nil, errors.New(fmt.Sprintf(
+				"Malformed date expression (should be like date[\"2006-01-02T15:04:05\"]): %v", idx))
+		}
+	} else {
+		return nil, errors.New(fmt.Sprintf("Unknown index expression (only date[] is supported): %s", rcvName))
+	}
+}
+
+func parseDate(idx string) (interface{}, error) {
+	date, err := time.Parse("2006-01-02T15:04:05", idx)
+	if err == nil {
+		return date, nil
+	}
+	date, err = time.Parse("2006-01-02T15:04", idx)
+	if err == nil {
+		return date, nil
+	}
+	date, err = time.Parse("2006-01-02", idx)
+	if err == nil {
+		return date, nil
+	}
+	return nil, errors.New("invalid date: %v (valid formats are: \"2006-01-02T15:04:05\", " +
+		"\"2006-01-02T15:04\", \"2006-01-02\"")
 }
 
 // ToContext attempts to convert a variable to a [Context].
