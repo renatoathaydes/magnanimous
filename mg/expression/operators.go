@@ -3,14 +3,16 @@ package expression
 import (
 	"errors"
 	"fmt"
+	"time"
 )
 
 type numberOp func(x float64, y float64) interface{}
 type stringOp func(x string, y string) interface{}
 type boolOp func(x bool, y bool) interface{}
+type timeOp func(x time.Time, y time.Time) interface{}
 type opOther func() (interface{}, error)
 
-func op(x interface{}, y interface{}, no numberOp, so stringOp, oe opOther) (interface{}, error) {
+func op(x interface{}, y interface{}, no numberOp, so stringOp, to timeOp, oe opOther) (interface{}, error) {
 	if no != nil {
 		xf, ok := x.(float64)
 		if ok {
@@ -26,6 +28,15 @@ func op(x interface{}, y interface{}, no numberOp, so stringOp, oe opOther) (int
 			ys, ok := y.(string)
 			if ok {
 				return so(xs, ys), nil
+			}
+		}
+	}
+	if to != nil {
+		xt, ok := x.(time.Time)
+		if ok {
+			yt, ok := y.(time.Time)
+			if ok {
+				return to(xt, yt), nil
 			}
 		}
 	}
@@ -50,7 +61,7 @@ func add(x interface{}, y interface{}) (interface{}, error) {
 		return x + y
 	}, func(x string, y string) interface{} {
 		return x + y
-	}, func() (interface{}, error) {
+	}, nil, func() (interface{}, error) {
 		xs := fmt.Sprintf("%v", x)
 		ys := fmt.Sprintf("%v", y)
 		return xs + ys, nil
@@ -60,7 +71,7 @@ func add(x interface{}, y interface{}) (interface{}, error) {
 func subtract(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x - y
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot subtract %v from %v", y, x))
 	})
 }
@@ -68,7 +79,7 @@ func subtract(x interface{}, y interface{}) (interface{}, error) {
 func multiply(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x * y
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot multiply %v and %v", x, y))
 	})
 }
@@ -76,7 +87,7 @@ func multiply(x interface{}, y interface{}) (interface{}, error) {
 func divide(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return x / y
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot divide %v by %v", x, y))
 	})
 }
@@ -84,7 +95,7 @@ func divide(x interface{}, y interface{}) (interface{}, error) {
 func rem(x interface{}, y interface{}) (interface{}, error) {
 	return op(x, y, func(x float64, y float64) interface{} {
 		return float64(int64(x) % int64(y))
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot divide %v by %v (remainder)", x, y))
 	})
 }
@@ -102,9 +113,12 @@ func Less(x interface{}, y interface{}) (interface{}, error) {
 		return x < y
 	}, func(x string, y string) interface{} {
 		return x < y
-	}, func() (interface{}, error) {
-		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
-	})
+	}, func(x time.Time, y time.Time) interface{} {
+		return x.Before(y)
+	},
+		func() (interface{}, error) {
+			return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
+		})
 }
 
 func Greater(x interface{}, y interface{}) (interface{}, error) {
@@ -112,6 +126,8 @@ func Greater(x interface{}, y interface{}) (interface{}, error) {
 		return x > y
 	}, func(x string, y string) interface{} {
 		return x > y
+	}, func(x time.Time, y time.Time) interface{} {
+		return x.After(y)
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
 	})
@@ -122,6 +138,8 @@ func LessOrEq(x interface{}, y interface{}) (interface{}, error) {
 		return x <= y
 	}, func(x string, y string) interface{} {
 		return x <= y
+	}, func(x time.Time, y time.Time) interface{} {
+		return x.Before(y) || x == y
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
 	})
@@ -132,6 +150,8 @@ func GreaterOrEq(x interface{}, y interface{}) (interface{}, error) {
 		return x >= y
 	}, func(x string, y string) interface{} {
 		return x >= y
+	}, func(x time.Time, y time.Time) interface{} {
+		return x.After(y) || x == y
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
 	})
@@ -163,7 +183,7 @@ func not(x interface{}) (interface{}, error) {
 func minus(x interface{}) (interface{}, error) {
 	return op(x, float64(0), func(x float64, y float64) interface{} {
 		return -x
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot use '-' on %v", x))
 	})
 }
@@ -171,7 +191,7 @@ func minus(x interface{}) (interface{}, error) {
 func plus(x interface{}) (interface{}, error) {
 	return op(x, float64(0), func(x float64, y float64) interface{} {
 		return x
-	}, nil, func() (interface{}, error) {
+	}, nil, nil, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot use '+' on %v", x))
 	})
 }

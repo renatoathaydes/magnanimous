@@ -240,7 +240,7 @@ func parseDate(idx string) (interface{}, error) {
 		return date, nil
 	}
 	return nil, errors.New("invalid date: %v (valid formats are: \"2006-01-02T15:04:05\", " +
-		"\"2006-01-02T15:04\", \"2006-01-02\"")
+		"\"2006-01-02T15:04\", \"2006-01-02\")")
 }
 
 // ToContext attempts to convert a variable to a [Context].
