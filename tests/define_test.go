@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestDefineNumber(t *testing.T) {
@@ -31,6 +32,19 @@ func TestDefineString(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
+
+	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+}
+
+func TestDefineDate(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("{{ define date1 date[\"2017-11-23T22:12:21\"] }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	check(err)
+
+	date1, err := time.Parse("2006-01-02T15:04:05", "2017-11-23T22:12:21")
+	check(err)
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["date1"] = date1
 
 	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
