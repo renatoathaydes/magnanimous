@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"strings"
-	"time"
 )
 
 type DefineContent struct {
@@ -68,8 +67,8 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 			if r == nil {
 				r = ""
 			}
-			if date, ok := r.(time.Time); ok {
-				r = date.Format("02 Jan 2006, 03:04 PM")
+			if dateTime, ok := r.(expression.DateTime); ok {
+				r = dateTime.Time.Format(dateTime.Format)
 			}
 			_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
 		}

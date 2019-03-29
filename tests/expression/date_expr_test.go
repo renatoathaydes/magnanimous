@@ -234,12 +234,16 @@ func checkDate(t *testing.T, dateExpr, expected, format string) {
 		t.Fatalf("Could not evaluate: %v", err)
 	}
 
-	expectedTime, err := time.Parse(format, expected)
-	if err != nil {
-		panic(err)
-	}
+	if result, ok := v.(expression.DateTime); ok {
+		expectedTime, err := time.Parse(format, expected)
+		if err != nil {
+			panic(err)
+		}
 
-	if v != expectedTime {
-		t.Errorf("Expected '%v' but got '%v'", expectedTime, v)
+		if result.Time != expectedTime {
+			t.Errorf("Expected '%v' but got '%v'", expectedTime, v)
+		}
+	} else {
+		t.Errorf("Expected DateTime, got '%v'", v)
 	}
 }

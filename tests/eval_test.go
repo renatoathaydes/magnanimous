@@ -29,6 +29,17 @@ func TestEvalDate(t *testing.T) {
 	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Time: ", "23 Nov 2017, 10:12 PM"})
 }
 
+func TestEvalDateCustom(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Time: {{ eval date[\"2017-11-23T22:12:21\"][\"15:04:05 on 02 January 2006\"] }}"))
+	processed, err := mg.ProcessReader(r, "", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Time: ", "22:12:21 on 23 November 2017"})
+}
+
 func TestEvalArithmetic(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("2 + 2 * 5 == {{ eval 2 + 2 * 5 }}"))
 	processed, err := mg.ProcessReader(r, "", 11, nil)

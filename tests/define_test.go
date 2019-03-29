@@ -3,6 +3,7 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"strings"
 	"testing"
 	"time"
@@ -37,14 +38,14 @@ func TestDefineString(t *testing.T) {
 }
 
 func TestDefineDate(t *testing.T) {
-	r := bufio.NewReader(strings.NewReader("{{ define date1 date[\"2017-11-23T22:12:21\"] }}"))
+	r := bufio.NewReader(strings.NewReader("{{ define date1 date[\"2017-11-23T22:12:21\"][\"2016-01-02\"] }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
 	check(err)
 
 	date1, err := time.Parse("2006-01-02T15:04:05", "2017-11-23T22:12:21")
 	check(err)
 	expectedCtx := make(map[string]interface{})
-	expectedCtx["date1"] = date1
+	expectedCtx["date1"] = expression.DateTime{Time: date1, Format: "2016-01-02"}
 
 	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }

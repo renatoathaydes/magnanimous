@@ -11,11 +11,19 @@ import (
 	"time"
 )
 
+var defaultDateLayouts = []string{"2006-01-02T15:04:05", "2006-01-02T15:04", "2006-01-02"}
+
 // Expression is a parsed Magnanimous expression.
 //
 // It can be evaluated with the [EvalExpr] function.
 type Expression struct {
 	expr ast.Expr
+}
+
+// DateTime is the result of evaluating a date expression.
+type DateTime struct {
+	Time   time.Time
+	Format string
 }
 
 // Context contains the bindings available for an expression.
@@ -199,48 +207,55 @@ func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error
 }
 
 func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
-	// the only supported index expression is of form 'date["2016-05-04"]'
-	var rcvName string
 	switch rcv := expr.X.(type) {
 	case *ast.Ident:
-		rcvName = rcv.Name
-	default:
-		return nil, errors.New(fmt.Sprintf("Malformed index expression (only date[] is supported): %v", rcv))
+		if rcv.Name == "date" {
+			idx, err := eval(expr.Index, ctx)
+			if err == nil {
+				if d, ok := idx.(string); ok {
+					return parseDate(d, "02 Jan 2006, 03:04 PM")
+				} else {
+					return nil, errors.New("malformed date expression (should be date[date])")
+				}
+			} else {
+				return nil, err
+			}
+		}
+		return nil, errors.New("unsupported index expression (only date[] supported)")
+	case *ast.IndexExpr:
+		if i, ok := rcv.X.(*ast.Ident); ok {
+			if i.Name == "date" {
+				idx2, err := eval(expr.Index, ctx)
+				if err == nil {
+					if format, ok := idx2.(string); ok {
+						idx1, err := eval(rcv.Index, ctx)
+						if err == nil {
+							if date, ok := idx1.(string); ok {
+								return parseDate(date, format)
+							}
+						}
+					}
+				}
+				if err != nil {
+					return nil, err
+				}
+				return nil, errors.New("malformed date expression (should be date[date][layout])")
+			}
+		}
+		return nil, errors.New("unsupported index expression (only date[][] supported)")
 	}
 
-	if rcvName == "date" {
-		idx, err := eval(expr.Index, ctx)
-		if err != nil {
-			return nil, err
-		}
-		switch date := idx.(type) {
-		case string:
-			return parseDate(date)
-		default:
-			// format: Mon Jan 2 15:04:05 -0700 MST 2006
-			return nil, errors.New(fmt.Sprintf(
-				"Malformed date expression (should be like date[\"2006-01-02T15:04:05\"]): %v", idx))
-		}
-	} else {
-		return nil, errors.New(fmt.Sprintf("Unknown index expression (only date[] is supported): %s", rcvName))
-	}
+	return nil, errors.New("malformed index expression (only date[][] supported)")
 }
 
-func parseDate(idx string) (interface{}, error) {
-	date, err := time.Parse("2006-01-02T15:04:05", idx)
-	if err == nil {
-		return date, nil
+func parseDate(idx string, format string) (DateTime, error) {
+	for _, layout := range defaultDateLayouts {
+		date, err := time.Parse(layout, idx)
+		if err == nil {
+			return DateTime{Format: format, Time: date}, nil
+		}
 	}
-	date, err = time.Parse("2006-01-02T15:04", idx)
-	if err == nil {
-		return date, nil
-	}
-	date, err = time.Parse("2006-01-02", idx)
-	if err == nil {
-		return date, nil
-	}
-	return nil, errors.New("invalid date: %v (valid formats are: \"2006-01-02T15:04:05\", " +
-		"\"2006-01-02T15:04\", \"2006-01-02\")")
+	return DateTime{}, errors.New(fmt.Sprintf("invalid date: %v (valid formats: %v)", idx, defaultDateLayouts))
 }
 
 // ToContext attempts to convert a variable to a [Context].
