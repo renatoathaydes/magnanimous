@@ -408,6 +408,8 @@ something + other != "hello" + yet_another
 thing == null
 `multiline
 string`
+date["2019-03-20"]
+date["2019-03-20T08:24:00"]["Mon Jan 2 15:04:05 2006"]
 ```
 
 The above expressions include all types of variables available:
@@ -417,6 +419,7 @@ The above expressions include all types of variables available:
 * Numbers: like `2` or `2.42`.
 * Booleans: `true` or `false`.
 * Null: the `null` value (i.e. a variable that has not been defined).
+* Dates: see the dates section below for details.
 
 They also show the use of _variables_, such as `variable` and `negated` above, which must be declared via the
 [define](#define) instruction.
@@ -537,5 +540,33 @@ the following [for](#for) instruction to display the `section_name` of each file
 ```
 
 See [Paths and Links](paths.html) for more details about paths.
+
+#### Dates
+
+Dates are represented in the following full format (some parts are optional, as we'll see):
+
+```javascript
+date["2018-03-20T22:55:00"]["Mon Jan 2 15:04:05 2006"]
+```
+
+The String between the first brackets is the actual date value, `20th of March 2018, 10:55:00AM` in this example,
+and the second is the optional layout, which uses the fixed date-time `02nd of January 2006, 03:04:05PM` as a
+layout-by-example (this is copied from the [Go Time Formatter](https://golang.org/pkg/time/#Time.Format)).
+
+If not given, the following layout is used:
+
+```
+02 Jan 2006, 03:04 PM
+```
+
+To make things clearer, here are a few examples:
+
+| Date expression | Evaluated result |
+|-----------------|------------------|
+|`date["2018-03-20T22:55:00"]["Mon Jan 2 15:04:05 2006"]` | `Tue Mar 20 22:55:00 2018` |
+|`date["2018-03-20T22:55"]["2 Jan 2006 03:04:05PM"]` | `20 Mar 2018 10:55:00PM` |
+|`date["2018-03-20"]["2 Jan 2006"]` | `20 Mar 2018` |
+|`date["2018-03-20"]` | `20 Mar 2018, 12:00 AM` |
+|`date["2018-03-20T22:55"]` | `20 Mar 2018, 10:55 PM` |
 
 {{ include _docs_footer.html }}
