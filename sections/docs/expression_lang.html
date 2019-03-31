@@ -374,6 +374,8 @@ something <span style="color:#666">+</span> other <span style="color:#666">!=</s
 thing <span style="color:#666">==</span> <span style="color:#444;font-style:italic">null</span>
 <span style="color:#b83838">`</span><span style="color:#b83838">multiline
 </span><span style="color:#b83838">string</span><span style="color:#b83838">`</span>
+date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20&#34;</span><span style="color:#888">]</span>
+date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20T08:24:00&#34;</span><span style="color:#888">]</span><span style="color:#888">[</span><span style="color:#b83838">&#34;Mon Jan 2 15:04:05 2006&#34;</span><span style="color:#888">]</span>
 </pre>
 <p>The above expressions include all types of variables available:</p>
 
@@ -383,6 +385,7 @@ thing <span style="color:#666">==</span> <span style="color:#444;font-style:ital
 <li>Numbers: like <code>2</code> or <code>2.42</code>.</li>
 <li>Booleans: <code>true</code> or <code>false</code>.</li>
 <li>Null: the <code>null</code> value (i.e. a variable that has not been defined).</li>
+<li>Dates: see the dates section below for details.</li>
 </ul>
 
 <p>They also show the use of <em>variables</em>, such as <code>variable</code> and <code>negated</code> above, which must be declared via the
@@ -496,6 +499,56 @@ the following <a href="#for">for</a> instruction to display the <code>section_na
 {{ end }}\
 </pre>
 <p>See <a href="paths.html">Paths and Links</a> for more details about paths.</p>
+
+<h4>Dates</h4>
+
+<p>Dates are represented in the following full format (some parts are optional, as we&rsquo;ll see):</p>
+<pre style="background-color:#fff">date<span style="color:#888">[</span><span style="color:#b83838">&#34;2018-03-20T22:55:00&#34;</span><span style="color:#888">]</span><span style="color:#888">[</span><span style="color:#b83838">&#34;Mon Jan 2 15:04:05 2006&#34;</span><span style="color:#888">]</span>
+</pre>
+<p>The String between the first brackets is the actual date value, <code>20th of March 2018, 10:55:00AM</code> in this example,
+and the second is the optional layout, which uses the fixed date-time <code>02nd of January 2006, 03:04:05PM</code> as a
+layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/#Time.Format">Go Time Formatter</a>).</p>
+
+<p>If not given, the following layout is used:</p>
+<pre style="background-color:#fff">02 Jan 2006, 03:04 PM
+</pre>
+<p>To make things clearer, here are a few examples:</p>
+
+<table>
+<thead>
+<tr>
+<th>Date expression</th>
+<th>Evaluated result</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>date[&quot;2018-03-20T22:55:00&quot;][&quot;Mon Jan 2 15:04:05 2006&quot;]</code></td>
+<td><code>Tue Mar 20 22:55:00 2018</code></td>
+</tr>
+
+<tr>
+<td><code>date[&quot;2018-03-20T22:55&quot;][&quot;2 Jan 2006 03:04:05PM&quot;]</code></td>
+<td><code>20 Mar 2018 10:55:00PM</code></td>
+</tr>
+
+<tr>
+<td><code>date[&quot;2018-03-20&quot;][&quot;2 Jan 2006&quot;]</code></td>
+<td><code>20 Mar 2018</code></td>
+</tr>
+
+<tr>
+<td><code>date[&quot;2018-03-20&quot;]</code></td>
+<td><code>20 Mar 2018, 12:00 AM</code></td>
+</tr>
+
+<tr>
+<td><code>date[&quot;2018-03-20T22:55&quot;]</code></td>
+<td><code>20 Mar 2018, 10:55 PM</code></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="footer">
     <div>
