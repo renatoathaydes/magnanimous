@@ -458,48 +458,7 @@ Operators
 <p>For example, in the following <a href="#eval">eval</a> declaration, the document should get the value of the <code>example_var</code>
 if it&rsquo;s been defined, <em>or</em> the default value, <code>Not here</code>, otherwise.</p>
 <pre style="background-color:#fff">{{ eval example_var || &#34;Not here&#34; }}
-</pre><div style="height: 1em;"></div>
-<h3 id="iterables" class="link-header-component">
-<a href="#iterables"><img src="/magnanimous/images/link.svg"></a>
-Iterables
-
-</h3>
-<p>Iterables are part of the syntax of the <a href="#for">for</a> instruction, and may only be declared within them.</p>
-
-<p>They can be of two types:</p>
-
-<ul>
-<li>Arrays.</li>
-<li>Paths to directories.</li>
-</ul>
-
-<h4>Arrays</h4>
-
-<p>Arrays have the following form:</p>
-<pre style="background-color:#fff">[ expr1, expr2 ... ]
 </pre>
-<p>Examples:</p>
-<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> number <span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">,</span> <span style="color:#444">3</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">,</span> <span style="color:#444">5</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
-<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> word <span style="color:#888">[</span> <span style="color:#b83838">&#34;ABC&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
-<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> section <span style="color:#888">[</span> <span style="color:#b83838">&#34;Home&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;About&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;Docs&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span> 
-</pre>
-<h4>Paths to directories</h4>
-
-<p>A <code>for</code> expression may iterate over each file of a directory by declaring a <em>path</em> to a directory as its iterable.</p>
-
-<p>For example, suppose there is a directory with the following contents:</p>
-<pre style="background-color:#fff">my-sections/
-    /something.md
-    /other.md
-</pre>
-<p>If each file <a href="#define">defines</a> a variable named <code>section_name</code>, for example, then a summary file could contain
-the following <a href="#for">for</a> instruction to display the <code>section_name</code> of each file:</p>
-<pre style="background-color:#fff">{{ for section my-sections/ }}\
-  The name of the section is {{ eval section_name }}!
-{{ end }}\
-</pre>
-<p>See <a href="paths.html">Paths and Links</a> for more details about paths.</p>
-
 <h4>Dates</h4>
 
 <p>Dates are represented in the following full format (some parts are optional, as we&rsquo;ll see):</p>
@@ -549,6 +508,47 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 </tr>
 </tbody>
 </table>
+<div style="height: 1em;"></div>
+<h3 id="iterables" class="link-header-component">
+<a href="#iterables"><img src="/magnanimous/images/link.svg"></a>
+Iterables
+
+</h3>
+<p>Iterables are part of the syntax of the <a href="#for">for</a> instruction, and may only be declared within them.</p>
+
+<p>They can be of two types:</p>
+
+<ul>
+<li>Arrays.</li>
+<li>Paths to directories.</li>
+</ul>
+
+<h4>Arrays</h4>
+
+<p>Arrays have the following form:</p>
+<pre style="background-color:#fff">[ expr1, expr2 ... ]
+</pre>
+<p>Examples:</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> number <span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">,</span> <span style="color:#444">3</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">,</span> <span style="color:#444">5</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> word <span style="color:#888">[</span> <span style="color:#b83838">&#34;ABC&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> section <span style="color:#888">[</span> <span style="color:#b83838">&#34;Home&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;About&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;Docs&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span> 
+</pre>
+<h4>Paths to directories</h4>
+
+<p>A <code>for</code> expression may iterate over each file of a directory by declaring a <em>path</em> to a directory as its iterable.</p>
+
+<p>For example, suppose there is a directory with the following contents:</p>
+<pre style="background-color:#fff">my-sections/
+    /something.md
+    /other.md
+</pre>
+<p>If each file <a href="#define">defines</a> a variable named <code>section_name</code>, for example, then a summary file could contain
+the following <a href="#for">for</a> instruction to display the <code>section_name</code> of each file:</p>
+<pre style="background-color:#fff">{{ for section my-sections/ }}\
+  The name of the section is {{ eval section_name }}!
+{{ end }}\
+</pre>
+<p>See <a href="paths.html">Paths and Links</a> for more details about paths.</p>
 </div>
 <div class="footer">
     <div>
