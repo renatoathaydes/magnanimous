@@ -408,6 +408,7 @@ something + other != "hello" + yet_another
 thing == null
 `multiline
 string`
+[1, 2, 3, 4]
 date["2019-03-20"]
 date["2019-03-20T08:24:00"]["Mon Jan 2 15:04:05 2006"]
 ```
@@ -419,6 +420,7 @@ The above expressions include all types of variables available:
 * Numbers: like `2` or `2.42`.
 * Booleans: `true` or `false`.
 * Null: the `null` value (i.e. a variable that has not been defined).
+* Array: arrays of values of any type (can be used with the [for](#for) instruction.
 * Dates: see the dates section below for details.
 
 They also show the use of _variables_, such as `variable` and `negated` above, which must be declared via the
@@ -523,7 +525,7 @@ To make things clearer, here are a few examples:
 Iterables
 {{ end }}
 
-Iterables are part of the syntax of the [for](#for) instruction, and may only be declared within them.
+Iterables are collections of values which can be used with the [for](#for) instruction.
 
 They can be of two types:
 

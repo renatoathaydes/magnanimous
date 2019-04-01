@@ -135,7 +135,7 @@ func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
 	location *Location, resolver FileResolver) (iterable, error) {
 
 	if strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]") {
-		expr, err := expression.ParseExpr(fmt.Sprintf("[]interface{}{%s}", forArg[1:len(forArg)-1]))
+		expr, err := expression.ParseExpr(forArg)
 		if err != nil {
 			return nil, err
 		}

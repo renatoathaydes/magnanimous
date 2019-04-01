@@ -47,6 +47,10 @@ func (m *MapContext) Get(name string) (interface{}, bool) {
 
 // ParseExpr parses the given string as a Magnanimous expression.
 func ParseExpr(expr string) (Expression, error) {
+	expr = strings.Trim(expr, " ")
+	if strings.HasPrefix(expr, "[") && strings.HasSuffix(expr, "]") {
+		expr = fmt.Sprintf("[]interface{}{%s}", expr[1:len(expr)-1])
+	}
 	e, err := parser.ParseExpr(expr)
 	if err != nil {
 		return Expression{}, err
