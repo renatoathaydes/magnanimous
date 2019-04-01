@@ -34,7 +34,18 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 }
 
 func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	actualPath := maybeEvalPath(c.Path, magParams{stack: stack, webFiles: files})
+	maybePath := pathOrEval(c.Path, magParams{stack: stack, webFiles: files})
+	var actualPath string
+	if s, ok := maybePath.(string); ok {
+		actualPath = s
+	} else {
+		log.Printf("WARNING: path expression evaluated to invalid value: %v", maybePath)
+		_, err := writer.Write([]byte(c.Text))
+		if err != nil {
+			return &MagnanimousError{Code: IOError, message: err.Error()}
+		}
+		return nil
+	}
 	path := c.Resolver.Resolve(actualPath, c.Location, stack.NearestLocation())
 	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
 	componentFile, ok := files.WebFiles[path]

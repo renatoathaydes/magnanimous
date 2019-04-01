@@ -12,7 +12,7 @@ import (
 
 type ForLoop struct {
 	Variable string
-	iter     iterable
+	iter     *genericIterable
 	Text     string
 	Location *Location
 	contents []Content
@@ -49,8 +49,15 @@ type iterable interface {
 		parameters magParams, fc fileConsumer, ic itemConsumer) error
 }
 
+type genericIterable struct {
+	arg             string
+	resolver        FileResolver
+	location        *Location
+	subInstructions []forLoopSubInstruction
+}
+
 type arrayIterable struct {
-	array           *expression.Expression
+	array           []interface{}
 	location        *Location
 	subInstructions []forLoopSubInstruction
 }
@@ -93,10 +100,24 @@ func (f *ForLoop) AppendContent(content Content) {
 
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	stack = stack.Push(nil, true)
-	err := f.iter.forEach(files, stack, magParams{
+	params := magParams{
 		webFiles: files,
 		stack:    stack,
-	}, func(file *webFileWithContext) error {
+	}
+	gIter := f.iter
+	arg := pathOrEval(gIter.arg, params)
+	var iter iterable
+	switch a := arg.(type) {
+	case string:
+		iter = &directoryIterable{path: a, location: gIter.location, resolver: gIter.resolver,
+			subInstructions: gIter.subInstructions}
+	case []interface{}:
+		iter = &arrayIterable{array: a, location: gIter.location, subInstructions: gIter.subInstructions}
+	default:
+		log.Printf("WARNING: invalid for-loop expression, cannot iterate over: %v", arg)
+		return nil
+	}
+	err := iter.forEach(files, stack, params, func(file *webFileWithContext) error {
 		// use the file's context as the value of the bound variable
 		stack.Top().Set(f.Variable, file.context)
 		return writeContents(f, writer, files, stack)
@@ -116,7 +137,7 @@ func (f *ForLoop) String() string {
 	return fmt.Sprintf("ForLoop{%s}", f.Text)
 }
 
-func asIterable(arg string, location *Location, resolver FileResolver) (iterable, error) {
+func asIterable(arg string, location *Location, resolver FileResolver) (*genericIterable, error) {
 	var forArg string
 	var subInstructions []forLoopSubInstruction
 	if strings.HasPrefix(arg, "(") {
@@ -128,55 +149,33 @@ func asIterable(arg string, location *Location, resolver FileResolver) (iterable
 	} else {
 		forArg = arg
 	}
-	return iterableFrom(forArg, subInstructions, location, resolver)
-}
-
-func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
-	location *Location, resolver FileResolver) (iterable, error) {
-
-	isEval := strings.HasPrefix(forArg, "eval ")
-	if isEval || (strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]")) {
-		if isEval {
-			forArg = forArg[5:]
-		}
-		expr, err := expression.ParseExpr(forArg)
-		if err != nil {
-			return nil, err
-		}
-		return &arrayIterable{array: &expr, location: location, subInstructions: subInstructions}, nil
-	}
-	return &directoryIterable{path: forArg, location: location, resolver: resolver, subInstructions: subInstructions}, nil
+	return &genericIterable{arg: forArg, location: location, resolver: resolver,
+		subInstructions: subInstructions}, nil
 }
 
 func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
-	v, err := expression.EvalExpr(*e.array, parameters)
-	if err != nil {
-		return err
-	}
-	array, ok := v.([]interface{})
-	if ok {
-		for _, subInstruction := range e.subInstructions {
-			sortBy := subInstruction.sortBy
-			if sortBy != nil {
-				sortArray(array, sortBy)
-			}
-			if subInstruction.reverse != nil {
-				reverseArray(array)
-			}
-			if subInstruction.limit != nil {
-				limit := len(array)
-				if subInstruction.limit.max < limit {
-					limit = subInstruction.limit.max
-				}
-				array = array[0:limit]
-			}
+	array := e.array
+	for _, subInstruction := range e.subInstructions {
+		sortBy := subInstruction.sortBy
+		if sortBy != nil {
+			sortArray(array, sortBy)
 		}
-		for _, item := range array {
-			err := ic(item)
-			if err != nil {
-				return err
+		if subInstruction.reverse != nil {
+			reverseArray(array)
+		}
+		if subInstruction.limit != nil {
+			limit := len(array)
+			if subInstruction.limit.max < limit {
+				limit = subInstruction.limit.max
 			}
+			array = array[0:limit]
+		}
+	}
+	for _, item := range array {
+		err := ic(item)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -184,8 +183,7 @@ func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
 
 func (e *directoryIterable) filesWithContext(files WebFilesMap,
 	stack ContextStack, parameters magParams) ([]webFileWithContext, error) {
-	path := maybeEvalPath(e.path, parameters)
-	_, webFiles, err := e.resolver.FilesIn(path, e.location)
+	_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
 	if err != nil {
 		return nil, err
 	}
