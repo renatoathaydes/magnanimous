@@ -28,6 +28,26 @@ func TestForArray(t *testing.T) {
 			"Number 42\n")
 }
 
+func TestForDefineArray(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
+		"{{ define a [1,2,3, 42] }}" +
+		"{{for v eval a}}" +
+		"Number {{ eval v }}\n" +
+		"{{ end }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, emptyFilesMap, processed,
+		"Loop Sample:\n"+
+			"Number 1\n"+
+			"Number 2\n"+
+			"Number 3\n"+
+			"Number 42\n")
+}
+
 func TestForNestedArray(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Nested Sample:\n" +
 		"{{ for i [1,2] }}" +

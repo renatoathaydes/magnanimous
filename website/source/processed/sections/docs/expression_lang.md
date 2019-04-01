@@ -545,7 +545,16 @@ Examples:
 ```javascript
 \{{ for number [1, 2, 3, 4, 5] }}\{{ end }}
 \{{ for word [ "ABC" ] }}\{{ end }}
-\{{ for section [ "Home", "About", "Docs" ] }}\{{ end }} 
+\{{ for section [ "Home", "About", "Docs" ] }}\{{ end }}
+```
+
+To iterate over an array defined elsewhere, the variable must be eval'd:
+
+```javascript
+\{{ define array [1,2,3] }}
+\{{ for item eval array }}
+    \{{ eval item }}
+\{{ end }}
 ```
 
 #### Paths to directories

@@ -134,7 +134,11 @@ func asIterable(arg string, location *Location, resolver FileResolver) (iterable
 func iterableFrom(forArg string, subInstructions []forLoopSubInstruction,
 	location *Location, resolver FileResolver) (iterable, error) {
 
-	if strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]") {
+	isEval := strings.HasPrefix(forArg, "eval ")
+	if isEval || (strings.HasPrefix(forArg, "[") && strings.HasSuffix(forArg, "]")) {
+		if isEval {
+			forArg = forArg[5:]
+		}
 		expr, err := expression.ParseExpr(forArg)
 		if err != nil {
 			return nil, err
