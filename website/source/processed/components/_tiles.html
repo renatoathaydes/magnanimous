@@ -1,0 +1,14 @@
+{{doc 
+This component places tiles in a 2-column layout.
+"tiles" must be an iterable with the contents of each tile.
+}}\
+<div class="container">
+    {{define i 0}}\
+    {{for tile eval tiles}}\
+    <div class="tile-outer{{if i % 2 == 0}} right{{end}}">
+        <div class="tile">
+            {{eval tile}}{{define i i + 1}}\
+        </div>
+    </div>
+    {{end}}\
+</div>

@@ -55,7 +55,7 @@ p {
 pre {
     padding: 0.6em;
     border-left: 1px black dotted;
-    overflow: scroll;
+    overflow: overlay;
     margin-bottom: 2em;
     margin-top: 2em;
 }
@@ -110,4 +110,31 @@ a:link {
 
 .link-header-component:hover img {
     opacity: 1.0;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tile-outer {
+    width: 40%;
+    min-width: 20em;
+    background: linear-gradient(to right, rgba(27,158,245,1) 0%, rgba(248,79,50,1) 100%);
+    border-radius: 1em;
+    display: grid;
+    padding: 0.5em;
+    margin: 1em;
+}
+
+.tile-outer.right {
+    background: linear-gradient(to right, rgba(248,79,50,1) 0%, rgba(27,158,245,1) 100%);
+}
+
+.tile {
+    padding: 2em;
+    background-color: white;
+    border-radius: 0.5em;
+    overflow: hidden;
 }

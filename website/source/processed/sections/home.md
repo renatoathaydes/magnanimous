@@ -10,7 +10,7 @@
 
 <div id="bottom-mag-title"></div>
 
-> The fastest and easiest static website generator in the world!
+> The friendliest website generator in the world!
 
 {{ include /processed/components/_spacer.html }}
 
@@ -20,17 +20,77 @@ Magnanimous generates static websites from source files really fast.
 
 And it's incredibly simple to use!
 
-Features:
+### Features:
 
-* simple templating mechanism based on a tiny [expression language]({{eval INSTRUCTIONS_PATH}})
- (simple as `2 + 2 is \{{ eval 2 + 2 }}`).
-* include a file into another (`\{{ include other-file.html }}`).
-* define variables (`\{{ define title "Hello world" }}`).
-* [components]({{eval baseURL + "/sections/docs/components.html"}}) and slots inspired by web components.
-* [conditional content]({{eval INSTRUCTIONS_PATH + "#if"}}) (`\{{ if title == "Home" }}We are home\{{ end }}`).
-* [for loops]({{eval INSTRUCTIONS_PATH + "#for"}}) over files and variables (`\{{ for file /path/to/files }}* Post name: \{{eval file.postName}} \{{end}}`).
-* [markdown content]({{eval baseURL + "/sections/docs/markdown_guide.html"}}) automatically converted to HTML.
-* [source code highlighting]({{eval baseURL + "/sections/docs/markdown_guide.html#source-code"}}) in markdown.
+{{component /processed/components/_tiles.html}}
+{{slot a}}
+Simple templating mechanism based on a tiny [expression language]({{eval INSTRUCTIONS_PATH}}),
+
+```javascript
+2 + 2 is \{{ eval 2 + 2 }}
+```
+{{end}}
+{{slot b}}
+Compose snippets to create content.
+
+```html
+\{{ include _header.html }}
+<h2>Content!</h2>
+\{{ include footer.html }}
+```
+{{end}}
+{{slot c}}
+Define variables for easy re-use.
+
+```javascript
+\{{ define title "Hello world" }}
+```
+{{end}}
+{{slot d}}
+[Components]({{eval baseURL + "/sections/docs/components.html"}}) and slots inspired by web components.
+
+```javascript
+\{{ component other-file.html }}
+  \{{ slot main }}Main content\{{ end }}
+\{{ end }}
+```
+{{end}}
+{{slot e}}
+[Conditional content]({{eval INSTRUCTIONS_PATH + "#if"}}).
+
+```javascript
+\{{ if title == "Home" }}We are home\{{ end }}
+```
+{{end}}
+{{slot f}}
+[For loops]({{eval INSTRUCTIONS_PATH + "#for"}}) over files and variables.
+
+```javascript
+\{{ for file /path/to/files }}
+* Post name: \{{eval file.postName}}
+\{{end}}
+```
+{{end}}
+{{slot g}}
+[markdown content]({{eval baseURL + "/sections/docs/markdown_guide.html"}}) automatically converted to HTML.
+
+```markdown
+## Markdown is easy!
+
+> Note
+```
+{{end}}
+{{slot h}}
+[Source code highlighting]({{eval baseURL + "/sections/docs/markdown_guide.html#source-code"}}) in markdown.
+
+````javascript
+```javascript
+const hello = () => "Hello world";
+```
+````
+{{end}}
+{{define tiles [a, b, c, d, e, f, g, h]}}
+{{end}}
 
 ### 1. Download the binary
 
