@@ -83,7 +83,7 @@ Define variables for easy re-use.
 {{slot h}}
 [Source code highlighting]({{eval baseURL + "/sections/docs/markdown_guide.html#source-code"}}) in markdown.
 
-````javascript
+````markdown
 ```javascript
 const hello = () => "Hello world";
 ```
