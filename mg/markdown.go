@@ -64,15 +64,15 @@ func unwrapMarkdownContent(f *ProcessedFile) ([]Content, bool) {
 	return nil, false
 }
 
-func writeAsHtmlAndReset(contents []Content, writer io.Writer, content Content, files WebFilesMap,
+func writeAsHtmlAndReset(markdownContents []Content, writer io.Writer, includedContent Content, files WebFilesMap,
 	stack ContextStack) ([]Content, error) {
-	// write contents, converting it to html
-	err := writeAsHtml(contents, writer, files, stack)
+	// write markdownContents, converting it to html
+	err := writeAsHtml(markdownContents, writer, files, stack)
 	if err != nil {
 		return nil, err
 	}
-	// write content as it is, returning nil (or empty array)
-	return nil, content.Write(writer, files, stack)
+	// write includedContent as it is, returning nil (or empty array) to "reset" the markdown contents slice
+	return nil, includedContent.Write(writer, files, stack)
 }
 
 func writeAsHtml(c []Content, writer io.Writer, files WebFilesMap, stack ContextStack) error {
@@ -84,9 +84,9 @@ func writeAsHtml(c []Content, writer io.Writer, files WebFilesMap, stack Context
 	var chromaRenderer = blackfriday.WithRenderer(
 		bfchroma.NewRenderer(bfchroma.WithoutAutodetect(), mdStyle))
 
-	md := blackfriday.Run(mdBytes, chromaRenderer)
+	html := blackfriday.Run(mdBytes, chromaRenderer)
 
-	_, err = writer.Write(md)
+	_, err = writer.Write(html)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
