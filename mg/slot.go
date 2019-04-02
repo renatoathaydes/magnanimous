@@ -33,7 +33,11 @@ func (s *SlotContent) Write(writer io.Writer, files WebFilesMap, stack ContextSt
 }
 
 func (s *SlotContent) GetContents() []Content {
-	return s.contents
+	if isMd(s.Location.Origin) {
+		return []Content{&HtmlFromMarkdownContent{MarkDownContent: s.contents}}
+	} else {
+		return s.contents
+	}
 }
 
 func (s *SlotContent) AppendContent(content Content) {

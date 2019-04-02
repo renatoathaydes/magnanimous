@@ -100,6 +100,8 @@ My blog posts:</p>
 		`<link rel="stylesheet" href="/style.css"><h2>Post 2</h2>
 
 <p>Short one.</p>
+<div class="comp"><h3>this is markdown</h3>
+</div>
 `)
 
 	assertFileContents(t, files, dir, "style.css", `h2 {
