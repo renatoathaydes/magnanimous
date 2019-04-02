@@ -162,21 +162,21 @@ A more advanced example
 </ul>
 
 <p>To make things more concrete, here&rsquo;s what the files could look like:</p>
-<pre style="background-color:#fff">{{ define name &#34;My first post&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define path &#34;/processed/posts/first_post.html&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define date &#34;2018-04-05&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> My first post
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/posts/first_post.md</div><pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define date &#34;2018-06-07&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> My second post
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>etc...<span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/posts/second_post.md</div><p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
+<pre style="background-color:#fff">{{ define name &#34;My first post&#34; }}\
+{{ define path &#34;/processed/posts/first_post.html&#34; }}\
+{{ define date &#34;2018-04-05&#34; }}\
+
+<span style="color:#666"># My first post
+</span><span style="color:#666"></span>
+etc...
+</pre><div class="file-box">source/processed/posts/first_post.md</div><pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\
+{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\
+{{ define date &#34;2018-06-07&#34; }}\
+
+<span style="color:#666"># My second post
+</span><span style="color:#666"></span>
+etc...
+</pre><div class="file-box">source/processed/posts/second_post.md</div><p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
 <pre style="background-color:#fff">{{ doc
     Arguments:
       * dataDirectory - path to a directory containing files with the following properties:

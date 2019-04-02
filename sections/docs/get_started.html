@@ -74,14 +74,14 @@ But they are useful to create <a href="components.html">Components</a>, or <em>f
 <code>_header.html</code> and <code>_footer.html</code> fragments to generate a final <code>target/index.html</code> file.</p>
 
 <p>The contents of <code>source/processed/index.md</code> could look like this:</p>
-<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include _header.html }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> Main content
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>This is a markdown file that will be converted to a full HTML file by Magnanimous!<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include _footer.html }} <span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/index.md</div><p>The fragments for the HTML header and footer, which you probably will want to include in most MD files:</p>
+<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}
+{{ include _header.html }}
+<span style="color:#666"># Main content
+</span><span style="color:#666"></span>
+This is a markdown file that will be converted to a full HTML file by Magnanimous!
+
+{{ include _footer.html }} 
+</pre><div class="file-box">source/processed/index.md</div><p>The fragments for the HTML header and footer, which you probably will want to include in most MD files:</p>
 
 <blockquote>
 <p>Notice the use of the <code>title</code> variable in this fragment to determine what to show in the browser&rsquo;s title bar.

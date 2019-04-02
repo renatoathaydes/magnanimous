@@ -43,7 +43,7 @@
 <div id="bottom-mag-title"></div>
 
 <blockquote>
-<p>The fastest and easiest static website generator in the world!</p>
+<p>The friendliest website generator in the world!</p>
 </blockquote>
 <div style="height: 1em;"></div><hr />
 
@@ -51,20 +51,67 @@
 
 <p>And it&rsquo;s incredibly simple to use!</p>
 
-<p>Features:</p>
-
-<ul>
-<li>simple templating mechanism based on a tiny <a href="/magnanimous/sections/docs/expression_lang.html">expression language</a>
-(simple as <code>2 + 2 is {{ eval 2 + 2 }}</code>).</li>
-<li>include a file into another (<code>{{ include other-file.html }}</code>).</li>
-<li>define variables (<code>{{ define title &quot;Hello world&quot; }}</code>).</li>
-<li><a href="/magnanimous/sections/docs/components.html">components</a> and slots inspired by web components.</li>
-<li><a href="/magnanimous/sections/docs/expression_lang.html#if">conditional content</a> (<code>{{ if title == &quot;Home&quot; }}We are home{{ end }}</code>).</li>
-<li><a href="/magnanimous/sections/docs/expression_lang.html#for">for loops</a> over files and variables (<code>{{ for file /path/to/files }}* Post name: {{eval file.postName}} {{end}}</code>).</li>
-<li><a href="/magnanimous/sections/docs/markdown_guide.html">markdown content</a> automatically converted to HTML.</li>
-<li><a href="/magnanimous/sections/docs/markdown_guide.html#source-code">source code highlighting</a> in markdown.</li>
-</ul>
-
+<h3>Features:</h3>
+<div class="container">
+            <div class="tile-outer right">
+        <div class="tile">
+            <p>Simple templating mechanism based on a tiny <a href="/magnanimous/sections/docs/expression_lang.html">expression language</a>,</p>
+<pre style="background-color:#fff"><span style="color:#444">2</span> <span style="color:#666">+</span> <span style="color:#444">2</span> is <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> <span style="color:#444">2</span> <span style="color:#666">+</span> <span style="color:#444">2</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>        </div>
+    </div>
+        <div class="tile-outer">
+        <div class="tile">
+            <p>Compose snippets to create content.</p>
+<pre style="background-color:#fff">{{ include _header.html }}
+<span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Content!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+{{ include footer.html }}
+</pre>        </div>
+    </div>
+        <div class="tile-outer right">
+        <div class="tile">
+            <p>Define variables for easy re-use.</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define title <span style="color:#b83838">&#34;Hello world&#34;</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>        </div>
+    </div>
+        <div class="tile-outer">
+        <div class="tile">
+            <p><a href="/magnanimous/sections/docs/components.html">Components</a> and slots inspired by web components.</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> component other<span style="color:#666">-</span>file<span style="color:#888">.</span>html <span style="color:#888">}</span><span style="color:#888">}</span>
+  <span style="color:#888">{</span><span style="color:#888">{</span> slot main <span style="color:#888">}</span><span style="color:#888">}</span>Main content<span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>        </div>
+    </div>
+        <div class="tile-outer right">
+        <div class="tile">
+            <p><a href="/magnanimous/sections/docs/expression_lang.html#if">Conditional content</a>.</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">if</span> title <span style="color:#666">==</span> <span style="color:#b83838">&#34;Home&#34;</span> <span style="color:#888">}</span><span style="color:#888">}</span>We are home<span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>        </div>
+    </div>
+        <div class="tile-outer">
+        <div class="tile">
+            <p><a href="/magnanimous/sections/docs/expression_lang.html#for">For loops</a> over files and variables.</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> file <span style="color:#666">/</span>path<span style="color:#666">/</span>to<span style="color:#666">/</span>files <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#666">*</span> Post name<span style="color:#666">:</span> <span style="color:#888">{</span><span style="color:#888">{</span><span style="color:#388038">eval</span> file<span style="color:#888">.</span>postName<span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span>end<span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>        </div>
+    </div>
+        <div class="tile-outer right">
+        <div class="tile">
+            <p><a href="/magnanimous/sections/docs/markdown_guide.html">markdown content</a> automatically converted to HTML.</p>
+<pre style="background-color:#fff"><span style="color:#444">## Markdown is easy!
+</span><span style="color:#444"></span><span style="color:#2838b0">
+</span><span style="color:#2838b0">&gt; </span><span style="font-style:italic">Note
+</span></pre>        </div>
+    </div>
+        <div class="tile-outer">
+        <div class="tile">
+            <p><a href="/magnanimous/sections/docs/markdown_guide.html#source-code">Source code highlighting</a> in markdown.</p>
+<pre style="background-color:#fff"><span style="color:#b83838">`</span><span style="color:#b83838">`</span><span style="color:#b83838">`</span><span style="color:#b83838">javascript
+</span><span style="color:#b83838">const hello = () =&gt; &#34;Hello world&#34;;
+</span><span style="color:#b83838"></span><span style="color:#b83838">`</span><span style="color:#b83838">`</span><span style="color:#b83838">`</span>
+</pre>        </div>
+    </div>
+    </div>
 <h3>1. Download the binary</h3>
 
 <p>Go to the <a href="https://github.com/renatoathaydes/magnanimous/releases">releases page</a> and download the binary for your OS.</p>
@@ -82,14 +129,14 @@
 </pre><div class="file-box">source/processed/_header.html</div><pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </pre><div class="file-box">source/_footer.html</div><p>Add some <a href="https://en.wikipedia.org/wiki/Markdown">markdown</a> for comfortably writing content.</p>
-<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include /processed/_header.html }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#666">#</span> This is my website
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>How awesome is it?!<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include /_footer.html }}<span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/index.md</div><h3>3. Run magnanimous</h3>
+<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}
+{{ include /processed/_header.html }}
+<span style="color:#666"># This is my website
+</span><span style="color:#666"></span>
+How awesome is it?!
+
+{{ include /_footer.html }}
+</pre><div class="file-box">source/processed/index.md</div><h3>3. Run magnanimous</h3>
 <pre style="background-color:#fff">$ magnanimous
 </pre>
 <p>Your website is ready on the <code>target</code> directory!</p>
@@ -119,8 +166,8 @@ You can learn that in about 15 minutes!</p>
 <a href="https://github.com/alecthomas/chroma#supported-languages">any language</a>, just provide the block language as you do on GitHub markdown:</p>
 <pre style="background-color:#fff"><span style="color:#b83838">```</span><span style="color:#b83838">javascript</span><span style="color:#b83838">
 </span><span style="color:#b83838"></span><span style="color:#2838b0">const</span> magnanimous <span style="color:#666">=</span> <span style="color:#888">(</span><span style="color:#888">)</span> <span style="color:#888">=&gt;</span> <span style="color:#b83838">&#34;Awesome&#34;</span><span style="color:#888">;</span>
-<span style="color:#b83838">```</span><span style="background-color:#a848a8">
-</span></pre>
+<span style="color:#b83838">```</span>
+</pre>
 <p>Head to the <a href="/magnanimous/sections/docs.html">Documentation</a> to learn more.</p>
 </div>
 <div class="footer">

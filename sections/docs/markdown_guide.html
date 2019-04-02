@@ -52,17 +52,17 @@ text, images and a simple layout.</p>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">img</span> <span style="color:#388038">src</span><span style="color:#666">=</span><span style="color:#b83838">&#34;image.png&#34;</span> <span style="color:#388038">alt</span><span style="color:#666">=</span><span style="color:#b83838">&#34;some image&#34;</span><span style="color:#888">/</span><span style="color:#888">&gt;</span>
 </pre>
 <p>The equivalent content could be written using markdown as follows:</p>
-<pre style="background-color:#fff"><span style="color:#666">#</span> Title
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>This is a [<span style="color:#2838b0">link</span>](<span style="color:#388038">https://example.org</span>).<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>![<span style="color:#2838b0">some image</span>](<span style="color:#388038">image.png</span>)<span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff"><span style="color:#666"># Title
+</span><span style="color:#666"></span>
+This is a [<span style="color:#2838b0">link</span>](<span style="color:#388038">https://example.org</span>).
+
+![<span style="color:#2838b0">some image</span>](<span style="color:#388038">image.png</span>)
+</pre>
 <p>And in case you want to control exactly the layout of the content, you can just embed HTML into markdown!</p>
-<pre style="background-color:#fff"><span style="color:#444">##</span> Example with HTML in Markdown
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>&lt;div class=&#34;float-top-right&#34;&gt;HTML can be embedded inside markdown!&lt;/div&gt;<span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff"><span style="color:#444">## Example with HTML in Markdown
+</span><span style="color:#444"></span>
+&lt;div class=&#34;float-top-right&#34;&gt;HTML can be embedded inside markdown!&lt;/div&gt;
+</pre>
 <p>To learn more about markdown, check out the <a href="https://guides.github.com/features/mastering-markdown/">GitHub Guide</a>
 which briefly describes all you&rsquo;ll need to know!</p>
 <div style="height: 1em;"></div>
@@ -86,8 +86,8 @@ Writing full HTML pages via markdown
 <p>So, if you write this simple markdown:</p>
 
 <p><strong>source/processed/index.md</strong></p>
-<pre style="background-color:#fff"><span style="color:#444">##</span> hello
-</pre>
+<pre style="background-color:#fff"><span style="color:#444">## hello
+</span></pre>
 <p>You&rsquo;ll get something like this:</p>
 
 <p><strong>target/index.html</strong></p>
@@ -117,11 +117,11 @@ Writing full HTML pages via markdown
 <p>Now, we can <code>include</code> these two in the beginning and end of all our markdown files:</p>
 
 <p><strong>source/processed/index.md</strong></p>
-<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include /processed/_header.html }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">##</span> hello
-{{ include /_footer.html }}<span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}
+{{ include /processed/_header.html }}
+<span style="color:#444">## hello
+</span><span style="color:#444"></span>{{ include /_footer.html }}
+</pre>
 <p>Notice that we can define some properties before we include the header in order to customize the header.
 Check the <a href="components.html">Components</a> chapter to learn more about this pattern.</p>
 
@@ -156,8 +156,8 @@ as in this example:</p>
     System<span style="color:#666">.</span><span style="color:#388038">out</span><span style="color:#666">.</span><span style="color:#388038">println</span><span style="color:#666">(</span><span style="color:#b83838">&#34;Hello world&#34;</span><span style="color:#666">)</span><span style="color:#666">;</span>
   <span style="color:#666">}</span>
 <span style="color:#666">}</span>
-<span style="color:#b83838">```</span><span style="background-color:#a848a8">
-</span></pre>
+<span style="color:#b83838">```</span>
+</pre>
 <p>This website is itself created with Magnanimous, so the above formatting is actually a sample of what code samples
 should look like in your own website!</p>
 

@@ -165,21 +165,21 @@ much easier to write.</p>
 <p>The directory maps directly to the page URL, so files inside <code>source/processed/sections/</code> will be served under the
   <code>sections/</code> URL path (e.g. <code>http://www.example.com/sections/home.html</code>).</p>
 </blockquote>
-<pre style="background-color:#fff">{{ include /processed/_header.html }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">##</span> About
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>This website demonstrates some [<span style="color:#2838b0">Magnanimous</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) features.<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include /processed/_footer.html }}<span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/sections/about.md</div><div style="height: 1em;"></div><pre style="background-color:#fff">{{ include /processed/_header.html }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">##</span> Contact Us
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>Do not hesitate to contact us!<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>[<span style="color:#2838b0">Click here</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) to visit our website.<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ include /processed/_footer.html }}<span style="background-color:#a848a8">
-</span></pre><div class="file-box">source/processed/sections/contact.md</div><p>After running <code>magnanimous</code> again, you can visit the new pages directly on their URL:</p>
+<pre style="background-color:#fff">{{ include /processed/_header.html }}
+<span style="color:#444">## About
+</span><span style="color:#444"></span>
+This website demonstrates some [<span style="color:#2838b0">Magnanimous</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) features.
+
+{{ include /processed/_footer.html }}
+</pre><div class="file-box">source/processed/sections/about.md</div><div style="height: 1em;"></div><pre style="background-color:#fff">{{ include /processed/_header.html }}
+<span style="color:#444">## Contact Us
+</span><span style="color:#444"></span>
+Do not hesitate to contact us!
+
+[<span style="color:#2838b0">Click here</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) to visit our website.
+
+{{ include /processed/_footer.html }}
+</pre><div class="file-box">source/processed/sections/contact.md</div><p>After running <code>magnanimous</code> again, you can visit the new pages directly on their URL:</p>
 
 <ul>
 <li><a href="http://localhost:8080/sections/about.html">http://localhost:8080/sections/about.html</a>.</li>
@@ -247,12 +247,12 @@ the name of the sections. That&rsquo;s because Magnanimous doesn&rsquo;t know wh
 
 <p>But we can tell it! On each section page, we can define a variable called <code>name</code> which can then be used by the header
 to display the section name, rather than its path:</p>
-<pre style="background-color:#fff">{{ define name &#34;About&#34; }}<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">##</span> About
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>...<span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff">{{ define name &#34;About&#34; }}
+
+<span style="color:#444">## About
+</span><span style="color:#444"></span>
+...
+</pre>
 <p>Now, the header can refer to the <code>name</code> variable on each file (notice we write <code>eval section.name</code> instead of just
 <code>eval section</code> for the link&rsquo;s text):</p>
 <pre style="background-color:#fff">{{ for section /processed/sections/ }}\
@@ -261,18 +261,18 @@ to display the section name, rather than its path:</p>
 </pre>
 <p>This feature allows us to create summaries of files very easily&hellip; for example, you could put your blog posts under the
 <code>processed/blog</code> directory, and add a few definitions on top of each file, like this:</p>
-<pre style="background-color:#fff">{{ define name &#34;My first blog post&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define date &#34;2019-03-10&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">##</span> My first blog post
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="color:#444">###</span> Abstract
-<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ eval abstract }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>...<span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff">{{ define name &#34;My first blog post&#34; }}\
+{{ define date &#34;2019-03-10&#34; }}\
+{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\
+
+<span style="color:#444">## My first blog post
+</span><span style="color:#444"></span>
+<span style="color:#444">### Abstract
+</span><span style="color:#444"></span>
+{{ eval abstract }}\
+
+...
+</pre>
 <p>On the blog summary page, you could then list your blog posts:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Most recent blog posts:<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
 <span style="color:#888">&lt;</span><span style="color:#2838b0">ul</span><span style="color:#888"></span><span style="color:#888">&gt;</span> 

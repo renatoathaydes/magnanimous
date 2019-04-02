@@ -103,8 +103,8 @@ eval
 processed document instead of being set to a variable.</p>
 
 <p>As an example, suppose you have the following <em>md</em> file:</p>
-<pre style="background-color:#fff"><span style="color:#444">##</span> The dog is {{ eval &#34;big&#34; }}
-</pre>
+<pre style="background-color:#fff"><span style="color:#444">## The dog is {{ eval &#34;big&#34; }}
+</span></pre>
 <p>After processing, this file would be turned into HTML and its instructions processed, resulting in the following
 content:</p>
 <pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>The dog is big<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
@@ -113,14 +113,14 @@ content:</p>
 
 <p>For example, you could define a number of variables beforehand, to be used later in several other places
 (so you could change them in only one place if you ever changed your mind about their values):</p>
-<pre style="background-color:#fff">{{ define title &#34;OurWebsite&#34; }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ define visitorsPerMonth 10000 }}\<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>The best website in the world, {{ eval title }}, has an average number of<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>{{ eval visitorsPerMonth / 30 }} visitors per day!<span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span><span style="background-color:#a848a8">
-</span><span style="background-color:#a848a8"></span>Many people love {{ eval title }} because it is so great!  <span style="background-color:#a848a8">
-</span></pre>
+<pre style="background-color:#fff">{{ define title &#34;OurWebsite&#34; }}\
+{{ define visitorsPerMonth 10000 }}\
+
+The best website in the world, {{ eval title }}, has an average number of
+{{ eval visitorsPerMonth / 30 }} visitors per day!
+
+Many people love {{ eval title }} because it is so great!  
+</pre>
 <blockquote>
 <p>You may have noticed that instructions often end with a <code>\</code> character. That&rsquo;s to avoid a new-line
   character being inserted where the instructions were in the source file, as the <code>\</code> can escape new lines.</p>
@@ -374,6 +374,7 @@ something <span style="color:#666">+</span> other <span style="color:#666">!=</s
 thing <span style="color:#666">==</span> <span style="color:#444;font-style:italic">null</span>
 <span style="color:#b83838">`</span><span style="color:#b83838">multiline
 </span><span style="color:#b83838">string</span><span style="color:#b83838">`</span>
+<span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">,</span> <span style="color:#444">3</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">]</span>
 date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20&#34;</span><span style="color:#888">]</span>
 date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20T08:24:00&#34;</span><span style="color:#888">]</span><span style="color:#888">[</span><span style="color:#b83838">&#34;Mon Jan 2 15:04:05 2006&#34;</span><span style="color:#888">]</span>
 </pre>
@@ -385,6 +386,7 @@ date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20
 <li>Numbers: like <code>2</code> or <code>2.42</code>.</li>
 <li>Booleans: <code>true</code> or <code>false</code>.</li>
 <li>Null: the <code>null</code> value (i.e. a variable that has not been defined).</li>
+<li>Array: arrays of values of any type (can be used with the <a href="#for">for</a> instruction.</li>
 <li>Dates: see the dates section below for details.</li>
 </ul>
 
@@ -514,7 +516,7 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 Iterables
 
 </h3>
-<p>Iterables are part of the syntax of the <a href="#for">for</a> instruction, and may only be declared within them.</p>
+<p>Iterables are collections of values which can be used with the <a href="#for">for</a> instruction.</p>
 
 <p>They can be of two types:</p>
 
@@ -531,7 +533,13 @@ Iterables
 <p>Examples:</p>
 <pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> number <span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">,</span> <span style="color:#444">3</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">,</span> <span style="color:#444">5</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
 <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> word <span style="color:#888">[</span> <span style="color:#b83838">&#34;ABC&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
-<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> section <span style="color:#888">[</span> <span style="color:#b83838">&#34;Home&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;About&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;Docs&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span> 
+<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> section <span style="color:#888">[</span> <span style="color:#b83838">&#34;Home&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;About&#34;</span><span style="color:#888">,</span> <span style="color:#b83838">&#34;Docs&#34;</span> <span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>
+<p>To iterate over an array defined elsewhere, the variable must be eval&rsquo;d:</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define array <span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span><span style="color:#444">2</span><span style="color:#888">,</span><span style="color:#444">3</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#2838b0">for</span> item <span style="color:#388038">eval</span> array <span style="color:#888">}</span><span style="color:#888">}</span>
+    <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> item <span style="color:#888">}</span><span style="color:#888">}</span>
+<span style="color:#888">{</span><span style="color:#888">{</span> end <span style="color:#888">}</span><span style="color:#888">}</span>
 </pre>
 <h4>Paths to directories</h4>
 
