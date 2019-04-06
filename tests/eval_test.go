@@ -3,6 +3,7 @@ package tests
 import (
 	"bufio"
 	"github.com/renatoathaydes/magnanimous/mg"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"strings"
 	"testing"
 	"time"
@@ -50,6 +51,28 @@ func TestEvalDateCustom(t *testing.T) {
 	}
 
 	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Time: ", "22:12:21 on 23 November 2017"})
+}
+
+func TestEvalDateOfFileUpdate(t *testing.T) {
+	update := time.Date(1992, 12, 19, 8, 30, 0, 0, time.UTC)
+
+	fileMap := make(map[string]mg.WebFile)
+	fileMap["other.file"] = mg.WebFile{Processed: &mg.ProcessedFile{LastUpdated: update}}
+	files := mg.WebFilesMap{WebFiles: fileMap}
+	resolver := mg.DefaultFileResolver{Files: &files}
+
+	r := bufio.NewReader(strings.NewReader("File updated on " +
+		"{{define examplePath path[\"other.file\"]}}{{ eval date[examplePath][\"15:04:05 on 02 January 2006\"] }}"))
+	processed, err := mg.ProcessReader(r, "", 11, &resolver, time.Now())
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["examplePath"] = &expression.Path{Value: "other.file", LastUpdated: update}
+
+	checkParsing(t, files, processed, expectedCtx, []string{"File updated on ", "", "08:30:00 on 19 December 1992"})
 }
 
 func TestEvalArithmetic(t *testing.T) {
