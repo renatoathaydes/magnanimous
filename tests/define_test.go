@@ -50,6 +50,28 @@ func TestDefineDate(t *testing.T) {
 	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
 
+func TestDefineDateNow(t *testing.T) {
+	now := time.Now()
+
+	r := bufio.NewReader(strings.NewReader("{{ define date1 date[\"now\"] }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	check(err)
+
+	ctx := processed.ResolveContext(mg.WebFilesMap{}, mg.ContextStack{})
+	if actualDate1, ok := ctx.Get("date1"); ok {
+		if d1, ok := actualDate1.(expression.DateTime); ok {
+			if d1.Time.Unix()-now.Unix() > 1 {
+				t.Errorf("Time difference between now and evaluated date[now] is too big: %d",
+					d1.Time.Unix()-now.Unix())
+			}
+		} else {
+			t.Errorf("Expected DateTime but got %v", actualDate1)
+		}
+	} else {
+		t.Errorf("Expected map[]{date1: now} but got %v", ctx)
+	}
+}
+
 func TestDefineStringConcat(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define title \"My\" + \" Site\" }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)

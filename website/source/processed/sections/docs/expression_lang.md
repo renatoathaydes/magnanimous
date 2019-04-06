@@ -510,6 +510,12 @@ If not given, the following layout is used:
 02 Jan 2006, 03:04 PM
 ```
 
+The first String can also be `"now"` to evaluate the current time (when Magnanimous is running):
+
+```javascript
+date["now"]
+```
+
 To make things clearer, here are a few examples:
 
 | Date expression | Evaluated result |
@@ -519,6 +525,7 @@ To make things clearer, here are a few examples:
 |`date["2018-03-20"]["2 Jan 2006"]` | `20 Mar 2018` |
 |`date["2018-03-20"]` | `20 Mar 2018, 12:00 AM` |
 |`date["2018-03-20T22:55"]` | `20 Mar 2018, 10:55 PM` |
+|`date["now"]["2016"]` | `2019` (current year) |
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "iterables" }}\

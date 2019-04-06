@@ -219,7 +219,7 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 				if d, ok := idx.(string); ok {
 					return parseDate(d, "02 Jan 2006, 03:04 PM")
 				} else {
-					return nil, errors.New("malformed date expression (should be date[date])")
+					return nil, errors.New("malformed date expression (should be like date[\"2006-01-02T15:04:00\"])")
 				}
 			} else {
 				return nil, err
@@ -243,7 +243,7 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 				if err != nil {
 					return nil, err
 				}
-				return nil, errors.New("malformed date expression (should be date[date][layout])")
+				return nil, errors.New("malformed date expression (should be like date[\"2006-01-02T15:04:00\"][layout])")
 			}
 		}
 		return nil, errors.New("unsupported index expression (only date[][] supported)")
@@ -253,6 +253,9 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 }
 
 func parseDate(idx string, format string) (DateTime, error) {
+	if idx == "now" { // special case
+		return DateTime{Format: format, Time: time.Now()}, nil
+	}
 	for _, layout := range defaultDateLayouts {
 		date, err := time.Parse(layout, idx)
 		if err == nil {
