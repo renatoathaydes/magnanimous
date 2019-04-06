@@ -16,6 +16,7 @@ type ForLoop struct {
 	Text     string
 	Location *Location
 	contents []Content
+	resolver FileResolver
 }
 
 type forLoopSubInstruction struct {
@@ -84,7 +85,7 @@ func NewForInstruction(arg string, location *Location, original string, resolver
 			location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ForLoop{Variable: parts[0], iter: iter, Text: original, Location: location}
+	return &ForLoop{Variable: parts[0], iter: iter, Text: original, Location: location, resolver: resolver}
 }
 
 var _ Content = (*ForLoop)(nil)
@@ -101,11 +102,12 @@ func (f *ForLoop) AppendContent(content Content) {
 func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
 	stack = stack.Push(nil, true)
 	params := magParams{
-		webFiles: files,
-		stack:    stack,
+		fileResolver: f.resolver,
+		stack:        stack,
+		location:     f.Location,
 	}
 	gIter := f.iter
-	arg := pathOrEval(gIter.arg, params)
+	arg := pathOrEval(gIter.arg, &params)
 	var iter iterable
 	switch a := arg.(type) {
 	case string:

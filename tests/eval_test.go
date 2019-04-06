@@ -5,11 +5,12 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestEvalString(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Hello {{ eval \"Joe\" }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -20,7 +21,7 @@ func TestEvalString(t *testing.T) {
 
 func TestEvalArray(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Numbers: {{ eval [ 1, 2, 3, 4 ] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +32,7 @@ func TestEvalArray(t *testing.T) {
 
 func TestEvalDate(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Time: {{ eval date[\"2017-11-23T22:12:21\"] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -42,7 +43,7 @@ func TestEvalDate(t *testing.T) {
 
 func TestEvalDateCustom(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Time: {{ eval date[\"2017-11-23T22:12:21\"][\"15:04:05 on 02 January 2006\"] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +54,7 @@ func TestEvalDateCustom(t *testing.T) {
 
 func TestEvalArithmetic(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("2 + 2 * 5 == {{ eval 2 + 2 * 5 }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -64,7 +65,7 @@ func TestEvalArithmetic(t *testing.T) {
 
 func TestEvalNonExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -75,7 +76,7 @@ func TestEvalNonExistingParameter(t *testing.T) {
 
 func TestEvalWithExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +93,7 @@ func TestEvalWithExistingParameter(t *testing.T) {
 
 func TestEvalWithOrExprParameterExists(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval a || 100 }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +110,7 @@ func TestEvalWithOrExprParameterExists(t *testing.T) {
 
 func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval a || 100 }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -128,14 +129,14 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ eval 2 * hello }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("OUTER\n{{ define hello 7 }}{{ include /processed/hi.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)

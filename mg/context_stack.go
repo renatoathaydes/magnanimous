@@ -32,6 +32,7 @@ func (c *ContextStack) Top() Context {
 	return c.contexts[len(c.contexts)-1]
 }
 
+// Find the nearest Location to the top of the Stack. Returns nil if no Location has been pushed.
 func (c *ContextStack) NearestLocation() *Location {
 	l := len(c.locations)
 	if l == 0 {

@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 	"unicode/utf8"
 )
 
@@ -84,7 +85,7 @@ func CreateTempFiles(files map[string]string) (mg.WebFilesMap, string) {
 		_, err = file.Write([]byte(content))
 		check(err)
 		fileReader := bufio.NewReader(strings.NewReader(content))
-		pf, err := mg.ProcessReader(fileReader, name, len(content), nil)
+		pf, err := mg.ProcessReader(fileReader, name, len(content), nil, time.Now())
 		check(err)
 		filesMap.WebFiles[filepath.Join(dir, name)] = mg.WebFile{
 			Processed:   pf,

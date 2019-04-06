@@ -2,6 +2,7 @@ package mg
 
 import (
 	"io"
+	"time"
 )
 
 // Magnanimous is the entry point of the magnanimous library.
@@ -47,11 +48,15 @@ type ContextStack struct {
 type FileResolver interface {
 	// FilesIn return the files in a certain directory, or an error if something goes wrong.
 	FilesIn(dir string, from *Location) (dirPath string, f []WebFile, e error)
-	// Resolve resolves a path given a location to resolve it from.
+	// Resolve a path given a location to resolve it from.
 	// It allows Magnanimous to resolve relative paths correctly.
 	// To support up-paths, the [at] location calling the resolution (which can be different from [from])
 	// is also needed.
 	Resolve(path string, from *Location, at *Location) string
+	// Get the file at the given path.
+	//
+	// This method does not attempt to resolve the path. If that is required, Resolve() should be called first.
+	Get(path string) (*WebFile, bool)
 }
 
 // ContentContainer is a collection of Content.
@@ -76,6 +81,13 @@ type Content interface {
 	Write(writer io.Writer, files WebFilesMap, stack ContextStack) error
 }
 
+// CanResolvePath indicates a Content that is capable of resolving the path of a file based on its own Location
+// using a FileResolver.
+type CanResolvePath interface {
+	Location() *Location
+	FileResolver() FileResolver
+}
+
 // Context represents the current context of a Content being written.
 type Context interface {
 	Get(name string) (interface{}, bool)
@@ -89,6 +101,7 @@ type ProcessedFile struct {
 	contents     []Content
 	NewExtension string
 	Path         string
+	LastUpdated  time.Time
 }
 
 var _ ContentContainer = (*ProcessedFile)(nil)

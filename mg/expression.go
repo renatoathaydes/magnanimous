@@ -12,24 +12,26 @@ type DefineContent struct {
 	Name     string
 	Expr     *expression.Expression
 	Location *Location
+	resolver FileResolver
 }
 
 type ExpressionContent struct {
 	Expr     *expression.Expression
 	Text     string
 	Location *Location
+	resolver FileResolver
 }
 
-func NewEvalInstruction(arg string, location *Location, original string) Content {
+func NewEvalInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	expr, err := expression.ParseExpr(arg)
 	if err != nil {
 		log.Printf("WARNING: (%s) Unable to eval: %s (%s)", location.String(), arg, err.Error())
 		return unevaluatedExpression(original)
 	}
-	return &ExpressionContent{Expr: &expr, Location: location, Text: original}
+	return &ExpressionContent{Expr: &expr, Location: location, Text: original, resolver: resolver}
 }
 
-func NewDefineInstruction(arg string, location *Location, original string) Content {
+func NewDefineInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 2 {
 		variable, rawExpr := parts[0], parts[1]
@@ -39,7 +41,7 @@ func NewDefineInstruction(arg string, location *Location, original string) Conte
 				location.String(), variable, rawExpr, err.Error())
 			return unevaluatedExpression(original)
 		}
-		return &DefineContent{Name: variable, Expr: &expr, Location: location}
+		return &DefineContent{Name: variable, Expr: &expr, Location: location, resolver: resolver}
 	}
 	log.Printf("WARNING: (%s) malformed define expression: %s", location.String(), arg)
 	return unevaluatedExpression(original)
@@ -52,9 +54,10 @@ func unevaluatedExpression(original string) Content {
 var _ Content = (*ExpressionContent)(nil)
 
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	r, err := expression.EvalExpr(*e.Expr, magParams{
-		stack:    stack,
-		webFiles: files,
+	r, err := expression.EvalExpr(*e.Expr, &magParams{
+		stack:        stack,
+		fileResolver: e.resolver,
+		location:     e.Location,
 	})
 	if err == nil {
 		// an expression can evaluate to a content container, such as a slot
@@ -121,9 +124,10 @@ func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack Context
 }
 
 func (d *DefineContent) Eval(files WebFilesMap, stack ContextStack) (interface{}, bool) {
-	v, err := expression.EvalExpr(*d.Expr, magParams{
-		webFiles: files,
-		stack:    stack,
+	v, err := expression.EvalExpr(*d.Expr, &magParams{
+		fileResolver: d.resolver,
+		stack:        stack,
+		location:     d.Location,
 	})
 	if err != nil {
 		log.Printf("WARNING: (%s) define failure: %s", d.Location.String(), err.Error())

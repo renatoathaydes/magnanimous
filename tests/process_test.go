@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
@@ -31,7 +32,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 
 func TestProcessSimple(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello world"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +52,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &m}
 
 	r := bufio.NewReader(strings.NewReader("hello {{ include example.html }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hello.html", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -61,9 +62,9 @@ func TestProcessIncludeSimple(t *testing.T) {
 }
 
 func TestMarkdownToHtml(t *testing.T) {
-	header := mg.ProcessedFile{}
+	header := mg.ProcessedFile{Path: "header"}
 	header.AppendContent(&mg.StringContent{Text: "<html><body class=\"hello\">\n"})
-	footer := mg.ProcessedFile{}
+	footer := mg.ProcessedFile{Path: "footer"}
 	footer.AppendContent(&mg.StringContent{Text: "</body></html>"})
 
 	m := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
@@ -73,7 +74,7 @@ func TestMarkdownToHtml(t *testing.T) {
 	rsvr := mg.DefaultFileResolver{BasePath: "", Files: &m}
 
 	loc := mg.Location{}
-	file := mg.ProcessedFile{}
+	file := mg.ProcessedFile{Path: "test_file"}
 	file.AppendContent(mg.NewIncludeInstruction("header.html", &loc, "", &rsvr))
 	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
 	file.AppendContent(&mg.StringContent{Text: "## Mag"})
@@ -108,7 +109,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 
 	// read a file that includes the previous file
 	r := bufio.NewReader(strings.NewReader("# hello\n{{ include /example.md }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -119,7 +120,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello \\{{ include example.html }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -130,7 +131,7 @@ func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 
 func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Hello {{\n  bad-instruction \"contains \\}} ignored\"\n}}. How are you?"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -145,7 +146,7 @@ func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 
 func TestProcessIgnoreEscapedNewLine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ eval \"Joe\" }}\\\n, how are you\\\n, good?"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -157,7 +158,7 @@ func TestProcessIgnoreEscapedNewLine(t *testing.T) {
 
 func TestProcessDoNotIgnoreEscapedEscapedNewLine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ eval \"Joe\" }}\\\\\n, how are you\\\\\n, good?"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -169,7 +170,7 @@ func TestProcessDoNotIgnoreEscapedEscapedNewLine(t *testing.T) {
 
 func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello {{ eval \"Joe\" }}\\\r\n, how are you\\\r\n, good?\r\nKeep line."))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -181,7 +182,7 @@ func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
 
 func TestProcessDoc(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("hello{{ doc this is ignored content }}{{ doc\n And this too\n}}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil)
+	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)

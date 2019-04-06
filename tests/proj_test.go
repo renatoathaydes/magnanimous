@@ -2,10 +2,26 @@ package tests
 
 import (
 	"github.com/renatoathaydes/magnanimous/mg"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
+
+var proj5Examplelastupdated time.Time
+
+func init() {
+	// Project 5 writes the last updated time of this file, so we need to know that time
+	f, err := os.Open("test_proj_5/processed/folder/example.txt")
+	check(err)
+	defer f.Close()
+
+	stats, err := f.Stat()
+	check(err)
+
+	proj5Examplelastupdated = stats.ModTime()
+}
 
 func TestProj0(t *testing.T) {
 	dir := runMg(t, "test_proj_0")
@@ -261,16 +277,21 @@ func TestProj5(t *testing.T) {
 		t.Fatalf("Expected 4 output files, but got: %v", files)
 	}
 
+	exampleFileUpdatedOn := proj5Examplelastupdated.Format(expression.DefaultDateTimeFormat)
+
 	assertFileContents(t, files, dir, "a.txt", "")
 	assertFileContents(t, files, dir, "main.txt", "A and B:\n\n"+
 		"/my-website/10\n"+
 		"/my-website/20")
-	assertFileContents(t, files, dir, "folder/example.txt", "Full path: /my-website/folder/example.txt")
+	assertFileContents(t, files, dir, "folder/example.txt",
+		"Full path: /my-website/folder/example.txt\n"+
+			"I was last updated on "+exampleFileUpdatedOn)
 	assertFileContents(t, files, dir, "scopes.txt", "Base URL: /my-website/\n\n"+
 		"/other-website/A\n"+
 		"/other-website/<nil>\n\n"+
 		"File sees /other-website/\n"+
 		"Full path: /other-website/folder/example.txt\n"+
+		"I was last updated on "+exampleFileUpdatedOn+"\n"+
 		"After unset, base URL: /my-website/")
 }
 

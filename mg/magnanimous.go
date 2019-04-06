@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // ReadAll source files, creating a mapping from file paths to [WebFile] instances.
@@ -54,20 +55,23 @@ func ProcessFile(file, basePath string, resolver FileResolver) (*WebFile, error)
 	if err != nil {
 		return nil, &MagnanimousError{message: err.Error(), Code: IOError}
 	}
-	processed, magErr := ProcessReader(reader, file, int(s.Size()), resolver)
+	processed, magErr := ProcessReader(reader, file, int(s.Size()), resolver, s.ModTime())
 	if magErr != nil {
 		return nil, magErr
 	}
+
 	nonWritable := strings.HasPrefix(filepath.Base(file), "_")
 	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: processed, NonWritable: nonWritable}, nil
 }
 
 // ProcessReader processes the contents provided by the given reader.
-func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver FileResolver) (*ProcessedFile, error) {
+func ProcessReader(reader *bufio.Reader, file string, sizeHint int, resolver FileResolver,
+	lastUpdated time.Time) (*ProcessedFile, error) {
+
 	var builder strings.Builder
 	builder.Grow(sizeHint)
 	isMarkDown := isMd(file)
-	processed := ProcessedFile{Path: file}
+	processed := ProcessedFile{Path: file, LastUpdated: lastUpdated}
 	stack := []ContentContainer{&processed}
 	state := parserState{file: file, row: 1, col: 1, builder: &builder, reader: reader, contentStack: stack}
 	magErr := parseText(&state, resolver)

@@ -116,11 +116,11 @@ func createInstruction(name, arg string, location *Location,
 	case "include":
 		return NewIncludeInstruction(arg, location, original, resolver)
 	case "define":
-		return NewDefineInstruction(arg, location, original)
+		return NewDefineInstruction(arg, location, original, resolver)
 	case "eval":
-		return NewEvalInstruction(arg, location, original)
+		return NewEvalInstruction(arg, location, original, resolver)
 	case "if":
-		return NewIfInstruction(arg, location, original)
+		return NewIfInstruction(arg, location, original, resolver)
 	case "for":
 		return NewForInstruction(arg, location, original, resolver)
 	case "doc":
@@ -128,7 +128,7 @@ func createInstruction(name, arg string, location *Location,
 	case "component":
 		return NewComponentInstruction(arg, location, original, resolver)
 	case "slot":
-		return NewSlotInstruction(arg, location, original)
+		return NewSlotInstruction(arg, location, original, resolver)
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)

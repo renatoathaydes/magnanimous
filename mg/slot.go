@@ -11,16 +11,17 @@ type SlotContent struct {
 	Text     string
 	Location *Location
 	contents []Content
+	resolver FileResolver
 }
 
 var _ Content = (*SlotContent)(nil)
 var _ ContentContainer = (*SlotContent)(nil)
 
-func NewSlotInstruction(arg string, location *Location, original string) Content {
+func NewSlotInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	parts := strings.SplitN(strings.TrimSpace(arg), " ", 2)
 	if len(parts) == 1 {
 		variable := parts[0]
-		return &SlotContent{Name: variable, Location: location}
+		return &SlotContent{Name: variable, Location: location, resolver: resolver}
 	}
 	log.Printf("WARNING: (%s) malformed slot instruction: %s", location.String(), arg)
 	return unevaluatedExpression(original)

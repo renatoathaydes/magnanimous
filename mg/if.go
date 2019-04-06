@@ -11,12 +11,13 @@ type IfContent struct {
 	condition *expression.Expression
 	Location  *Location
 	contents  []Content
+	resolver  FileResolver
 }
 
 var _ Content = (*IfContent)(nil)
 var _ ContentContainer = (*IfContent)(nil)
 
-func NewIfInstruction(arg string, location *Location, original string) Content {
+func NewIfInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	cond, err := expression.ParseExpr(arg)
 
 	if err != nil {
@@ -28,6 +29,7 @@ func NewIfInstruction(arg string, location *Location, original string) Content {
 		Text:      original,
 		condition: &cond,
 		Location:  location,
+		resolver:  resolver,
 	}
 }
 
@@ -40,9 +42,10 @@ func (ic *IfContent) AppendContent(content Content) {
 }
 
 func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	res, err := expression.EvalExpr(*ic.condition, magParams{
-		webFiles: files,
-		stack:    stack,
+	res, err := expression.EvalExpr(*ic.condition, &magParams{
+		fileResolver: ic.resolver,
+		stack:        stack,
+		location:     ic.Location,
 	})
 	if err != nil {
 		return err

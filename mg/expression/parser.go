@@ -13,6 +13,8 @@ import (
 
 var defaultDateLayouts = []string{"2006-01-02T15:04:05", "2006-01-02T15:04", "2006-01-02"}
 
+const DefaultDateTimeFormat = "02 Jan 2006, 03:04 PM"
+
 // Expression is a parsed Magnanimous expression.
 //
 // It can be evaluated with the [EvalExpr] function.
@@ -28,9 +30,13 @@ type DateTime struct {
 
 // Path is the result of evaluating a path expression.
 type Path struct {
-	Value string
+	Value       string
+	LastUpdated time.Time
 }
 
+// PathProperty refers to a property within a Path.
+//
+// The property value can only be evaluated by obtaining a reference to all files visible to Magnanimous.
 type PathProperty struct {
 	Path *Path
 	Name string
@@ -41,10 +47,18 @@ type Context interface {
 	Get(name string) (interface{}, bool)
 }
 
+type PathFinder interface {
+	Path(path string) (*Path, bool)
+}
+
 // MapContext is a simple implementation of [Context].
 type MapContext struct {
-	Map map[string]interface{}
+	Map      map[string]interface{}
+	delegate Context
 }
+
+var _ Context = (*MapContext)(nil)
+var _ Context = (*Path)(nil)
 
 // Get the value of a binding from the context.
 func (m *MapContext) Get(name string) (interface{}, bool) {
@@ -219,7 +233,7 @@ func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	if v, ok := ToContext(rcv); ok {
+	if v, ok := ToContext(rcv, ctx); ok {
 		return eval(expr.Sel, v)
 	}
 	return nil, errors.New(fmt.Sprintf("cannot access properties of object: %v", rcv))
@@ -233,7 +247,9 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 			if err == nil {
 				switch d := idx.(type) {
 				case string:
-					return parseDate(d, "02 Jan 2006, 03:04 PM")
+					return parseDate(d, DefaultDateTimeFormat)
+				case *Path:
+					return &DateTime{Time: d.LastUpdated, Format: DefaultDateTimeFormat}, nil
 				default:
 					return nil, errors.New("malformed date expression (should be like date[\"2006-01-02T15:04:00\"])")
 				}
@@ -245,10 +261,17 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 			idx, err := eval(expr.Index, ctx)
 			if err == nil {
 				if p, ok := idx.(string); ok {
-					return &Path{Value: p}, nil
-				} else {
-					return nil, errors.New("malformed path expression (should be like path[\"to/file.txt\"])")
+					if pf, ok := ctx.(PathFinder); ok {
+						if f, ok := pf.Path(p); ok {
+							return &Path{Value: p, LastUpdated: f.LastUpdated}, nil
+						} else {
+							return nil, fmt.Errorf("path expression refers to non-existing file: %s", p)
+						}
+					} else {
+						return nil, fmt.Errorf("path expression used in location missing context: %s", p)
+					}
 				}
+				return nil, errors.New("malformed path expression (should be like path[\"to/file.txt\"])")
 			} else {
 				return nil, err
 			}
@@ -262,9 +285,11 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 					if format, ok := idx2.(string); ok {
 						idx1, err := eval(rcv.Index, ctx)
 						if err == nil {
-							switch date := idx1.(type) {
+							switch d := idx1.(type) {
 							case string:
-								return parseDate(date, format)
+								return parseDate(d, format)
+							case *Path:
+								return &DateTime{Time: d.LastUpdated, Format: format}, nil
 							}
 						}
 					}
@@ -295,12 +320,12 @@ func parseDate(idx string, format string) (*DateTime, error) {
 }
 
 // ToContext attempts to convert a variable to a [Context].
-func ToContext(ctx interface{}) (Context, bool) {
-	if v, ok := ctx.(Context); ok {
+func ToContext(obj interface{}, ctx Context) (Context, bool) {
+	if v, ok := obj.(Context); ok {
 		return v, true
 	}
-	if v, ok := ctx.(map[string]interface{}); ok {
-		return &MapContext{Map: v}, true
+	if v, ok := obj.(map[string]interface{}); ok {
+		return &MapContext{Map: v, delegate: ctx}, true
 	}
 	return nil, false
 }

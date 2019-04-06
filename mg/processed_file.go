@@ -17,7 +17,7 @@ func (f *ProcessedFile) AppendContent(content Content) {
 // ResolveContext evaluates all of the [DefineContent] instructions at the top-level scope
 // of the [ProcessedFile].
 func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Context {
-	ctx := fileContext(f)
+	ctx := newFileContext(f)
 	stack = stack.PushContext(ctx)
 	for _, c := range f.expandedContents() {
 		if content, ok := c.(*DefineContent); ok {

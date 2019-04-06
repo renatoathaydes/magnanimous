@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestSimpleContext(t *testing.T) {
@@ -37,7 +38,7 @@ func TestResolveContext(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("hello\n{{define x 1}}\n{{define y x + 1}}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)

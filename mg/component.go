@@ -9,7 +9,7 @@ type Component struct {
 	Path     string
 	Location *Location
 	Text     string
-	Resolver FileResolver
+	resolver FileResolver
 	contents []Content
 }
 
@@ -29,12 +29,13 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 		Path:     arg,
 		Location: location,
 		Text:     original,
-		Resolver: resolver,
+		resolver: resolver,
 	}
 }
 
 func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	maybePath := pathOrEval(c.Path, magParams{stack: stack, webFiles: files})
+	params := magParams{stack: stack, fileResolver: c.resolver, location: c.Location}
+	maybePath := pathOrEval(c.Path, &params)
 	var actualPath string
 	if s, ok := maybePath.(string); ok {
 		actualPath = s
@@ -46,9 +47,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 		}
 		return nil
 	}
-	path := c.Resolver.Resolve(actualPath, c.Location, stack.NearestLocation())
-	//fmt.Printf("Including %s from %v : %s\n", c.Path, c.Origin, path)
-	componentFile, ok := files.WebFiles[path]
+	componentFile, ok := params.File(actualPath)
 	if !ok {
 		log.Printf("WARNING: (%s) refers to a non-existent Component: %s", c.Location, actualPath)
 		_, err := writer.Write([]byte(c.Text))
@@ -57,7 +56,7 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 		}
 	} else {
 		stack = stack.Push(c.Location, false)
-		err := detectCycle(stack, actualPath, path, c.Location)
+		err := detectCycle(stack, actualPath, componentFile.Processed.Path, c.Location)
 		if err != nil {
 			return err
 		}

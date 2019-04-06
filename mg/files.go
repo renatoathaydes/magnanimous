@@ -83,6 +83,10 @@ func (r *DefaultFileResolver) Resolve(path string, from, at *Location) string {
 		return r.searchUp(path[4:], from, at)
 	}
 
+	if path == "." {
+		return from.Origin
+	}
+
 	// relative path
 	p := filepath.Join(filepath.Dir(from.Origin), path)
 
@@ -94,6 +98,11 @@ func (r *DefaultFileResolver) Resolve(path string, from, at *Location) string {
 		return filepath.Join(r.BasePath, p)
 	}
 	return p
+}
+
+func (r *DefaultFileResolver) Get(path string) (*WebFile, bool) {
+	f, ok := r.Files.WebFiles[path]
+	return &f, ok
 }
 
 func (r *DefaultFileResolver) searchUp(path string, from, at *Location) string {

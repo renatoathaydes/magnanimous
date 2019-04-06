@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestIfTrue(t *testing.T) {
@@ -12,7 +13,7 @@ func TestIfTrue(t *testing.T) {
 		"{{ if true }}" +
 		"YES" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -26,7 +27,7 @@ func TestIfTrueExpr(t *testing.T) {
 		"{{ if 2 + 2 == 4 }}" +
 		"YES" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -40,7 +41,7 @@ func TestIfFalse(t *testing.T) {
 		"{{ if false }}" +
 		"NO" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -54,7 +55,7 @@ func TestIfNil(t *testing.T) {
 		"{{ if nil }}" +
 		"NO" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -68,7 +69,7 @@ func TestIfFalseExpr(t *testing.T) {
 		"{{ if 2 > 100 }}" +
 		"NO" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +83,7 @@ func TestIfNegatedFalseExpr(t *testing.T) {
 		"{{ if !(2 + 2 > 10) }}" +
 		"NO" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -96,7 +97,7 @@ func TestIfNegatedTrueExpr(t *testing.T) {
 		"{{ if !(2 + 2 < 10) }}" +
 		"NO" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -111,7 +112,7 @@ func TestIfNonBooleanCondition(t *testing.T) {
 		"{{ if \"hi\" }}STRING{{ end }}" +
 		"{{ if 2 * 2 }}MULT{{ end }}" +
 		"{{ if 0 }}ZERO{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -130,7 +131,7 @@ func TestIfScope(t *testing.T) {
 			"  Inside IF, Y = {{ eval y }}\n" +
 			"{{ end }}\n" +
 			"After IF, X = {{ eval x }} and Y = {{ eval y }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)

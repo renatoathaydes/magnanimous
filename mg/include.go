@@ -24,7 +24,8 @@ func (inc *IncludeInstruction) String() string {
 }
 
 func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	maybePath := pathOrEval(inc.Path, magParams{stack: stack, webFiles: files})
+	params := magParams{stack: stack, location: inc.Origin, fileResolver: inc.Resolver}
+	maybePath := pathOrEval(inc.Path, &params)
 	var actualPath string
 	if s, ok := maybePath.(string); ok {
 		actualPath = s
@@ -36,9 +37,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 		}
 		return nil
 	}
-	path := inc.Resolver.Resolve(actualPath, inc.Origin, stack.NearestLocation())
-	//fmt.Printf("Including %s from %v : %s\n", inc.Path, inc.Origin, path)
-	webFile, ok := files.WebFiles[path]
+	webFile, ok := params.File(actualPath)
 	if !ok {
 		log.Printf("WARNING: (%s) include non-existent resource: %s", inc.Origin.String(), actualPath)
 		_, err := writer.Write([]byte(inc.Text))
@@ -47,7 +46,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 		}
 	} else {
 		stack = stack.Push(inc.Origin, false)
-		err := detectCycle(stack, actualPath, path, inc.Origin)
+		err := detectCycle(stack, actualPath, webFile.Processed.Path, inc.Origin)
 		if err != nil {
 			return err
 		}
@@ -59,7 +58,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 	return nil
 }
 
-func pathOrEval(path string, params magParams) interface{} {
+func pathOrEval(path string, params *magParams) interface{} {
 	startIndex := -1
 	if strings.HasPrefix(path, "eval ") {
 		startIndex = 5

@@ -10,13 +10,15 @@ type mapContext struct {
 	str *string
 }
 
+var _ Context = (*mapContext)(nil)
+
 // NewContext creates a simple [Context] based on a map.
 func NewContext() Context {
 	m := make(map[string]interface{}, 10)
 	return &mapContext{ctx: m}
 }
 
-func fileContext(file *ProcessedFile) Context {
+func newFileContext(file *ProcessedFile) Context {
 	var str string
 	if file != nil {
 		path := file.Path
@@ -33,8 +35,6 @@ func fileContext(file *ProcessedFile) Context {
 	}
 	return &mapContext{ctx: make(map[string]interface{}, 10), str: &str}
 }
-
-var _ Context = (*mapContext)(nil)
 
 func (m *mapContext) Get(name string) (interface{}, bool) {
 	v, ok := m.ctx[name]

@@ -1,1 +1,2 @@
 Full path: {{ eval baseURL + "folder/example.txt" }}{{define myBaseURL baseURL }}
+I was last updated on {{ define updated_on path["."] }}{{eval date[updated_on] }}

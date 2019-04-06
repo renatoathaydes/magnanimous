@@ -5,6 +5,7 @@ import (
 	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestIncludeFile(t *testing.T) {
@@ -12,14 +13,14 @@ func TestIncludeFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("OUTER\n{{ include /processed/hi.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -41,7 +42,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +52,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	r = bufio.NewReader(strings.NewReader("{{define p `/processed/`}}" +
 		"OUTER\n{{ include eval p + `/hi.txt` }}\nEND"))
 
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -75,7 +76,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver)
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +85,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	r = bufio.NewReader(strings.NewReader("{{define p `/processed`}}" +
 		"OUTER\n{{ include \"/processed\" + `/hi.txt` }}\nEND"))
 
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -108,14 +109,14 @@ func TestIncludeFileNested(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A1"))
-	processed1, err := mg.ProcessReader(r, "source/a1.txt", 6, &resolver)
+	processed1, err := mg.ProcessReader(r, "source/a1.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("A2\n{{include /a1.txt}}"))
-	processed2, err := mg.ProcessReader(r, "source/processed/a2.txt", 6, &resolver)
+	processed2, err := mg.ProcessReader(r, "source/processed/a2.txt", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -123,7 +124,7 @@ func TestIncludeFileNested(t *testing.T) {
 
 	// include relative path
 	r = bufio.NewReader(strings.NewReader("A3\n{{ include a2.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver)
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -146,19 +147,19 @@ func TestIncludeUpPath(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A1{{include .../_msg}}A1"))
-	processed1, err := mg.ProcessReader(r, "source/processed/en/a1.txt", 12, &resolver)
+	processed1, err := mg.ProcessReader(r, "source/processed/en/a1.txt", 12, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("A2{{include .../_msg}}A2"))
-	processed2, err := mg.ProcessReader(r, "source/processed/pt/abc/a2.txt", 12, &resolver)
+	processed2, err := mg.ProcessReader(r, "source/processed/pt/abc/a2.txt", 12, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("English"))
-	english, err := mg.ProcessReader(r, "source/_msg", 7, &resolver)
+	english, err := mg.ProcessReader(r, "source/_msg", 7, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("Portuguese"))
-	portuguese, err := mg.ProcessReader(r, "source/processed/pt/_msg", 7, &resolver)
+	portuguese, err := mg.ProcessReader(r, "source/processed/pt/_msg", 7, &resolver, time.Now())
 	check(err)
 
 	files["source/processed/en/a1.txt"] = mg.WebFile{Processed: processed1}
