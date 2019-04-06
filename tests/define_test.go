@@ -45,7 +45,7 @@ func TestDefineDate(t *testing.T) {
 	date1, err := time.Parse("2006-01-02T15:04:05", "2017-11-23T22:12:21")
 	check(err)
 	expectedCtx := make(map[string]interface{})
-	expectedCtx["date1"] = expression.DateTime{Time: date1, Format: "2016-01-02"}
+	expectedCtx["date1"] = &expression.DateTime{Time: date1, Format: "2016-01-02"}
 
 	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
 }
@@ -59,7 +59,7 @@ func TestDefineDateNow(t *testing.T) {
 
 	ctx := processed.ResolveContext(mg.WebFilesMap{}, mg.ContextStack{})
 	if actualDate1, ok := ctx.Get("date1"); ok {
-		if d1, ok := actualDate1.(expression.DateTime); ok {
+		if d1, ok := actualDate1.(*expression.DateTime); ok {
 			if d1.Time.Unix()-now.Unix() > 1 {
 				t.Errorf("Time difference between now and evaluated date[now] is too big: %d",
 					d1.Time.Unix()-now.Unix())

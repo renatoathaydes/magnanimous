@@ -279,17 +279,17 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 	return nil, errors.New("malformed index expression (only date[][] supported)")
 }
 
-func parseDate(idx string, format string) (DateTime, error) {
+func parseDate(idx string, format string) (*DateTime, error) {
 	if idx == "now" { // special case
-		return DateTime{Format: format, Time: time.Now()}, nil
+		return &DateTime{Format: format, Time: time.Now()}, nil
 	}
 	for _, layout := range defaultDateLayouts {
 		date, err := time.Parse(layout, idx)
 		if err == nil {
-			return DateTime{Format: format, Time: date}, nil
+			return &DateTime{Format: format, Time: date}, nil
 		}
 	}
-	return DateTime{}, errors.New(fmt.Sprintf("invalid date: %v (valid formats: %v)", idx, defaultDateLayouts))
+	return nil, errors.New(fmt.Sprintf("invalid date: %v (valid formats: %v)", idx, defaultDateLayouts))
 }
 
 // ToContext attempts to convert a variable to a [Context].

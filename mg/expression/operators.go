@@ -3,12 +3,13 @@ package expression
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type numberOp func(x float64, y float64) interface{}
 type stringOp func(x string, y string) interface{}
 type boolOp func(x bool, y bool) interface{}
-type timeOp func(x DateTime, y DateTime) interface{}
+type timeOp func(x *DateTime, y *DateTime) interface{}
 type opOther func() (interface{}, error)
 
 func op(x interface{}, y interface{}, no numberOp, so stringOp, to timeOp, oe opOther) (interface{}, error) {
@@ -31,9 +32,9 @@ func op(x interface{}, y interface{}, no numberOp, so stringOp, to timeOp, oe op
 		}
 	}
 	if to != nil {
-		xt, ok := x.(DateTime)
+		xt, ok := x.(*DateTime)
 		if ok {
-			yt, ok := y.(DateTime)
+			yt, ok := y.(*DateTime)
 			if ok {
 				return to(xt, yt), nil
 			}
@@ -100,11 +101,11 @@ func rem(x interface{}, y interface{}) (interface{}, error) {
 }
 
 func Equal(x interface{}, y interface{}) (interface{}, error) {
-	return x == y, nil
+	return reflect.DeepEqual(x, y), nil
 }
 
 func NotEqual(x interface{}, y interface{}) (interface{}, error) {
-	return x != y, nil
+	return !reflect.DeepEqual(x, y), nil
 }
 
 func Less(x interface{}, y interface{}) (interface{}, error) {
@@ -112,12 +113,11 @@ func Less(x interface{}, y interface{}) (interface{}, error) {
 		return x < y
 	}, func(x string, y string) interface{} {
 		return x < y
-	}, func(x DateTime, y DateTime) interface{} {
+	}, func(x *DateTime, y *DateTime) interface{} {
 		return x.Time.Before(y.Time)
-	},
-		func() (interface{}, error) {
-			return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
-		})
+	}, func() (interface{}, error) {
+		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
+	})
 }
 
 func Greater(x interface{}, y interface{}) (interface{}, error) {
@@ -125,7 +125,7 @@ func Greater(x interface{}, y interface{}) (interface{}, error) {
 		return x > y
 	}, func(x string, y string) interface{} {
 		return x > y
-	}, func(x DateTime, y DateTime) interface{} {
+	}, func(x *DateTime, y *DateTime) interface{} {
 		return x.Time.After(y.Time)
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
@@ -137,8 +137,8 @@ func LessOrEq(x interface{}, y interface{}) (interface{}, error) {
 		return x <= y
 	}, func(x string, y string) interface{} {
 		return x <= y
-	}, func(x DateTime, y DateTime) interface{} {
-		return x.Time.Before(y.Time) || x == y
+	}, func(x *DateTime, y *DateTime) interface{} {
+		return x.Time.Before(y.Time) || *x == *y
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
 	})
@@ -149,8 +149,8 @@ func GreaterOrEq(x interface{}, y interface{}) (interface{}, error) {
 		return x >= y
 	}, func(x string, y string) interface{} {
 		return x >= y
-	}, func(x DateTime, y DateTime) interface{} {
-		return x.Time.After(y.Time) || x == y
+	}, func(x *DateTime, y *DateTime) interface{} {
+		return x.Time.After(y.Time) || *x == *y
 	}, func() (interface{}, error) {
 		return nil, errors.New(fmt.Sprintf("cannot compare %v and %v", x, y))
 	})
