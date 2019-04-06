@@ -231,9 +231,10 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 		if rcv.Name == "date" {
 			idx, err := eval(expr.Index, ctx)
 			if err == nil {
-				if d, ok := idx.(string); ok {
+				switch d := idx.(type) {
+				case string:
 					return parseDate(d, "02 Jan 2006, 03:04 PM")
-				} else {
+				default:
 					return nil, errors.New("malformed date expression (should be like date[\"2006-01-02T15:04:00\"])")
 				}
 			} else {
@@ -261,7 +262,8 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 					if format, ok := idx2.(string); ok {
 						idx1, err := eval(rcv.Index, ctx)
 						if err == nil {
-							if date, ok := idx1.(string); ok {
+							switch date := idx1.(type) {
+							case string:
 								return parseDate(date, format)
 							}
 						}
