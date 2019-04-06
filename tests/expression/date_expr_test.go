@@ -234,7 +234,7 @@ func checkDate(t *testing.T, dateExpr, expected, format string) {
 		t.Fatalf("Could not evaluate: %v", err)
 	}
 
-	if result, ok := v.(expression.DateTime); ok {
+	if result, ok := v.(*expression.DateTime); ok {
 		expectedTime, err := time.Parse(format, expected)
 		if err != nil {
 			panic(err)

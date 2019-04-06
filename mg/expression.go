@@ -64,13 +64,9 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 				return err
 			}
 		} else {
-			if r == nil {
-				r = ""
-			}
-			if dateTime, ok := r.(expression.DateTime); ok {
-				r = dateTime.Time.Format(dateTime.Format)
-			}
-			_, err = writer.Write([]byte(fmt.Sprintf("%v", r)))
+			// evaluate special types to a simple string to write
+			s := evalSpecialType(r, files, stack, e.Location)
+			_, err = writer.Write([]byte(s))
 		}
 	} else {
 		log.Printf("WARNING: (%s) eval failure: %s", e.Location.String(), err.Error())
@@ -80,6 +76,30 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
 	return nil
+}
+
+func evalSpecialType(r interface{}, files WebFilesMap, stack ContextStack, location *Location) string {
+	switch v := r.(type) {
+	case nil:
+		return ""
+	case *expression.DateTime:
+		return v.Time.Format(v.Format)
+	case *expression.Path:
+		return v.Value
+	case *expression.PathProperty:
+		if f, ok := files.WebFiles[v.Path.Value]; ok {
+			ctx := f.Processed.ResolveContext(files, stack)
+			if prop, ok := ctx.Get(v.Name); ok {
+				return evalSpecialType(prop, files, stack, location)
+			} else {
+				log.Printf("WARNING: (%s) eval failure: File at path %s has no such property: %s",
+					location.String(), v.Path.Value, prop)
+				return fmt.Sprintf("%s.%s", v.Path.Value, v.Name)
+			}
+		}
+	}
+	// no special type found, stringify it
+	return fmt.Sprintf("%v", r)
 }
 
 func (e *ExpressionContent) String() string {

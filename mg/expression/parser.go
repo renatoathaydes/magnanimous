@@ -26,6 +26,16 @@ type DateTime struct {
 	Format string
 }
 
+// Path is the result of evaluating a path expression.
+type Path struct {
+	Value string
+}
+
+type PathProperty struct {
+	Path *Path
+	Name string
+}
+
 // Context contains the bindings available for an expression.
 type Context interface {
 	Get(name string) (interface{}, bool)
@@ -43,6 +53,11 @@ func (m *MapContext) Get(name string) (interface{}, bool) {
 	}
 	v, ok := m.Map[name]
 	return v, ok
+}
+
+// Get the value of a property of the file point at by the Path.
+func (p *Path) Get(name string) (interface{}, bool) {
+	return &PathProperty{Path: p, Name: name}, true
 }
 
 // ParseExpr parses the given string as a Magnanimous expression.
@@ -225,7 +240,19 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 				return nil, err
 			}
 		}
-		return nil, errors.New("unsupported index expression (only date[] supported)")
+		if rcv.Name == "path" {
+			idx, err := eval(expr.Index, ctx)
+			if err == nil {
+				if p, ok := idx.(string); ok {
+					return &Path{Value: p}, nil
+				} else {
+					return nil, errors.New("malformed path expression (should be like path[\"to/file.txt\"])")
+				}
+			} else {
+				return nil, err
+			}
+		}
+		return nil, fmt.Errorf("unsupported index expression (only date[] and path[] supported): %v", rcv)
 	case *ast.IndexExpr:
 		if i, ok := rcv.X.(*ast.Ident); ok {
 			if i.Name == "date" {

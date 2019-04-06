@@ -72,6 +72,25 @@ func TestDefineDateNow(t *testing.T) {
 	}
 }
 
+func TestDefinePath(t *testing.T) {
+	r := bufio.NewReader(strings.NewReader("{{ define f1 path[\"/processed/f1.txt\"] }}" +
+		"Greeting: {{ eval f1.hello }}"))
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 43, nil)
+	check(err)
+
+	r2 := bufio.NewReader(strings.NewReader("Defining hello: {{ define hello \"Hey Joe\" }}"))
+	f1, err := mg.ProcessReader(r2, "source/processed/f1.txt", 11, nil)
+	check(err)
+
+	expectedCtx := make(map[string]interface{})
+	expectedCtx["f1"] = &expression.Path{Value: "/processed/f1.txt"}
+
+	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
+	files.WebFiles["/processed/f1.txt"] = mg.WebFile{Processed: f1}
+
+	checkParsing(t, files, processed, expectedCtx, []string{"", "Greeting: ", "Hey Joe"})
+}
+
 func TestDefineStringConcat(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define title \"My\" + \" Site\" }}"))
 	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil)
