@@ -25,10 +25,12 @@ func (mag *Magnanimous) ReadAll() (WebFilesMap, error) {
 	if err != nil {
 		return webFiles, err
 	}
-	CopyAll(&staticFiles, staticDir, webFiles)
-	AddNonWritables(&otherFiles, mag.SourcesDir, webFiles)
-
-	return webFiles, nil
+	err = CopyAll(&staticFiles, staticDir, webFiles)
+	if err != nil {
+		return webFiles, err
+	}
+	err = AddNonWritables(&otherFiles, mag.SourcesDir, webFiles)
+	return webFiles, err
 }
 
 // ProcessAll given files, putting the results in the given webFiles map.

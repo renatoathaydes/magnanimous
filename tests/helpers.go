@@ -16,7 +16,6 @@ import (
 )
 
 var emptyContext = make(map[string]interface{})
-var emptyFilesMap = mg.WebFilesMap{}
 
 func shouldHaveError(t *testing.T, err error, code mg.ErrorCode, messageAlternatives ...string) {
 	if err == nil {

@@ -7,24 +7,42 @@ import (
 	"path/filepath"
 )
 
-func CopyAll(files *[]string, basePath string, filesMap WebFilesMap) {
+func CopyAll(files *[]string, basePath string, filesMap WebFilesMap) error {
 	for _, file := range *files {
-		wf := Copy(file, basePath, true)
+		wf, err := Copy(file, basePath, true)
+		if err != nil {
+			return err
+		}
 		filesMap.WebFiles[file] = *wf
 	}
+	return nil
 }
 
-func AddNonWritables(files *[]string, basePath string, filesMap WebFilesMap) {
+func AddNonWritables(files *[]string, basePath string, filesMap WebFilesMap) error {
 	for _, file := range *files {
-		wf := Copy(file, basePath, false)
+		wf, err := Copy(file, basePath, false)
+		if err != nil {
+			return err
+		}
 		filesMap.WebFiles[file] = *wf
 	}
+	return nil
 }
 
-func Copy(file, basePath string, writable bool) *WebFile {
-	var proc = ProcessedFile{}
+func Copy(file, basePath string, writable bool) (*WebFile, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	defer f.Close()
+	stats, err := f.Stat()
+	if err != nil {
+		return nil, &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+
+	var proc = ProcessedFile{Path: file, LastUpdated: stats.ModTime()}
 	proc.AppendContent(&copiedContent{file: file})
-	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: &proc, NonWritable: !writable}
+	return &WebFile{BasePath: basePath, Name: filepath.Base(file), Processed: &proc, NonWritable: !writable}, nil
 }
 
 type copiedContent struct {

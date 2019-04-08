@@ -23,6 +23,7 @@ var mdStyle = bfchroma.Style("lovelace")
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	return ProcessedFile{
 		Path:         file.Path,
+		LastUpdated:  file.LastUpdated,
 		contents:     []Content{&HtmlFromMarkdownContent{MarkDownContent: file.contents}},
 		NewExtension: "html",
 	}
