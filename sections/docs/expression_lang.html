@@ -375,7 +375,10 @@ thing <span style="color:#666">==</span> <span style="color:#444;font-style:ital
 <span style="color:#b83838">`</span><span style="color:#b83838">multiline
 </span><span style="color:#b83838">string</span><span style="color:#b83838">`</span>
 <span style="color:#888">[</span><span style="color:#444">1</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">,</span> <span style="color:#444">3</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">]</span>
+path<span style="color:#888">[</span><span style="color:#b83838">&#34;path/to/some/file.html&#34;</span><span style="color:#888">]</span>
 date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20&#34;</span><span style="color:#888">]</span>
+date<span style="color:#888">[</span><span style="color:#b83838">&#34;now&#34;</span><span style="color:#888">]</span>
+date<span style="color:#888">[</span>some_path<span style="color:#888">]</span>
 date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20T08:24:00&#34;</span><span style="color:#888">]</span><span style="color:#888">[</span><span style="color:#b83838">&#34;Mon Jan 2 15:04:05 2006&#34;</span><span style="color:#888">]</span>
 </pre>
 <p>The above expressions include all types of variables available:</p>
@@ -473,6 +476,13 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 <p>If not given, the following layout is used:</p>
 <pre style="background-color:#fff">02 Jan 2006, 03:04 PM
 </pre>
+<p>The first String can also be <code>&quot;now&quot;</code> to evaluate the current time (when Magnanimous is running):</p>
+<pre style="background-color:#fff">date<span style="color:#888">[</span><span style="color:#b83838">&#34;now&#34;</span><span style="color:#888">]</span>
+</pre>
+<p>When a path value is given to <code>date</code>, it resolves to the time the relevant file was last updated.</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define p1 path<span style="color:#888">[</span><span style="color:#b83838">&#34;path/to/file.txt&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+File path<span style="color:#666">/</span>to<span style="color:#666">/</span>file<span style="color:#888">.</span>txt was last updated on <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> date<span style="color:#888">[</span>p1<span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>
 <p>To make things clearer, here are a few examples:</p>
 
 <table>
@@ -507,6 +517,11 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 <tr>
 <td><code>date[&quot;2018-03-20T22:55&quot;]</code></td>
 <td><code>20 Mar 2018, 10:55 PM</code></td>
+</tr>
+
+<tr>
+<td><code>date[&quot;now&quot;][&quot;2016&quot;]</code></td>
+<td><code>2019</code> (current year)</td>
 </tr>
 </tbody>
 </table>

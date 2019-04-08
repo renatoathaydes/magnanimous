@@ -129,6 +129,32 @@ or explicitly with <code>eval &lt;expr&gt;</code>.</p>
 {{ define dir &#34;/hello/world/&#34; }}
 {{ include eval dir + &#34;file.html }}
 </pre>
+<h3>Path variables</h3>
+
+<p>Even though most of the time, paths are declared as simple expressions or unquoted strings, it is possible to
+explicitly declare a path as follows:</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define my_path path<span style="color:#888">[</span><span style="color:#b83838">&#34;/processed/example/file.txt&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>
+<p>This is useful to read the top-level variables defined by another file.
+For example, suppose the file at <code>/processed/example/file.txt</code> contained the following definition:</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define astronaut <span style="color:#b83838">&#34;Neil Armstrong&#34;</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</pre>
+<p>Then, given <code>my_path</code> defined above, we can evaluate this definition in another file:</p>
+<pre style="background-color:#fff">The first astronaut to step on the Moon was <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> my_path<span style="color:#888">.</span>astronaut <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</pre>
+<p>It is even possible to refer to the current file:</p>
+<pre style="background-color:#fff">This file is at <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</pre>
+<p>Path variables can also be used with <a href="expression_lang.html#expressions">date expressions</a>:</p>
+<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define <span style="color:#2838b0">this</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+This file <span style="color:#b83838">`</span><span style="color:#b83838">{{eval this}}</span><span style="color:#b83838">`</span> was last updated on <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> date<span style="color:#888">[</span><span style="color:#2838b0">this</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</pre>
+<p>Here&rsquo;s how the above code sample renders on this document itself!</p>
+
+<blockquote>
+<p>This file <code>website/source/processed/sections/docs/paths.md</code> was last updated on 08 Apr 2019, 06:18 PM.</p>
+</blockquote>
+
 <h3>When are paths resolved?</h3>
 
 <p>Paths are resolved when Magnanimous is writing the generated website files.</p>
