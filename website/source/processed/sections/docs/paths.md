@@ -130,6 +130,46 @@ For example, the paths in these [include](expression_lang.html#include) instruct
 \{{ include eval dir + "file.html }}
 ```
 
+### Path variables
+
+Even though most of the time, paths are declared as simple expressions or unquoted strings, it is possible to
+explicitly declare a path as follows:
+
+```javascript
+\{{ define my_path path["/processed/example/file.txt"] }}
+```
+
+This is useful to read the top-level variables defined by another file.
+For example, suppose the file at `/processed/example/file.txt` contained the following definition:
+
+```javascript
+\{{ define astronaut "Neil Armstrong" }}
+```
+
+Then, given `my_path` defined above, we can evaluate this definition in another file:
+
+```javascript
+The first astronaut to step on the Moon was \{{ eval my_path.astronaut }}.
+```
+
+It is even possible to refer to the current file:
+
+```javascript
+This file is at \{{ eval path["."] }}.
+```
+
+Path variables can also be used with [date expressions](expression_lang.html#expressions):
+
+```javascript
+\{{ define this path["."] }}
+This file `\{{eval this}}` was last updated on \{{ eval date[this] }}.
+```
+
+Here's how the above code sample renders on this document itself!
+
+{{ define this path["."] }}\
+> This file ``{{eval this}}`` was last updated on {{ eval date[this] }}.
+
 ### When are paths resolved?
 
 Paths are resolved when Magnanimous is writing the generated website files.

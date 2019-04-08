@@ -54,11 +54,8 @@ func unevaluatedExpression(original string) Content {
 var _ Content = (*ExpressionContent)(nil)
 
 func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	r, err := expression.EvalExpr(*e.Expr, &magParams{
-		stack:        stack,
-		fileResolver: e.resolver,
-		location:     e.Location,
-	})
+	params := magParams{stack: stack, fileResolver: e.resolver, location: e.Location}
+	r, err := expression.EvalExpr(*e.Expr, &params)
 	if err == nil {
 		// an expression can evaluate to a content container, such as a slot
 		if c, ok := r.(ContentContainer); ok {
@@ -68,7 +65,7 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 			}
 		} else {
 			// evaluate special types to a simple string to write
-			s := evalSpecialType(r, files, stack, e.Location)
+			s := evalSpecialType(r, &params, files, stack, e.Location)
 			_, err = writer.Write([]byte(s))
 		}
 	} else {
@@ -81,19 +78,23 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 	return nil
 }
 
-func evalSpecialType(r interface{}, files WebFilesMap, stack ContextStack, location *Location) string {
+// TODO remove files from parameters
+func evalSpecialType(r interface{}, params *magParams, files WebFilesMap, stack ContextStack, location *Location) string {
 	switch v := r.(type) {
 	case nil:
 		return ""
 	case *expression.DateTime:
 		return v.Time.Format(v.Format)
 	case *expression.Path:
+		if f, ok := params.File(v.Value); ok {
+			return f.Processed.Path
+		}
 		return v.Value
 	case *expression.PathProperty:
-		if f, ok := files.WebFiles[v.Path.Value]; ok {
+		if f, ok := params.File(v.Path.Value); ok {
 			ctx := f.Processed.ResolveContext(files, stack)
 			if prop, ok := ctx.Get(v.Name); ok {
-				return evalSpecialType(prop, files, stack, location)
+				return evalSpecialType(prop, params, files, stack, location)
 			} else {
 				log.Printf("WARNING: (%s) eval failure: File at path %s has no such property: %s",
 					location.String(), v.Path.Value, prop)

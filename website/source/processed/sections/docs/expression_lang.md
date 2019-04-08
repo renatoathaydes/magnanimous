@@ -409,7 +409,10 @@ thing == null
 `multiline
 string`
 [1, 2, 3, 4]
+path["path/to/some/file.html"]
 date["2019-03-20"]
+date["now"]
+date[some_path]
 date["2019-03-20T08:24:00"]["Mon Jan 2 15:04:05 2006"]
 ```
 
@@ -514,6 +517,13 @@ The first String can also be `"now"` to evaluate the current time (when Magnanim
 
 ```javascript
 date["now"]
+```
+
+When a path value is given to `date`, it resolves to the time the relevant file was last updated.
+
+```javascript
+\{{ define p1 path["path/to/file.txt"] }}
+File path/to/file.txt was last updated on \{{ eval date[p1] }}
 ```
 
 To make things clearer, here are a few examples:
