@@ -31,7 +31,7 @@ func TestIncludeFile(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed, expectedCtx, []string{
 		"OUTER\n",
 		"ABCDEF",
 		"\nEND"})
@@ -64,7 +64,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["p"] = "/processed/"
 
-	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed, expectedCtx, []string{
 		"",
 		"OUTER\n",
 		"ABCDEF",
@@ -97,7 +97,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["p"] = "/processed"
 
-	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed, expectedCtx, []string{
 		"",
 		"OUTER\n",
 		"ABCDEF",
@@ -136,7 +136,7 @@ func TestIncludeFileNested(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed, expectedCtx, []string{
 		"A3\n",
 		"A2\nA1",
 		"\nEND"})
@@ -169,11 +169,11 @@ func TestIncludeUpPath(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, *resolver.Files, processed1, expectedCtx, []string{
+	checkParsing(t, processed1, expectedCtx, []string{
 		"A1",
 		"English",
 		"A1"})
-	checkParsing(t, *resolver.Files, processed2, expectedCtx, []string{
+	checkParsing(t, processed2, expectedCtx, []string{
 		"A2",
 		"Portuguese",
 		"A2"})

@@ -23,7 +23,7 @@ func (inc *IncludeInstruction) String() string {
 	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", inc.Path, inc.Origin, inc.Resolver)
 }
 
-func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (inc *IncludeInstruction) Write(writer io.Writer, stack ContextStack) error {
 	params := magParams{stack: stack, location: inc.Origin, fileResolver: inc.Resolver}
 	maybePath := pathOrEval(inc.Path, &params)
 	var actualPath string
@@ -50,7 +50,7 @@ func (inc *IncludeInstruction) Write(writer io.Writer, files WebFilesMap, stack 
 		if err != nil {
 			return err
 		}
-		err = webFile.Write(writer, files, stack)
+		err = webFile.Write(writer, stack)
 		if err != nil {
 			return err
 		}

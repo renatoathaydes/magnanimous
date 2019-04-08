@@ -53,19 +53,19 @@ func unevaluatedExpression(original string) Content {
 
 var _ Content = (*ExpressionContent)(nil)
 
-func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (e *ExpressionContent) Write(writer io.Writer, stack ContextStack) error {
 	params := magParams{stack: stack, fileResolver: e.resolver, location: e.Location}
 	r, err := expression.EvalExpr(*e.Expr, &params)
 	if err == nil {
 		// an expression can evaluate to a content container, such as a slot
 		if c, ok := r.(ContentContainer); ok {
-			err = writeContents(c, writer, files, stack)
+			err = writeContents(c, writer, stack)
 			if err != nil {
 				return err
 			}
 		} else {
 			// evaluate special types to a simple string to write
-			s := evalSpecialType(r, &params, files, stack, e.Location)
+			s := evalSpecialType(r, &params, stack, e.Location)
 			_, err = writer.Write([]byte(s))
 		}
 	} else {
@@ -78,8 +78,7 @@ func (e *ExpressionContent) Write(writer io.Writer, files WebFilesMap, stack Con
 	return nil
 }
 
-// TODO remove files from parameters
-func evalSpecialType(r interface{}, params *magParams, files WebFilesMap, stack ContextStack, location *Location) string {
+func evalSpecialType(r interface{}, params *magParams, stack ContextStack, location *Location) string {
 	switch v := r.(type) {
 	case nil:
 		return ""
@@ -92,9 +91,9 @@ func evalSpecialType(r interface{}, params *magParams, files WebFilesMap, stack 
 		return v.Value
 	case *expression.PathProperty:
 		if f, ok := params.File(v.Path.Value); ok {
-			ctx := f.Processed.ResolveContext(files, stack)
+			ctx := f.Processed.ResolveContext(stack)
 			if prop, ok := ctx.Get(v.Name); ok {
-				return evalSpecialType(prop, params, files, stack, location)
+				return evalSpecialType(prop, params, stack, location)
 			} else {
 				log.Printf("WARNING: (%s) eval failure: File at path %s has no such property: %s",
 					location.String(), v.Path.Value, prop)
@@ -112,9 +111,9 @@ func (e *ExpressionContent) String() string {
 
 var _ Content = (*DefineContent)(nil)
 
-func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (d *DefineContent) Write(writer io.Writer, stack ContextStack) error {
 	// DefineContent does not write anything!
-	if v, ok := d.Eval(files, stack); ok {
+	if v, ok := d.Eval(stack); ok {
 		if v == nil {
 			stack.Top().Remove(d.Name)
 		} else {
@@ -124,7 +123,7 @@ func (d *DefineContent) Write(writer io.Writer, files WebFilesMap, stack Context
 	return nil
 }
 
-func (d *DefineContent) Eval(files WebFilesMap, stack ContextStack) (interface{}, bool) {
+func (d *DefineContent) Eval(stack ContextStack) (interface{}, bool) {
 	v, err := expression.EvalExpr(*d.Expr, &magParams{
 		fileResolver: d.resolver,
 		stack:        stack,

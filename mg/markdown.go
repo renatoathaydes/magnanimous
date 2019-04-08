@@ -28,7 +28,7 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 	}
 }
 
-func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (f *HtmlFromMarkdownContent) Write(writer io.Writer, stack ContextStack) error {
 	// accumulate all contents that do not include another file, then writeAsHtmlAndReset it...
 	// inclusions are written as they are, without translation from markdown to html.
 	var nonIncludedContent []Content
@@ -37,12 +37,12 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, sta
 	for _, c := range f.MarkDownContent {
 		switch c.(type) {
 		case *IncludeInstruction:
-			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, files, stack)
+			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, stack)
 			if err != nil {
 				return err
 			}
 		case *Component:
-			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, files, stack)
+			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, stack)
 			if err != nil {
 				return err
 			}
@@ -51,7 +51,7 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, files WebFilesMap, sta
 		}
 	}
 
-	err = writeAsHtml(nonIncludedContent, writer, files, stack)
+	err = writeAsHtml(nonIncludedContent, writer, stack)
 	return err
 }
 
@@ -64,22 +64,22 @@ func unwrapMarkdownContent(f *ProcessedFile) ([]Content, bool) {
 	return nil, false
 }
 
-func writeAsHtmlAndReset(markdownContents []Content, writer io.Writer, includedContent Content, files WebFilesMap,
+func writeAsHtmlAndReset(markdownContents []Content, writer io.Writer, includedContent Content,
 	stack ContextStack) ([]Content, error) {
 	// write markdownContents, converting it to html
-	err := writeAsHtml(markdownContents, writer, files, stack)
+	err := writeAsHtml(markdownContents, writer, stack)
 	if err != nil {
 		return nil, err
 	}
 	// write includedContent as it is, returning nil (or empty array) to "reset" the markdown contents slice
-	return nil, includedContent.Write(writer, files, stack)
+	return nil, includedContent.Write(writer, stack)
 }
 
-func writeAsHtml(c []Content, writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func writeAsHtml(c []Content, writer io.Writer, stack ContextStack) error {
 	if len(c) == 0 {
 		return nil
 	}
-	mdBytes, err := asBytes(c, files, stack)
+	mdBytes, err := asBytes(c, stack)
 
 	var chromaRenderer = blackfriday.WithRenderer(
 		bfchroma.NewRenderer(bfchroma.WithoutAutodetect(), mdStyle))

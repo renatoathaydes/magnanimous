@@ -94,7 +94,7 @@ func (mag *Magnanimous) newContextStack(filesMap WebFilesMap) ContextStack {
 	}
 	if globalCtx, ok := filesMap.WebFiles[globalCtxPath]; ok {
 		log.Printf("Using global context file: %s", globalCtxPath)
-		ctx := globalCtx.Processed.ResolveContext(filesMap, stack)
+		ctx := globalCtx.Processed.ResolveContext(stack)
 		stack = NewContextStack(ctx)
 	} else if mag.GlobalContex != "" {
 		log.Printf("WARNING: global context file was not found: %s", globalCtxPath)
@@ -125,7 +125,7 @@ func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
 		if wf.Processed.NewExtension != "" {
 			targetFile = changeFileExt(targetFile, wf.Processed.NewExtension)
 		}
-		magErr := writeFile(file, targetFile, wf, filesMap, stack)
+		magErr := writeFile(file, targetFile, wf, stack)
 		if magErr != nil {
 			return magErr
 		}
@@ -133,7 +133,7 @@ func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
 	return nil
 }
 
-func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack ContextStack) error {
+func writeFile(file, targetFile string, wf WebFile, stack ContextStack) error {
 	log.Printf("Creating file %s from %s", targetFile, file)
 	stack = stack.Push(nil, true)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
@@ -148,7 +148,7 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	for _, c := range wf.Processed.contents {
-		err := c.Write(w, filesMap, stack)
+		err := c.Write(w, stack)
 		if err != nil {
 			return err
 		}
@@ -156,13 +156,13 @@ func writeFile(file, targetFile string, wf WebFile, filesMap WebFilesMap, stack 
 	return nil
 }
 
-func (wf *WebFile) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
-	return writeContents(wf.Processed, writer, files, stack)
+func (wf *WebFile) Write(writer io.Writer, stack ContextStack) error {
+	return writeContents(wf.Processed, writer, stack)
 }
 
-func writeContents(cc ContentContainer, writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func writeContents(cc ContentContainer, writer io.Writer, stack ContextStack) error {
 	for _, c := range cc.GetContents() {
-		err := c.Write(writer, files, stack)
+		err := c.Write(writer, stack)
 		if err != nil {
 			return err
 		}

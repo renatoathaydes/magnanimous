@@ -41,7 +41,7 @@ func (ic *IfContent) AppendContent(content Content) {
 	ic.contents = append(ic.contents, content)
 }
 
-func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (ic *IfContent) Write(writer io.Writer, stack ContextStack) error {
 	res, err := expression.EvalExpr(*ic.condition, &magParams{
 		fileResolver: ic.resolver,
 		stack:        stack,
@@ -54,7 +54,7 @@ func (ic *IfContent) Write(writer io.Writer, files WebFilesMap, stack ContextSta
 	switch res {
 	case true:
 		stack = stack.Push(nil, true)
-		err = writeContents(ic, writer, files, stack)
+		err = writeContents(ic, writer, stack)
 		if err != nil {
 			return err
 		}

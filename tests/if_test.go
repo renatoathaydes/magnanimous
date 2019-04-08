@@ -19,7 +19,7 @@ func TestIfTrue(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\nYES")
+	checkContents(t, processed, "IF:\nYES")
 }
 
 func TestIfTrueExpr(t *testing.T) {
@@ -33,7 +33,7 @@ func TestIfTrueExpr(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\nYES")
+	checkContents(t, processed, "IF:\nYES")
 }
 
 func TestIfFalse(t *testing.T) {
@@ -47,7 +47,7 @@ func TestIfFalse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\n")
+	checkContents(t, processed, "IF:\n")
 }
 
 func TestIfNil(t *testing.T) {
@@ -61,7 +61,7 @@ func TestIfNil(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\n")
+	checkContents(t, processed, "IF:\n")
 }
 
 func TestIfFalseExpr(t *testing.T) {
@@ -75,7 +75,7 @@ func TestIfFalseExpr(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\n")
+	checkContents(t, processed, "IF:\n")
 }
 
 func TestIfNegatedFalseExpr(t *testing.T) {
@@ -89,7 +89,7 @@ func TestIfNegatedFalseExpr(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\nNO")
+	checkContents(t, processed, "IF:\nNO")
 }
 
 func TestIfNegatedTrueExpr(t *testing.T) {
@@ -103,7 +103,7 @@ func TestIfNegatedTrueExpr(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\n")
+	checkContents(t, processed, "IF:\n")
 }
 
 func TestIfNonBooleanCondition(t *testing.T) {
@@ -118,7 +118,7 @@ func TestIfNonBooleanCondition(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "IF:\n")
+	checkContents(t, processed, "IF:\n")
 }
 
 func TestIfScope(t *testing.T) {
@@ -137,7 +137,7 @@ func TestIfScope(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed, "\nBefore IF, X = 10\n\n"+
+	checkContents(t, processed, "\nBefore IF, X = 10\n\n"+
 		"  Inside IF, X = 20\n\n"+
 		"  Inside IF, Y = 2\n\n"+
 		"After IF, X = 10 and Y = ")

@@ -27,7 +27,7 @@ func NewSlotInstruction(arg string, location *Location, original string, resolve
 	return unevaluatedExpression(original)
 }
 
-func (s *SlotContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (s *SlotContent) Write(writer io.Writer, stack ContextStack) error {
 	// slot does not write anything, it must be evaluated to resolve its body
 	stack.Top().Set(s.Name, s)
 	return nil

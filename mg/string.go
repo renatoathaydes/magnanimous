@@ -9,7 +9,7 @@ type StringContent struct {
 	Text string
 }
 
-func (c *StringContent) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (c *StringContent) Write(writer io.Writer, stack ContextStack) error {
 	_, err := writer.Write([]byte(c.Text))
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}

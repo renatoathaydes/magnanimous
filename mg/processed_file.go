@@ -16,12 +16,12 @@ func (f *ProcessedFile) AppendContent(content Content) {
 
 // ResolveContext evaluates all of the [DefineContent] instructions at the top-level scope
 // of the [ProcessedFile].
-func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Context {
+func (f *ProcessedFile) ResolveContext(stack ContextStack) Context {
 	ctx := newFileContext(f)
 	stack = stack.PushContext(ctx)
 	for _, c := range f.expandedContents() {
 		if content, ok := c.(*DefineContent); ok {
-			v, ok := content.Eval(files, stack)
+			v, ok := content.Eval(stack)
 			if ok {
 				ctx.Set(content.Name, v)
 			}
@@ -31,8 +31,8 @@ func (f *ProcessedFile) ResolveContext(files WebFilesMap, stack ContextStack) Co
 }
 
 // Bytes returns the bytes of the processed file.
-func (f *ProcessedFile) Bytes(files WebFilesMap, stack ContextStack) ([]byte, error) {
-	return body(f, files, stack)
+func (f *ProcessedFile) Bytes(stack ContextStack) ([]byte, error) {
+	return body(f, stack)
 }
 
 func (f *ProcessedFile) expandedContents() []Content {
@@ -43,16 +43,16 @@ func (f *ProcessedFile) expandedContents() []Content {
 	return f.contents
 }
 
-func body(c ContentContainer, files WebFilesMap, stack ContextStack) ([]byte, error) {
-	return asBytes(c.GetContents(), files, stack)
+func body(c ContentContainer, stack ContextStack) ([]byte, error) {
+	return asBytes(c.GetContents(), stack)
 }
 
-func asBytes(c []Content, files WebFilesMap, stack ContextStack) ([]byte, error) {
+func asBytes(c []Content, stack ContextStack) ([]byte, error) {
 	var b bytes.Buffer
 	b.Grow(512)
 	for _, c := range c {
 		if c != nil {
-			err := c.Write(&b, files, stack)
+			err := c.Write(&b, stack)
 			if err != nil {
 				return nil, err
 			}

@@ -104,7 +104,7 @@ func check(e error) {
 }
 
 func checkParsing(t *testing.T,
-	m mg.WebFilesMap, pf *mg.ProcessedFile,
+	pf *mg.ProcessedFile,
 	expectedCtx map[string]interface{}, expectedContents []string) {
 
 	contents := pf.GetContents()
@@ -119,7 +119,7 @@ func checkParsing(t *testing.T,
 
 	for i, c := range contents {
 		var result strings.Builder
-		err := c.Write(&result, m, stack)
+		err := c.Write(&result, stack)
 		check(err)
 
 		if result.String() != expectedContents[i] {
@@ -151,13 +151,13 @@ func isContextEqual(context mg.Context, expectedContents map[string]interface{})
 }
 
 func checkContents(t *testing.T,
-	m mg.WebFilesMap, pf *mg.ProcessedFile,
+	pf *mg.ProcessedFile,
 	expectedContent string) {
 
 	ctx := mg.NewContext()
 	stack := mg.NewContextStack(ctx)
 
-	content, err := pf.Bytes(m, stack)
+	content, err := pf.Bytes(stack)
 
 	if err != nil {
 		t.Fatal(err)

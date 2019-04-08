@@ -48,7 +48,7 @@ func TestResolveContext(t *testing.T) {
 
 	stack := mg.NewContextStack(mg.NewContext())
 
-	context := processed.ResolveContext(mg.WebFilesMap{WebFiles: files}, stack)
+	context := processed.ResolveContext(stack)
 
 	x := context.Remove("x")
 	y := context.Remove("y")

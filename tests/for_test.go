@@ -21,7 +21,7 @@ func TestForArray(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Number 1\n\n"+
 			"Number 2\n\n"+
@@ -41,7 +41,7 @@ func TestForDefineArray(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n"+
 			"Number 1\n"+
 			"Number 2\n"+
@@ -62,7 +62,7 @@ func TestForNestedArray(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Nested Sample:\n"+
 			"Numbers 1 6\n"+
 			"Numbers 1 5\n"+
@@ -81,7 +81,7 @@ func TestForArrayWithExpressions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"X is 2\n"+
 			"X is 4")
@@ -98,7 +98,7 @@ func TestForArraySorted(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"1 2 2 4 5 10 ")
 }
@@ -114,7 +114,7 @@ func TestForArraySortedBy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"1 2 2 4 5 10 ")
 }
@@ -130,7 +130,7 @@ func TestForArrayReverse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"5 2 1 4 2 10 ")
 }
@@ -146,7 +146,7 @@ func TestForArraySortReverse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"10 5 4 2 2 1 ")
 }
@@ -162,7 +162,7 @@ func TestForArrayLimit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Number 1\n\n"+
 			"Number 2\n\n"+
@@ -180,7 +180,7 @@ func TestForArraySortByReverseLimit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"Numbers:\n"+
 			"10 5 4 2 ")
 }
@@ -196,7 +196,7 @@ func TestForArrayInMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, emptyFilesMap, processed,
+	checkContents(t, processed,
 		"<h2>Home</h2>\n\n"+
 			"<p>Something something</p>\n\n"+
 			"<h2>About</h2>\n\n"+
@@ -225,7 +225,7 @@ func TestForFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Title File 1\n\n"+
 			"Title Second File\n")
@@ -253,7 +253,7 @@ func TestForFilesScope(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Title is \n\n"+
 			"  path.title: File 1\n"+
 			"  title: \n\n"+
@@ -283,7 +283,7 @@ func TestForFilesWithUnwritableFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Title File 1\n\n"+
 			"Title Second File\n")
@@ -315,7 +315,7 @@ func TestForFilesReverse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Title G\n\n"+
 			"Title F\n\n"+
@@ -352,7 +352,7 @@ func TestForFilesLimit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Title A\n\n"+
 			"Title B\n\n"+
@@ -383,7 +383,7 @@ func TestForFilesLimitTooMany(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Title A\n\n"+
 			"Title B\n\n"+
@@ -414,7 +414,7 @@ func TestForFilesSortBy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"A file\n\n"+
 			"Final\n\n"+
@@ -447,7 +447,7 @@ func TestForFilesSortByReverse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Z file\n\n"+
 			"Some file\n\n"+
@@ -480,7 +480,7 @@ func TestForFilesReverseSortBy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"A file\n\n"+
 			"Final\n\n"+
@@ -513,7 +513,7 @@ func TestForFilesLimitSortByReverse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Some file\n\n"+
 			"Other file\n\n"+
@@ -544,7 +544,7 @@ func TestForFilesEval(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"Some file\n\n"+
 			"Other file\n\n"+
@@ -576,7 +576,7 @@ func TestForFilesEvalSortBy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkContents(t, files, processed,
+	checkContents(t, processed,
 		"Loop Sample:\n\n"+
 			"A file\n\n"+
 			"Other file\n\n"+

@@ -46,7 +46,7 @@ type fileConsumer func(file *webFileWithContext) error
 type itemConsumer func(interface{}) error
 
 type iterable interface {
-	forEach(files WebFilesMap, stack ContextStack,
+	forEach(stack ContextStack,
 		parameters magParams, fc fileConsumer, ic itemConsumer) error
 }
 
@@ -99,7 +99,7 @@ func (f *ForLoop) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
-func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (f *ForLoop) Write(writer io.Writer, stack ContextStack) error {
 	stack = stack.Push(nil, true)
 	params := magParams{
 		fileResolver: f.resolver,
@@ -119,14 +119,14 @@ func (f *ForLoop) Write(writer io.Writer, files WebFilesMap, stack ContextStack)
 		log.Printf("WARNING: invalid for-loop expression, cannot iterate over: %v", arg)
 		return nil
 	}
-	err := iter.forEach(files, stack, params, func(file *webFileWithContext) error {
+	err := iter.forEach(stack, params, func(file *webFileWithContext) error {
 		// use the file's context as the value of the bound variable
 		stack.Top().Set(f.Variable, file.context)
-		return writeContents(f, writer, files, stack)
+		return writeContents(f, writer, stack)
 	}, func(item interface{}) error {
 		// use whatever was evaluated from the array as the bound variable
 		stack.Top().Set(f.Variable, item)
-		return writeContents(f, writer, files, stack)
+		return writeContents(f, writer, stack)
 	})
 
 	if err != nil {
@@ -155,7 +155,7 @@ func asIterable(arg string, location *Location, resolver FileResolver) (*generic
 		subInstructions: subInstructions}, nil
 }
 
-func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
+func (e *arrayIterable) forEach(stack ContextStack,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
 	array := e.array
 	for _, subInstruction := range e.subInstructions {
@@ -183,8 +183,7 @@ func (e *arrayIterable) forEach(files WebFilesMap, stack ContextStack,
 	return nil
 }
 
-func (e *directoryIterable) filesWithContext(files WebFilesMap,
-	stack ContextStack, parameters magParams) ([]webFileWithContext, error) {
+func (e *directoryIterable) filesWithContext(stack ContextStack, parameters magParams) ([]webFileWithContext, error) {
 	_, webFiles, err := e.resolver.FilesIn(e.path, e.location)
 	if err != nil {
 		return nil, err
@@ -192,7 +191,7 @@ func (e *directoryIterable) filesWithContext(files WebFilesMap,
 
 	webFilesCtx := make([]webFileWithContext, len(webFiles))
 	for i, wf := range webFiles {
-		ctx := wf.Processed.ResolveContext(files, stack)
+		ctx := wf.Processed.ResolveContext(stack)
 		// we must create a new ref here otherwise the file ref will point to the loop ref, which changes!
 		refToFile := wf
 		webFilesCtx[i] = webFileWithContext{file: &refToFile, context: ctx}
@@ -200,9 +199,9 @@ func (e *directoryIterable) filesWithContext(files WebFilesMap,
 	return webFilesCtx, nil
 }
 
-func (e *directoryIterable) forEach(files WebFilesMap, stack ContextStack,
+func (e *directoryIterable) forEach(stack ContextStack,
 	parameters magParams, fc fileConsumer, ic itemConsumer) error {
-	webFilesCtx, err := e.filesWithContext(files, stack, parameters)
+	webFilesCtx, err := e.filesWithContext(stack, parameters)
 	if err != nil {
 		return err
 	}

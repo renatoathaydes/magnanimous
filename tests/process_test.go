@@ -14,7 +14,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 	writeContentToString := func(content mg.Content) string {
 		stack := mg.NewContextStack(mg.NewContext())
 		var w strings.Builder
-		err := content.Write(&w, mg.WebFilesMap{}, stack)
+		err := content.Write(&w, stack)
 		check(err)
 		return w.String()
 	}
@@ -38,7 +38,7 @@ func TestProcessSimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"hello world"})
+	checkParsing(t, processed, emptyContext, []string{"hello world"})
 }
 
 func TestProcessIncludeSimple(t *testing.T) {
@@ -58,7 +58,7 @@ func TestProcessIncludeSimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, m, processed, emptyContext, []string{"hello ", "from another file!"})
+	checkParsing(t, processed, emptyContext, []string{"hello ", "from another file!"})
 }
 
 func TestMarkdownToHtml(t *testing.T) {
@@ -83,7 +83,7 @@ func TestMarkdownToHtml(t *testing.T) {
 	html := mg.MarkdownToHtml(file)
 
 	stack := mg.NewContextStack(mg.NewContext())
-	result, err := html.Bytes(m, stack)
+	result, err := html.Bytes(stack)
 
 	if err != nil {
 		t.Fatal(err)
@@ -115,7 +115,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, m, processed, emptyContext, []string{"<h1>hello</h1>\n<h2>header</h2>\n"})
+	checkParsing(t, processed, emptyContext, []string{"<h1>hello</h1>\n<h2>header</h2>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
@@ -126,7 +126,7 @@ func TestProcessIgnoreEscapedBrackets(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"hello {{ include example.html }}"})
+	checkParsing(t, processed, emptyContext, []string{"hello {{ include example.html }}"})
 }
 
 func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
@@ -137,7 +137,7 @@ func TestProcessIgnoreEscapedClosingBrackets(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{
+	checkParsing(t, processed, emptyContext, []string{
 		"Hello ",
 		"{{\n  bad-instruction \"contains }} ignored\"\n}}",
 		". How are you?",
@@ -152,7 +152,7 @@ func TestProcessIgnoreEscapedNewLine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext,
+	checkParsing(t, processed, emptyContext,
 		[]string{"hello ", "Joe", ", how are you, good?"})
 }
 
@@ -164,7 +164,7 @@ func TestProcessDoNotIgnoreEscapedEscapedNewLine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext,
+	checkParsing(t, processed, emptyContext,
 		[]string{"hello ", "Joe", "\\\n, how are you\\\n, good?"})
 }
 
@@ -176,7 +176,7 @@ func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext,
+	checkParsing(t, processed, emptyContext,
 		[]string{"hello ", "Joe", ", how are you, good?\r\nKeep line."})
 }
 
@@ -188,5 +188,5 @@ func TestProcessDoc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"hello"})
+	checkParsing(t, processed, emptyContext, []string{"hello"})
 }

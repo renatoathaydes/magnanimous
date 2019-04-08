@@ -21,7 +21,7 @@ func TestDefineNumber(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["a"] = float64(2)
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineString(t *testing.T) {
@@ -35,7 +35,7 @@ func TestDefineString(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineDate(t *testing.T) {
@@ -48,7 +48,7 @@ func TestDefineDate(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["date1"] = &expression.DateTime{Time: date1, Format: "2016-01-02"}
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineDateNow(t *testing.T) {
@@ -58,7 +58,7 @@ func TestDefineDateNow(t *testing.T) {
 	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
 	check(err)
 
-	ctx := processed.ResolveContext(mg.WebFilesMap{}, mg.ContextStack{})
+	ctx := processed.ResolveContext(mg.ContextStack{})
 	if actualDate1, ok := ctx.Get("date1"); ok {
 		if d1, ok := actualDate1.(*expression.DateTime); ok {
 			if d1.Time.Unix()-now.Unix() > 1 {
@@ -103,7 +103,7 @@ func TestDefinePath(t *testing.T) {
 
 	//checkParsing(t, files, processed, expectedCtx, []string{"", "Greeting: ", "Hey Joe"})
 
-	ctx := processed.ResolveContext(files, mg.ContextStack{})
+	ctx := processed.ResolveContext(mg.ContextStack{})
 	if f1, ok := ctx.Get("f1"); ok {
 		now := time.Now()
 		if d1, ok := f1.(*expression.Path); ok {
@@ -133,7 +133,7 @@ func TestDefineStringConcat(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["title"] = "My Site"
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineFromExpression(t *testing.T) {
@@ -147,7 +147,7 @@ func TestDefineFromExpression(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["n"] = float64(70)
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineFromOrExpression(t *testing.T) {
@@ -161,7 +161,7 @@ func TestDefineFromOrExpression(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["n"] = "alternative"
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{""})
+	checkParsing(t, processed, expectedCtx, []string{""})
 }
 
 func TestDefineBasedOnPreviousDefine(t *testing.T) {
@@ -180,7 +180,7 @@ func TestDefineBasedOnPreviousDefine(t *testing.T) {
 	expectedCtx["b"] = float64(4)
 	expectedCtx["c"] = float64(40)
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{"", "", ""})
+	checkParsing(t, processed, expectedCtx, []string{"", "", ""})
 }
 
 func TestDefineBasedOnPreviousEmptyStringDefine(t *testing.T) {
@@ -197,7 +197,7 @@ func TestDefineBasedOnPreviousEmptyStringDefine(t *testing.T) {
 	expectedCtx["baseURL"] = ""
 	expectedCtx["INSTRUCTIONS_PATH"] = "/hello"
 
-	checkParsing(t, emptyFilesMap, processed, expectedCtx, []string{"", ""})
+	checkParsing(t, processed, expectedCtx, []string{"", ""})
 }
 
 func TestMalformedDefine(t *testing.T) {
@@ -208,7 +208,7 @@ func TestMalformedDefine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ define }}"})
+	checkParsing(t, processed, emptyContext, []string{"{{ define }}"})
 
 	r = bufio.NewReader(strings.NewReader("{{ define abc }}"))
 	processed, err = mg.ProcessReader(r, "source/processed/hi.html", 11, nil, time.Now())
@@ -217,5 +217,5 @@ func TestMalformedDefine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ define abc }}"})
+	checkParsing(t, processed, emptyContext, []string{"{{ define abc }}"})
 }

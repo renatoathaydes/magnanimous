@@ -33,7 +33,7 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 	}
 }
 
-func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStack) error {
+func (c *Component) Write(writer io.Writer, stack ContextStack) error {
 	params := magParams{stack: stack, fileResolver: c.resolver, location: c.Location}
 	maybePath := pathOrEval(c.Path, &params)
 	var actualPath string
@@ -60,12 +60,12 @@ func (c *Component) Write(writer io.Writer, files WebFilesMap, stack ContextStac
 		if err != nil {
 			return err
 		}
-		contents, err := body(c, files, stack)
+		contents, err := body(c, stack)
 		if err != nil {
 			return err
 		}
 		stack.Top().Set("__contents__", string(contents))
-		err = componentFile.Write(writer, files, stack)
+		err = componentFile.Write(writer, stack)
 		if err != nil {
 			return err
 		}

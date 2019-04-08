@@ -17,7 +17,7 @@ func TestEvalString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Hello ", "Joe"})
+	checkParsing(t, processed, emptyContext, []string{"Hello ", "Joe"})
 }
 
 func TestEvalArray(t *testing.T) {
@@ -28,7 +28,7 @@ func TestEvalArray(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Numbers: ", "[1 2 3 4]"})
+	checkParsing(t, processed, emptyContext, []string{"Numbers: ", "[1 2 3 4]"})
 }
 
 func TestEvalDate(t *testing.T) {
@@ -39,7 +39,7 @@ func TestEvalDate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Time: ", "23 Nov 2017, 10:12 PM"})
+	checkParsing(t, processed, emptyContext, []string{"Time: ", "23 Nov 2017, 10:12 PM"})
 }
 
 func TestEvalDateCustom(t *testing.T) {
@@ -50,7 +50,7 @@ func TestEvalDateCustom(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"Time: ", "22:12:21 on 23 November 2017"})
+	checkParsing(t, processed, emptyContext, []string{"Time: ", "22:12:21 on 23 November 2017"})
 }
 
 func TestEvalDateOfFileUpdate(t *testing.T) {
@@ -72,7 +72,7 @@ func TestEvalDateOfFileUpdate(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["examplePath"] = &expression.Path{Value: "other.file", LastUpdated: update}
 
-	checkParsing(t, files, processed, expectedCtx, []string{"File updated on ", "", "08:30:00 on 19 December 1992"})
+	checkParsing(t, processed, expectedCtx, []string{"File updated on ", "", "08:30:00 on 19 December 1992"})
 }
 
 func TestEvalArithmetic(t *testing.T) {
@@ -83,7 +83,7 @@ func TestEvalArithmetic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
+	checkParsing(t, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
 }
 
 func TestEvalNonExistingParameter(t *testing.T) {
@@ -94,7 +94,7 @@ func TestEvalNonExistingParameter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, emptyFilesMap, processed, emptyContext, []string{"{{ eval 2 * a }}"})
+	checkParsing(t, processed, emptyContext, []string{"{{ eval 2 * a }}"})
 }
 
 func TestEvalWithExistingParameter(t *testing.T) {
@@ -111,7 +111,7 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, files, processed, expectedCtx, []string{"<p>6</p>\n"})
+	checkParsing(t, processed, expectedCtx, []string{"<p>6</p>\n"})
 }
 
 func TestEvalWithOrExprParameterExists(t *testing.T) {
@@ -128,7 +128,7 @@ func TestEvalWithOrExprParameterExists(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, files, processed, expectedCtx, []string{"<p>3</p>\n"})
+	checkParsing(t, processed, expectedCtx, []string{"<p>3</p>\n"})
 }
 
 func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
@@ -144,7 +144,7 @@ func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, files, processed, expectedCtx, []string{"<p>100</p>\n"})
+	checkParsing(t, processed, expectedCtx, []string{"<p>100</p>\n"})
 }
 
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
@@ -171,7 +171,7 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)
 
-	checkParsing(t, *resolver.Files, otherProcessed, expectedCtx, []string{
+	checkParsing(t, otherProcessed, expectedCtx, []string{
 		"OUTER\n",
 		"",
 		"A = 14",

@@ -74,11 +74,9 @@ type ContentContainer interface {
 type Content interface {
 	// Write contents using the given writer.
 	//
-	// The files argument contains all parsed source files.
-	//
 	// The stack contains context in which local data can be stored.
 	// Each implementation of Content that starts a new scope must push a new item onto the stack.
-	Write(writer io.Writer, files WebFilesMap, stack ContextStack) error
+	Write(writer io.Writer, stack ContextStack) error
 }
 
 // CanResolvePath indicates a Content that is capable of resolving the path of a file based on its own Location
