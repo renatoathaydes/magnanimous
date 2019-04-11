@@ -23,10 +23,11 @@ type WebFilesMap struct {
 
 // WebFile is a parsed source file.
 type WebFile struct {
-	BasePath    string
-	Name        string
-	Processed   *ProcessedFile
-	NonWritable bool
+	BasePath       string
+	Name           string
+	Processed      *ProcessedFile
+	NonWritable    bool
+	SkipIfUpToDate bool
 }
 
 // Location is used to show where in the source code errors or warning messages originate.

@@ -136,12 +136,24 @@ func (mag *Magnanimous) WriteTo(dir string, filesMap WebFilesMap) error {
 }
 
 func writeFile(file, targetFile string, wf WebFile, stack ContextStack) error {
-	log.Printf("Creating file %s from %s", targetFile, file)
 	stack = stack.Push(nil, true)
 	err := os.MkdirAll(filepath.Dir(targetFile), 0770)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
 	}
+
+	if wf.SkipIfUpToDate {
+		upToDate, err := isUpToDate(&wf, targetFile)
+		if err != nil {
+			return err
+		}
+		if upToDate {
+			log.Printf("Skipping file %s as it has not been updated since last run.", targetFile)
+			return nil
+		}
+	}
+
+	log.Printf("Creating file %s from %s", targetFile, file)
 	f, err := os.Create(targetFile)
 	if err != nil {
 		return &MagnanimousError{Code: IOError, message: err.Error()}
@@ -170,6 +182,17 @@ func writeContents(cc ContentContainer, writer io.Writer, stack ContextStack) er
 		}
 	}
 	return nil
+}
+
+func isUpToDate(wf *WebFile, targetFile string) (bool, error) {
+	stat, err := os.Stat(targetFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, &MagnanimousError{Code: IOError, message: err.Error()}
+	}
+	return stat.ModTime().After(wf.Processed.LastUpdated), nil
 }
 
 func inclusionChainToString(inclusionChain []Location) string {
