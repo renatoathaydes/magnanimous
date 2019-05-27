@@ -48,6 +48,8 @@ func main() {
 func parseOptions() (rootDir, globalContext *string, ok bool) {
 	globalContext = flag.String("globalctx", "",
 		"Path to the global context file relative to the 'processed' directory.")
+	style := flag.String("style", "lovelace",
+		"Style name for code highlighting. See https://xyproto.github.io/splash/docs/all.html.")
 
 	help := flag.Bool("help", false, "Print usage help.")
 
@@ -58,6 +60,8 @@ func parseOptions() (rootDir, globalContext *string, ok bool) {
 	}
 
 	flag.Parse()
+
+	mg.SetCodeStyle(*style)
 
 	otherArgs := flag.Args()
 

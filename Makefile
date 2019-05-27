@@ -23,7 +23,7 @@ install:
 # builds the website for local deployment
 .PHONY: website
 website: install
-	magnanimous -globalctx=_local_global_context website
+	magnanimous -style=lovelace -globalctx=_local_global_context website
 
 # builds the website for GitHub deployment
 .PHONY: website-github

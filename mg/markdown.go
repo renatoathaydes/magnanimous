@@ -18,6 +18,12 @@ var _ Content = (*HtmlFromMarkdownContent)(nil)
 
 var mdStyle = bfchroma.Style("lovelace")
 
+// SetCodeStyle sets the code style used to highlight source code.
+// See https://xyproto.github.io/splash/docs/all.html for the supported styles.
+func SetCodeStyle(style string) {
+	mdStyle = bfchroma.Style(style)
+}
+
 // MarkdownToHtml wraps the contents of a [ProcessedFile] so that it will be converted from markdown
 // to HTML on write.
 func MarkdownToHtml(file ProcessedFile) ProcessedFile {
