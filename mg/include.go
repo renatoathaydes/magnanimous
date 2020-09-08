@@ -11,10 +11,11 @@ type IncludeInstruction struct {
 	Path     string
 	Origin   *Location
 	Resolver FileResolver
+	AsHTML   bool
 }
 
-func NewIncludeInstruction(arg string, location *Location, original string, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Text: original, Path: arg, Origin: location, Resolver: resolver}
+func NewIncludeInstruction(arg string, location *Location, original string, resolver FileResolver, asHTML bool) *IncludeInstruction {
+	return &IncludeInstruction{Text: original, Path: arg, Origin: location, Resolver: resolver, AsHTML: asHTML}
 }
 
 func (inc *IncludeInstruction) String() string {

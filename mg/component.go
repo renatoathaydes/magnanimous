@@ -11,6 +11,7 @@ type Component struct {
 	Text     string
 	resolver FileResolver
 	contents []Content
+	AsHTML   bool
 }
 
 var _ Content = (*Component)(nil)
@@ -24,12 +25,13 @@ func (c *Component) GetContents() []Content {
 	return c.contents
 }
 
-func NewComponentInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
+func NewComponentInstruction(arg string, location *Location, original string, resolver FileResolver, asHTML bool) Content {
 	return &Component{
 		Path:     arg,
 		Location: location,
 		Text:     original,
 		resolver: resolver,
+		AsHTML:   asHTML,
 	}
 }
 

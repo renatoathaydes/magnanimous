@@ -114,7 +114,9 @@ func createInstruction(name, arg string, location *Location,
 	original string, resolver FileResolver) Content {
 	switch strings.TrimSpace(name) {
 	case "include":
-		return NewIncludeInstruction(arg, location, original, resolver)
+		return NewIncludeInstruction(arg, location, original, resolver, false)
+	case "includeHTML":
+		return NewIncludeInstruction(arg, location, original, resolver, true)
 	case "includeB64":
 		return NewIncludeB64Instruction(arg, location, original, resolver)
 	case "define":
@@ -128,7 +130,9 @@ func createInstruction(name, arg string, location *Location,
 	case "doc":
 		return nil
 	case "component":
-		return NewComponentInstruction(arg, location, original, resolver)
+		return NewComponentInstruction(arg, location, original, resolver, false)
+	case "componentHTML":
+		return NewComponentInstruction(arg, location, original, resolver, true)
 	case "slot":
 		return NewSlotInstruction(arg, location, original, resolver)
 	}

@@ -97,6 +97,7 @@ My blog posts:</p>
 
 <li><p>05 July 2018 - One more blog post</p></li>
 </ul>
+
 <h4>the footer</h4>
 `)
 
@@ -116,7 +117,10 @@ My blog posts:</p>
 		`<link rel="stylesheet" href="/style.css"><h2>Post 2</h2>
 
 <p>Short one.</p>
-<div class="comp"><h3>this is markdown</h3>
+
+<div class="comp">
+<h3>this is markdown</h3>
+
 </div>
 `)
 
@@ -181,7 +185,9 @@ My blog posts:</p>
 <body><h2>Post 1</h2>
 
 <p>Hello.</p>
+
 <blockquote>Note: This is a note.</blockquote>
+
 <p>Bye.</p>
 <h4>the footer</h4>
 </body>

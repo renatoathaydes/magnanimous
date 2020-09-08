@@ -1,9 +1,10 @@
 package mg
 
 import (
+	"io"
+
 	"github.com/Depado/bfchroma"
 	"gopkg.in/russross/blackfriday.v2"
-	"io"
 )
 
 // HtmlFromMarkdownContent wraps its contents so that it can convert that to HTML on write.
@@ -36,29 +37,36 @@ func MarkdownToHtml(file ProcessedFile) ProcessedFile {
 }
 
 func (f *HtmlFromMarkdownContent) Write(writer io.Writer, stack ContextStack) error {
-	// accumulate all contents that do not include another file, then writeAsHtmlAndReset it...
-	// inclusions are written as they are, without translation from markdown to html.
-	var nonIncludedContent []Content
+	// accumulate all markdown content until pure HTML content is found, then writeAsHtmlAndReset it...
+	var markdownContent []Content
 	var err error
 
 	for _, c := range f.MarkDownContent {
-		switch c.(type) {
+		switch v := c.(type) {
 		case *IncludeInstruction:
-			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, stack)
-			if err != nil {
-				return err
+			if v.AsHTML {
+				markdownContent, err = writeAsHtmlAndReset(markdownContent, writer, c, stack)
+				if err != nil {
+					return err
+				}
+			} else {
+				markdownContent = append(markdownContent, c)
 			}
 		case *Component:
-			nonIncludedContent, err = writeAsHtmlAndReset(nonIncludedContent, writer, c, stack)
-			if err != nil {
-				return err
+			if v.AsHTML {
+				markdownContent, err = writeAsHtmlAndReset(markdownContent, writer, c, stack)
+				if err != nil {
+					return err
+				}
+			} else {
+				markdownContent = append(markdownContent, c)
 			}
 		default:
-			nonIncludedContent = append(nonIncludedContent, c)
+			markdownContent = append(markdownContent, c)
 		}
 	}
 
-	err = writeAsHtml(nonIncludedContent, writer, stack)
+	err = writeAsHtml(markdownContent, writer, stack)
 	return err
 }
 
@@ -71,15 +79,15 @@ func unwrapMarkdownContent(f *ProcessedFile) ([]Content, bool) {
 	return nil, false
 }
 
-func writeAsHtmlAndReset(markdownContents []Content, writer io.Writer, includedContent Content,
+func writeAsHtmlAndReset(markdownContents []Content, writer io.Writer, htmlContent Content,
 	stack ContextStack) ([]Content, error) {
 	// write markdownContents, converting it to html
 	err := writeAsHtml(markdownContents, writer, stack)
 	if err != nil {
 		return nil, err
 	}
-	// write includedContent as it is, returning nil (or empty array) to "reset" the markdown contents slice
-	return nil, includedContent.Write(writer, stack)
+	// write htmlContent as it is, returning nil (or empty array) to "reset" the markdown contents slice
+	return nil, htmlContent.Write(writer, stack)
 }
 
 func writeAsHtml(c []Content, writer io.Writer, stack ContextStack) error {

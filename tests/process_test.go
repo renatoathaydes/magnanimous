@@ -75,10 +75,10 @@ func TestMarkdownToHtml(t *testing.T) {
 
 	loc := mg.Location{}
 	file := mg.ProcessedFile{Path: "test_file"}
-	file.AppendContent(mg.NewIncludeInstruction("header.html", &loc, "", &rsvr))
+	file.AppendContent(mg.NewIncludeInstruction("header.html", &loc, "", &rsvr, true))
 	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
 	file.AppendContent(&mg.StringContent{Text: "## Mag"})
-	file.AppendContent(mg.NewIncludeInstruction("footer.html", &loc, "", &rsvr))
+	file.AppendContent(mg.NewIncludeInstruction("footer.html", &loc, "", &rsvr, true))
 
 	html := mg.MarkdownToHtml(file)
 
@@ -115,7 +115,7 @@ func TestProcessIncludeMarkDown(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"<h1>hello</h1>\n<h2>header</h2>\n"})
+	checkParsing(t, processed, emptyContext, []string{"<h1>hello</h1>\n\n<h2>header</h2>\n"})
 }
 
 func TestProcessIgnoreEscapedBrackets(t *testing.T) {
