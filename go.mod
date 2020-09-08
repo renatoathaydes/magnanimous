@@ -1,5 +1,7 @@
 module github.com/renatoathaydes/magnanimous
 
+go 1.15
+
 require (
 	github.com/Depado/bfchroma v1.1.1
 	github.com/alecthomas/chroma v0.6.3 // indirect
