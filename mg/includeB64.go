@@ -1,27 +1,28 @@
 package mg
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
 	"log"
 )
 
-type IncludeInstruction struct {
+type IncludeB64Instruction struct {
 	Text     string
 	Path     string
 	Origin   *Location
 	Resolver FileResolver
 }
 
-func NewIncludeInstruction(arg string, location *Location, original string, resolver FileResolver) *IncludeInstruction {
-	return &IncludeInstruction{Text: original, Path: arg, Origin: location, Resolver: resolver}
+func NewIncludeB64Instruction(arg string, location *Location, original string, resolver FileResolver) *IncludeB64Instruction {
+	return &IncludeB64Instruction{Text: original, Path: arg, Origin: location, Resolver: resolver}
 }
 
-func (inc *IncludeInstruction) String() string {
-	return fmt.Sprintf("IncludeInstruction{%s, %v, %v}", inc.Path, inc.Origin, inc.Resolver)
+func (inc *IncludeB64Instruction) String() string {
+	return fmt.Sprintf("IncludeB64Instruction{%s, %v, %v}", inc.Path, inc.Origin, inc.Resolver)
 }
 
-func (inc *IncludeInstruction) Write(writer io.Writer, stack ContextStack) error {
+func (inc *IncludeB64Instruction) Write(writer io.Writer, stack ContextStack) error {
 	params := magParams{stack: stack, location: inc.Origin, fileResolver: inc.Resolver}
 	maybePath := pathOrEval(inc.Path, &params)
 	var actualPath string
@@ -48,10 +49,21 @@ func (inc *IncludeInstruction) Write(writer io.Writer, stack ContextStack) error
 		if err != nil {
 			return err
 		}
-		err = webFile.Write(writer, stack)
+		err = writeb64(webFile, writer, stack)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func writeb64(webFile *WebFile, writer io.Writer, stack ContextStack) error {
+	bytes, err := asBytes(webFile.Processed.GetContents(), stack)
+	if err != nil {
+		return err
+	}
+	encoder := base64.NewEncoder(base64.StdEncoding, writer)
+	defer encoder.Close()
+	_, err = encoder.Write(bytes)
+	return err
 }

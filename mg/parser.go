@@ -115,6 +115,8 @@ func createInstruction(name, arg string, location *Location,
 	switch strings.TrimSpace(name) {
 	case "include":
 		return NewIncludeInstruction(arg, location, original, resolver)
+	case "includeB64":
+		return NewIncludeB64Instruction(arg, location, original, resolver)
 	case "define":
 		return NewDefineInstruction(arg, location, original, resolver)
 	case "eval":
