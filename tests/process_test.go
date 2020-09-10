@@ -75,10 +75,10 @@ func TestMarkdownToHtml(t *testing.T) {
 
 	loc := mg.Location{}
 	file := mg.ProcessedFile{Path: "test_file"}
-	file.AppendContent(mg.NewIncludeInstruction("header.html", &loc, "", &rsvr, true))
+	file.AppendContent(mg.NewIncludeInstruction("header.html", &loc, "", &rsvr))
 	file.AppendContent(&mg.StringContent{Text: "# Hello\n"})
 	file.AppendContent(&mg.StringContent{Text: "## Mag"})
-	file.AppendContent(mg.NewIncludeInstruction("footer.html", &loc, "", &rsvr, true))
+	file.AppendContent(mg.NewIncludeInstruction("footer.html", &loc, "", &rsvr))
 
 	html := mg.MarkdownToHtml(file)
 

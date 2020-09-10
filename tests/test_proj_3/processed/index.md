@@ -1,4 +1,4 @@
-{{ includeHTML _header.html }}
+{{ include _header.html }}
 # Welcome
 <div class ="interessant">This is a website.</div>
 My blog posts:
