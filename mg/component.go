@@ -59,7 +59,7 @@ func (c *Component) Write(writer io.Writer, stack ContextStack) error {
 			return &MagnanimousError{Code: IOError, message: err.Error()}
 		}
 	} else {
-		stack = stack.Push(c.Location, false)
+		stack = stack.Push(c.Location, true)
 		err := detectCycle(stack, actualPath, componentFile.Processed.Path, c.Location)
 		if err != nil {
 			return err
