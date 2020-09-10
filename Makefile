@@ -33,8 +33,8 @@ website-github: install
 # serve the website locally
 .PHONY: serve
 serve: website
-	go get -u github.com/vwochnik/gost
-	gost website/target
+	go get -u github.com/m3ng9i/ran
+	ran -r website/target
 
 # deploy to GitHub
 .PHONY: deploy
