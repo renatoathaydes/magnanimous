@@ -8,7 +8,7 @@ install:
 - env GO111MODULE=on go get -u
 repo: renatoathaydes/magnanimous
 before_deploy:
-  - make release
+  - env GO111MODULE=on make release
 deploy:
   provider: releases
   api_key:
