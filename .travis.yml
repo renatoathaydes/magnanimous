@@ -3,12 +3,12 @@ sudo: false
 notifications:
   email: false
 go:
-- 1.11.x
+- 1.15.x
 install:
-- env GO111MODULE=on go get -u
+- go get -u
 repo: renatoathaydes/magnanimous
 before_deploy:
-  - env GO111MODULE=on make release
+  - make release
 deploy:
   provider: releases
   api_key:
