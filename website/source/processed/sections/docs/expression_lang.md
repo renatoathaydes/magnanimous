@@ -23,26 +23,26 @@ Only a single instruction may be present within double-braces (i.e. between `\{{
 
 Here's a list of all Magnanimous instructions:
 
-* [`define`](#define)        - defines a variable. Its value is given by an [expression](#expressions).
-* [`eval`](#eval)            - evaluates an [expression](#expressions) and inserts the result into the current position.
-* [`include`](#include)      - includes another file into the current position.
-* [`component`](#component)  - includes a [Component](components.html) into the current position.
-* [`slot`](#slot)            - defines a variable whose content is the body of the instruction.
-* [`if`](#if)                - conditionally includes some content into the current position.
-* [`for`](#for)              - repeats some content for each item in an [iterable](#iterables).
-* [`doc`](#doc)              - allows documentation to be added to sources (not included in the resource).
-* [`end`](#end)              - ends a scoped instruction (`component`, `slot`, `if` and `for`).
+* [`define`](#define)         - defines a variable. Its value is given by an [expression](#expressions).
+* [`eval`](#eval)             - evaluates an [expression](#expressions) and inserts the result into the current position.
+* [`include`](#include)       - includes contents of another file into the current position.
+* [`includeB64`](#includeB64) - includes base64-encoded contents of file into the current position.
+* [`component`](#component)   - includes a [Component](components.html) into the current position.
+* [`slot`](#slot)             - defines a variable whose content is the body of the instruction.
+* [`if`](#if)                 - conditionally includes some content into the current position.
+* [`for`](#for)               - repeats some content for each item in an [iterable](#iterables).
+* [`doc`](#doc)               - allows documentation to be added to sources (not included in the resource).
+* [`end`](#end)               - ends a scoped instruction (`component`, `slot`, `if` and `for`).
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "instructions" }}\
-Instructions
+{{ define text "Instructions" }}\
 {{ end }}
 
 In this section, we'll see details about every available instruction in Magnanimous, and how to use them.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "define" }}{{ define tag "h3" }}\
-define
 {{ end }}
 
 #### Syntax:
@@ -80,7 +80,6 @@ See [Expressions](#expressions) for more details about the kind of expressions y
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "eval" }}{{ define tag "h3" }}\
-eval
 {{ end }}
 
 #### Syntax:
@@ -129,7 +128,6 @@ Many people love \{{ eval title }} because it is so great!
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "include" }}{{ define tag "h3" }}\
-include
 {{ end }}
 
 #### Syntax:
@@ -175,8 +173,32 @@ Up-path example: `.../_header.html`
 See [Paths and Links](paths.html) for more details.
 
 {{ component /processed/components/_linked_header.html }}\
+{{ define id "includeB64" }}{{ define tag "h3" }}\
+{{ end }}
+
+#### Syntax:
+
+```
+\{{ includeB64 <path> }}
+```
+
+_where:_
+
+* `path` is a [path](paths.html) to another file.
+
+The `includeB64` statement is used to include the [base64](https://wikipedia.org/wiki/Base64)-encoded contents of a file into another file.
+
+Example:
+
+```html
+<!-- include a gif file encoded as a data URL -->
+<img src="data:image/gif;base64,\{{ includeB64 path/to/file.gif }}">
+```
+
+See the [include](#include) documentation for more information about paths that may be used.
+
+{{ component /processed/components/_linked_header.html }}\
 {{ define id "component" }}{{ define tag "h3" }}\
-component
 {{ end }}
 
 #### Syntax:
@@ -221,7 +243,6 @@ See [Components](components.html) for more details about using components.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "slot" }}{{ define tag "h3" }}\
-slot
 {{ end }}
 
 #### Syntax:
@@ -248,7 +269,6 @@ explained in more detail in the [Components](components.html) page.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "if" }}{{ define tag "h3" }}\
-if
 {{ end }}
 
 #### Syntax:
@@ -274,7 +294,6 @@ For example, you may want to include a certain CSS class on an element only if i
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "for" }}{{ define tag "h3" }}\
-for
 {{ end }}
 
 #### Syntax:
@@ -294,7 +313,7 @@ _where:_
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "for-instructions" }}{{ define tag "h4" }}\
-for sub-instructions
+{{ define text "for sub-instructions" }}\
 {{ end }}
 
 * `sort`            - sort the elements alphabetically.
@@ -341,7 +360,6 @@ See [Iterables](#iterables) for details about what iterable types can be used wi
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "doc" }}{{ define tag "h3" }}\
-doc
 {{ end }}
 
 #### Syntax:
@@ -362,7 +380,6 @@ be set for a [Component](components.html), for example.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "end" }}{{ define tag "h3" }}\
-end
 {{ end }}
 
 #### Syntax:
@@ -391,7 +408,7 @@ Each `end` instruction always matches the nearest unclosed scoped instruction.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "expressions" }}\
-Expressions
+{{ define text "Expressions" }}\
 {{ end }}
 
 Magnanimous expressions use a syntax that's similar to C-like languages, including Java, JavaScript and Go.
@@ -433,7 +450,7 @@ The names of the variables must be valid _identifiers_, as we'll see below.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "identifiers" }}{{ define tag "h3" }}\
-Identifiers
+{{ define text "Identifiers" }}\
 {{ end }}
 
 _Identifiers_ are used to name variables declared with the [define](#define) instruction.
@@ -456,7 +473,7 @@ CONSTANT_1
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "operators" }}{{ define tag "h3" }}\
-Operators
+{{ define text "Operators" }}\
 {{ end }}
 
 As shown above, expressions may comprise identifiers, numbers, Strings and also operators.
@@ -539,7 +556,7 @@ To make things clearer, here are a few examples:
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "iterables" }}\
-Iterables
+{{ define text "Iterables" }}\
 {{ end }}
 
 Iterables are collections of values which can be used with the [for](#for) instruction.

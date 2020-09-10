@@ -13,7 +13,7 @@ To avoid repeating the same code all over the place, you can use Magnanimous com
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "creating-and-using-component" }}\
-Creating and using a component
+{{ define text "Creating and using a component" }}\
 {{ end }}
 
 A component should normally be declared in a non-writable file (i.e. its name starts with underscore, as in `_example`)
@@ -66,7 +66,7 @@ Which should render like this:
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "customizing-components-with-variables" }}\
-Customizing components with variables
+{{ define text "Customizing components with variables" }}\
 {{ end }}
 
 Components allow the user to declare variables that customize its contents. The variables may be declared before the
@@ -119,7 +119,7 @@ Result:
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "customizing-components-with-slots" }}\
-Customizing components with slots
+{{ define text "Customizing components with slots" }}\
 {{ end }}
 
 `slot`s make components extremely powerful! They allow the creation of very modular components because the parts
@@ -189,7 +189,7 @@ Result:
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "advanced-example" }}\
-A more advanced example
+{{ define text "A more advanced example" }}\
 {{ end }}
 
 To really understand what can be achieved with components, let's look at a more advanced example.

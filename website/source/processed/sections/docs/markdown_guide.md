@@ -13,7 +13,7 @@ to make writing your website easier.
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "technologies" }}\
-Technologies used
+{{ define text "Technologies used" }}\
 {{ end }}
 
 The conversion markdown-HTML is done via a [Go](https://golang.org/) library called
@@ -25,7 +25,7 @@ Source code within markdown (content found between 3 back-ticks) is color-highli
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "why" }}\
-Why write markdown
+{{ define text "Why write markdown" }}\
 {{ end }}
 
 Markdown is much easier to write by hand than HTML, especially if the content being created is mostly composed of
@@ -64,7 +64,7 @@ which briefly describes all you'll need to know!
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "full-html-pages" }}\
-Writing full HTML pages via markdown
+{{ define text "Writing full HTML pages via markdown" }}\
 {{ end }}
 
 Magnanimous, in order to stay simple and easy to learn, does not do anything very "magical"!
@@ -155,7 +155,7 @@ Finally, running `magnanimous` should result in a valid `index.html` file in the
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "source-code" }}\
-Including source code
+{{ define text "Including source code" }}\
 {{ end }}
 
 Markdown files may contain sample source code which gets automatically highlighted.

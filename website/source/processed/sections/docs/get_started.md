@@ -23,7 +23,7 @@ go get -u github.com/renatoathaydes/magnanimous
 
 {{ component /processed/components/_linked_header.html }}\
 {{ define id "magnanimous-directories" }}\
-Magnanimous directories
+{{ define text "Magnanimous directories" }}\
 {{ end }}
 
 Magnanimous expects you to have a simple directory structure like this:

@@ -8,5 +8,5 @@
 {{define _tag tag || "h2"}}
 <{{eval _tag}} id="{{eval id}}" class="link-header-component">
 <a href="#{{eval id}}"><img src="{{eval baseURL + "/images/link.svg"}}"></a>
-{{eval __contents__}}
+<span>{{ eval text || id }}</span>
 </{{eval _tag}}>
