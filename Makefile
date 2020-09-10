@@ -49,11 +49,11 @@ release-linux:
 	env GOOS=linux env GOARCH=386 go build -ldflags "-s -w" -o releases/magnanimous-linux-386
 
 release-windows:
-	env GOOS=windows env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-windows-amd64
-	env GOOS=windows env GOARCH=386 go build -ldflags "-s -w" -o releases/magnanimous-windows-386
+	env GOOS=windows env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-windows-amd64.exe
+	env GOOS=windows env GOARCH=386 go build -ldflags "-s -w" -o releases/magnanimous-windows-386.exe
 
 release-darwin:
-	env GOOS=darwin env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-amd64	
+	env GOOS=darwin env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-amd64
 
 release: test release-linux release-windows release-darwin
 
