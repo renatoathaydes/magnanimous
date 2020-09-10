@@ -1,10 +1,11 @@
 package mg
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/Depado/bfchroma"
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/russross/blackfriday/v2"
 )
 
 // HtmlFromMarkdownContent wraps its contents so that it can convert that to HTML on write.
@@ -41,25 +42,27 @@ func (f *HtmlFromMarkdownContent) Write(writer io.Writer, stack ContextStack) er
 	var markdownContent []Content
 	var err error
 
+	write := func(path string, c Content) error {
+		if isMd(path) {
+			markdownContent = append(markdownContent, c)
+		} else {
+			markdownContent, err = writeAsHtmlAndReset(markdownContent, writer, c, stack)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	for _, c := range f.MarkDownContent {
 		switch v := c.(type) {
 		case *IncludeInstruction:
-			if v.AsHTML {
-				markdownContent, err = writeAsHtmlAndReset(markdownContent, writer, c, stack)
-				if err != nil {
-					return err
-				}
-			} else {
-				markdownContent = append(markdownContent, c)
+			if err = write(v.Path, c); err != nil {
+				return err
 			}
 		case *Component:
-			if v.AsHTML {
-				markdownContent, err = writeAsHtmlAndReset(markdownContent, writer, c, stack)
-				if err != nil {
-					return err
-				}
-			} else {
-				markdownContent = append(markdownContent, c)
+			if err = write(v.Path, c); err != nil {
+				return err
 			}
 		default:
 			markdownContent = append(markdownContent, c)
@@ -95,6 +98,7 @@ func writeAsHtml(c []Content, writer io.Writer, stack ContextStack) error {
 		return nil
 	}
 	mdBytes, err := asBytes(c, stack)
+	fmt.Printf("------- MARKDOWN -------\n%s\n---------------------\n", string(mdBytes))
 
 	var chromaRenderer = blackfriday.WithRenderer(
 		bfchroma.NewRenderer(bfchroma.WithoutAutodetect(), mdStyle))

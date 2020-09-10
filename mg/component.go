@@ -18,11 +18,15 @@ var _ Content = (*Component)(nil)
 var _ ContentContainer = (*Component)(nil)
 
 func (c *Component) AppendContent(content Content) {
-	c.contents = append(c.contents, content)
+	c.contents = append(c.GetContents(), content)
 }
 
 func (c *Component) GetContents() []Content {
-	return c.contents
+	if isMd(c.Location.Origin) {
+		return []Content{&HtmlFromMarkdownContent{MarkDownContent: c.contents}}
+	} else {
+		return c.contents
+	}
 }
 
 func NewComponentInstruction(arg string, location *Location, original string, resolver FileResolver, asHTML bool) Content {

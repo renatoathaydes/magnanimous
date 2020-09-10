@@ -315,7 +315,16 @@ func TestProj6(t *testing.T) {
 
 	assertFileContents(t, files, dir, "index.html", `<h2>Simple Component Example</h2>
 <div class="wrapper">
-    Hello components
+    <p>Hello components</p>
+
+</div><h2>HTML Component with Markdown contents</h2>
+<div class="wrapper">
+    <p>Bar</p>
+
+<h3>inner markdown</h3>
+
+<p>Foo</p>
+
 </div>`)
 
 	assertFileContents(t, files, dir, "example/properties.html", `<div>Component example</div>
