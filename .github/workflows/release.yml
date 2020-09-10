@@ -25,7 +25,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload Mac Asset
-        id: upload-release-asset 
+        id: upload-mac-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,7 +34,43 @@ jobs:
           asset_path: ./releases/magnanimous-darwin-amd64
           asset_name: magnanimous-darwin-amd64
           asset_content_type: application/octet-stream
-    # - releases/magnanimous-linux-amd64
-    # - releases/magnanimous-linux-386
-    # - releases/magnanimous-windows-amd64
-    # - releases/magnanimous-windows-386
+      - name: Upload Linux AMD64 Asset
+        id: upload-linux-amd64-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/magnanimous-linux-amd64
+          asset_name: magnanimous-linux-amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Linux 386 Asset
+        id: upload-linux-386-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/magnanimous-linux-386
+          asset_name: magnanimous-linux-386
+          asset_content_type: application/octet-stream
+      - name: Upload Windows AMD64 Asset
+        id: upload-windows-amd64-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/magnanimous-windows-amd64.exe
+          asset_name: magnanimous-windows-amd64.exe
+          asset_content_type: application/octet-stream
+      - name: Upload Windows 386 Asset
+        id: upload-windows-386-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/magnanimous-windows-386
+          asset_name: magnanimous-windows-386.exe
+          asset_content_type: application/octet-stream
