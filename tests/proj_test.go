@@ -117,7 +117,6 @@ My blog posts:</p>
 		`<link rel="stylesheet" href="/style.css"><h2>Post 2</h2>
 
 <p>Short one.</p>
-
 <div class="comp">
 <h3>this is markdown</h3>
 
@@ -185,9 +184,7 @@ My blog posts:</p>
 <body><h2>Post 1</h2>
 
 <p>Hello.</p>
-
 <blockquote>Note: This is a note.</blockquote>
-
 <p>Bye.</p>
 <h4>the footer</h4>
 </body>

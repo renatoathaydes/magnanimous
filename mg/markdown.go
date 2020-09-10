@@ -1,7 +1,6 @@
 package mg
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/Depado/bfchroma"
@@ -97,8 +96,8 @@ func writeAsHtml(c []Content, writer io.Writer, stack ContextStack) error {
 	if len(c) == 0 {
 		return nil
 	}
+
 	mdBytes, err := asBytes(c, stack)
-	fmt.Printf("------- MARKDOWN -------\n%s\n---------------------\n", string(mdBytes))
 
 	var chromaRenderer = blackfriday.WithRenderer(
 		bfchroma.NewRenderer(bfchroma.WithoutAutodetect(), mdStyle))
