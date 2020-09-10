@@ -5,7 +5,7 @@ notifications:
 go:
 - 1.11.x
 install:
-- go get -u
+- env GO111MODULE=on go get -u
 repo: renatoathaydes/magnanimous
 before_deploy:
   - make release
