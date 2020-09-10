@@ -26,8 +26,7 @@ to make writing your website easier.</p>
 <div style="height: 1em;"></div>
 <h2 id="technologies" class="link-header-component">
 <a href="#technologies"><img src="/magnanimous/images/link.svg"></a>
-Technologies used
-
+<span>Technologies used</span>
 </h2>
 <p>The conversion markdown-HTML is done via a <a href="https://golang.org/">Go</a> library called
 <a href="https://github.com/russross/blackfriday">Blackfriday</a>.</p>
@@ -38,8 +37,7 @@ Technologies used
 <div style="height: 1em;"></div>
 <h2 id="why" class="link-header-component">
 <a href="#why"><img src="/magnanimous/images/link.svg"></a>
-Why write markdown
-
+<span>Why write markdown</span>
 </h2>
 <p>Markdown is much easier to write by hand than HTML, especially if the content being created is mostly composed of
 text, images and a simple layout.</p>
@@ -61,15 +59,14 @@ This is a [<span style="color:#2838b0">link</span>](<span style="color:#388038">
 <p>And in case you want to control exactly the layout of the content, you can just embed HTML into markdown!</p>
 <pre style="background-color:#fff"><span style="color:#444">## Example with HTML in Markdown
 </span><span style="color:#444"></span>
-&lt;div class=&#34;float-top-right&#34;&gt;HTML can be embedded inside markdown!&lt;/div&gt;
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;float-top-right&#34;</span><span style="color:#888">&gt;</span>HTML can be embedded inside markdown!<span style="color:#888">&lt;/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </pre>
 <p>To learn more about markdown, check out the <a href="https://guides.github.com/features/mastering-markdown/">GitHub Guide</a>
 which briefly describes all you&rsquo;ll need to know!</p>
 <div style="height: 1em;"></div>
 <h2 id="full-html-pages" class="link-header-component">
 <a href="#full-html-pages"><img src="/magnanimous/images/link.svg"></a>
-Writing full HTML pages via markdown
-
+<span>Writing full HTML pages via markdown</span>
 </h2>
 <p>Magnanimous, in order to stay simple and easy to learn, does not do anything very &ldquo;magical&rdquo;!</p>
 
@@ -143,17 +140,16 @@ Check the <a href="components.html">Components</a> chapter to learn more about t
 </pre><div style="height: 1em;"></div>
 <h2 id="source-code" class="link-header-component">
 <a href="#source-code"><img src="/magnanimous/images/link.svg"></a>
-Including source code
-
+<span>Including source code</span>
 </h2>
 <p>Markdown files may contain sample source code which gets automatically highlighted.</p>
 
 <p>To use that, wrap the code sample within three back-ticks, with the name of the language right after the first ticks,
 as in this example:</p>
-<pre style="background-color:#fff"><span style="color:#b83838">```</span><span style="color:#b83838">java</span><span style="color:#b83838">
+<pre style="background-color:#fff"><span style="color:#b83838">```java
 </span><span style="color:#b83838"></span><span style="color:#2838b0;font-style:italic">class</span> <span style="color:#287088">Main</span> <span style="color:#666">{</span>
-  <span style="color:#2838b0;font-style:italic">public</span> <span style="color:#2838b0;font-style:italic">static</span> <span style="color:#2838b0;font-style:italic">void</span> <span style="color:#785840">main</span><span style="color:#666">(</span>String<span style="color:#666">[</span><span style="color:#666">]</span> args<span style="color:#666">)</span> <span style="color:#666">{</span>
-    System<span style="color:#666">.</span><span style="color:#388038">out</span><span style="color:#666">.</span><span style="color:#388038">println</span><span style="color:#666">(</span><span style="color:#b83838">&#34;Hello world&#34;</span><span style="color:#666">)</span><span style="color:#666">;</span>
+  <span style="color:#2838b0;font-style:italic">public</span> <span style="color:#2838b0;font-style:italic">static</span> <span style="color:#2838b0;font-style:italic">void</span> <span style="color:#785840">main</span><span style="color:#666">(</span>String<span style="color:#666">[]</span> args<span style="color:#666">)</span> <span style="color:#666">{</span>
+    System<span style="color:#666">.</span><span style="color:#388038">out</span><span style="color:#666">.</span><span style="color:#388038">println</span><span style="color:#666">(</span><span style="color:#b83838">&#34;Hello world&#34;</span><span style="color:#666">);</span>
   <span style="color:#666">}</span>
 <span style="color:#666">}</span>
 <span style="color:#b83838">```</span>

@@ -36,28 +36,27 @@ directory.</p>
 <p>Here&rsquo;s a list of all Magnanimous instructions:</p>
 
 <ul>
-<li><a href="#define"><code>define</code></a>        - defines a variable. Its value is given by an <a href="#expressions">expression</a>.</li>
-<li><a href="#eval"><code>eval</code></a>            - evaluates an <a href="#expressions">expression</a> and inserts the result into the current position.</li>
-<li><a href="#include"><code>include</code></a>      - includes another file into the current position.</li>
-<li><a href="#component"><code>component</code></a>  - includes a <a href="components.html">Component</a> into the current position.</li>
-<li><a href="#slot"><code>slot</code></a>            - defines a variable whose content is the body of the instruction.</li>
-<li><a href="#if"><code>if</code></a>                - conditionally includes some content into the current position.</li>
-<li><a href="#for"><code>for</code></a>              - repeats some content for each item in an <a href="#iterables">iterable</a>.</li>
-<li><a href="#doc"><code>doc</code></a>              - allows documentation to be added to sources (not included in the resource).</li>
-<li><a href="#end"><code>end</code></a>              - ends a scoped instruction (<code>component</code>, <code>slot</code>, <code>if</code> and <code>for</code>).</li>
+<li><a href="#define"><code>define</code></a>         - defines a variable. Its value is given by an <a href="#expressions">expression</a>.</li>
+<li><a href="#eval"><code>eval</code></a>             - evaluates an <a href="#expressions">expression</a> and inserts the result into the current position.</li>
+<li><a href="#include"><code>include</code></a>       - includes contents of another file into the current position.</li>
+<li><a href="#includeB64"><code>includeB64</code></a> - includes base64-encoded contents of file into the current position.</li>
+<li><a href="#component"><code>component</code></a>   - includes a <a href="components.html">Component</a> into the current position.</li>
+<li><a href="#slot"><code>slot</code></a>             - defines a variable whose content is the body of the instruction.</li>
+<li><a href="#if"><code>if</code></a>                 - conditionally includes some content into the current position.</li>
+<li><a href="#for"><code>for</code></a>               - repeats some content for each item in an <a href="#iterables">iterable</a>.</li>
+<li><a href="#doc"><code>doc</code></a>               - allows documentation to be added to sources (not included in the resource).</li>
+<li><a href="#end"><code>end</code></a>               - ends a scoped instruction (<code>component</code>, <code>slot</code>, <code>if</code> and <code>for</code>).</li>
 </ul>
 <div style="height: 1em;"></div>
 <h2 id="instructions" class="link-header-component">
 <a href="#instructions"><img src="/magnanimous/images/link.svg"></a>
-Instructions
-
+<span>Instructions</span>
 </h2>
 <p>In this section, we&rsquo;ll see details about every available instruction in Magnanimous, and how to use them.</p>
 <div style="height: 1em;"></div>
 <h3 id="define" class="link-header-component">
 <a href="#define"><img src="/magnanimous/images/link.svg"></a>
-define
-
+<span>define</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ define &lt;variable-name&gt; &lt;expression&gt; }}
@@ -87,8 +86,7 @@ used upon evaluation.</p>
 <div style="height: 1em;"></div>
 <h3 id="eval" class="link-header-component">
 <a href="#eval"><img src="/magnanimous/images/link.svg"></a>
-eval
-
+<span>eval</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ eval &lt;expression&gt; }}
@@ -128,8 +126,7 @@ Many people love {{ eval title }} because it is so great!
 <div style="height: 1em;"></div>
 <h3 id="include" class="link-header-component">
 <a href="#include"><img src="/magnanimous/images/link.svg"></a>
-include
-
+<span>include</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ include &lt;path&gt; }}
@@ -166,10 +163,30 @@ up the source tree from the current file being written).</p>
 
 <p>See <a href="paths.html">Paths and Links</a> for more details.</p>
 <div style="height: 1em;"></div>
+<h3 id="includeB64" class="link-header-component">
+<a href="#includeB64"><img src="/magnanimous/images/link.svg"></a>
+<span>includeB64</span>
+</h3>
+<h4>Syntax:</h4>
+<pre style="background-color:#fff">{{ includeB64 &lt;path&gt; }}
+</pre>
+<p><em>where:</em></p>
+
+<ul>
+<li><code>path</code> is a <a href="paths.html">path</a> to another file.</li>
+</ul>
+
+<p>The <code>includeB64</code> statement is used to include the <a href="https://wikipedia.org/wiki/Base64">base64</a>-encoded contents of a file into another file.</p>
+
+<p>Example:</p>
+<pre style="background-color:#fff"><span style="color:#888;font-style:italic">&lt;!--</span><span style="color:#888;font-style:italic"> include a gif file encoded as a data URL </span><span style="color:#888;font-style:italic">--&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">img</span> <span style="color:#388038">src</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data:image/gif;base64,{{ includeB64 path/to/file.gif }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</pre>
+<p>See the <a href="#include">include</a> documentation for more information about paths that may be used.</p>
+<div style="height: 1em;"></div>
 <h3 id="component" class="link-header-component">
 <a href="#component"><img src="/magnanimous/images/link.svg"></a>
-component
-
+<span>component</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ component &lt;path&gt; }}
@@ -206,8 +223,7 @@ Include this in my component.
 <div style="height: 1em;"></div>
 <h3 id="slot" class="link-header-component">
 <a href="#slot"><img src="/magnanimous/images/link.svg"></a>
-slot
-
+<span>slot</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ slot &lt;slot-name&gt; }}
@@ -232,8 +248,7 @@ explained in more detail in the <a href="components.html">Components</a> page.</
 <div style="height: 1em;"></div>
 <h3 id="if" class="link-header-component">
 <a href="#if"><img src="/magnanimous/images/link.svg"></a>
-if
-
+<span>if</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ if &lt;expression&gt; }}
@@ -254,8 +269,7 @@ if
 </pre><div style="height: 1em;"></div>
 <h3 id="for" class="link-header-component">
 <a href="#for"><img src="/magnanimous/images/link.svg"></a>
-for
-
+<span>for</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ for &lt;variable-name&gt; [ (&lt;for-instruction&gt;...) ] &lt;iterable&gt; }}
@@ -273,8 +287,7 @@ for
 <div style="height: 1em;"></div>
 <h4 id="for-instructions" class="link-header-component">
 <a href="#for-instructions"><img src="/magnanimous/images/link.svg"></a>
-for sub-instructions
-
+<span>for sub-instructions</span>
 </h4>
 <ul>
 <li><code>sort</code>            - sort the elements alphabetically.</li>
@@ -313,8 +326,7 @@ If you need to pass in an expression, or just a variable instead of a hardcoded 
 <div style="height: 1em;"></div>
 <h3 id="doc" class="link-header-component">
 <a href="#doc"><img src="/magnanimous/images/link.svg"></a>
-doc
-
+<span>doc</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ doc &lt;text&gt; }}
@@ -333,8 +345,7 @@ be set for a <a href="components.html">Component</a>, for example.</p>
 <div style="height: 1em;"></div>
 <h3 id="end" class="link-header-component">
 <a href="#end"><img src="/magnanimous/images/link.svg"></a>
-end
-
+<span>end</span>
 </h3>
 <h4>Syntax:</h4>
 <pre style="background-color:#fff">{{ end }}
@@ -357,11 +368,10 @@ end
 <p>Each <code>end</code> instruction always matches the nearest unclosed scoped instruction.</p>
 <div style="height: 1em;"></div><hr>
 <div style="height: 1em;"></div>
-<h3 id="expressions" class="link-header-component">
+<h2 id="expressions" class="link-header-component">
 <a href="#expressions"><img src="/magnanimous/images/link.svg"></a>
-Expressions
-
-</h3>
+<span>Expressions</span>
+</h2>
 <p>Magnanimous expressions use a syntax that&rsquo;s similar to C-like languages, including Java, JavaScript and Go.</p>
 
 <p>For example, the following are all valid expressions:</p>
@@ -400,8 +410,7 @@ date<span style="color:#888">[</span><span style="color:#b83838">&#34;2019-03-20
 <div style="height: 1em;"></div>
 <h3 id="identifiers" class="link-header-component">
 <a href="#identifiers"><img src="/magnanimous/images/link.svg"></a>
-Identifiers
-
+<span>Identifiers</span>
 </h3>
 <p><em>Identifiers</em> are used to name variables declared with the <a href="#define">define</a> instruction.</p>
 
@@ -422,8 +431,7 @@ CONSTANT_1
 </pre><div style="height: 1em;"></div>
 <h3 id="operators" class="link-header-component">
 <a href="#operators"><img src="/magnanimous/images/link.svg"></a>
-Operators
-
+<span>Operators</span>
 </h3>
 <p>As shown above, expressions may comprise identifiers, numbers, Strings and also operators.</p>
 
@@ -526,11 +534,10 @@ File path<span style="color:#666">/</span>to<span style="color:#666">/</span>fil
 </tbody>
 </table>
 <div style="height: 1em;"></div>
-<h3 id="iterables" class="link-header-component">
+<h2 id="iterables" class="link-header-component">
 <a href="#iterables"><img src="/magnanimous/images/link.svg"></a>
-Iterables
-
-</h3>
+<span>Iterables</span>
+</h2>
 <p>Iterables are collections of values which can be used with the <a href="#for">for</a> instruction.</p>
 
 <p>They can be of two types:</p>
