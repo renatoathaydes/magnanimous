@@ -2,10 +2,11 @@ package tests
 
 import (
 	"bufio"
-	"github.com/renatoathaydes/magnanimous/mg"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 func TestIncludeFile(t *testing.T) {
@@ -13,14 +14,14 @@ func TestIncludeFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("OUTER\n{{ include /processed/hi.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", "source", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -31,10 +32,7 @@ func TestIncludeFile(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, otherProcessed, expectedCtx, []string{
-		"OUTER\n",
-		"ABCDEF",
-		"\nEND"})
+	checkParsing(t, otherProcessed, expectedCtx, "OUTER\nABCDEF\nEND")
 }
 
 func TestIncludeEvalFile(t *testing.T) {
@@ -42,7 +40,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -52,7 +50,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	r = bufio.NewReader(strings.NewReader("{{define p `/processed/`}}" +
 		"OUTER\n{{ include eval p + `/hi.txt` }}\nEND"))
 
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", "source", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -64,11 +62,7 @@ func TestIncludeEvalFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["p"] = "/processed/"
 
-	checkParsing(t, otherProcessed, expectedCtx, []string{
-		"",
-		"OUTER\n",
-		"ABCDEF",
-		"\nEND"})
+	checkParsing(t, otherProcessed, expectedCtx, "OUTER\nABCDEF\nEND")
 }
 
 func TestIncludeImplicitEvalFile(t *testing.T) {
@@ -76,7 +70,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("ABCDEF"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 6, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -85,7 +79,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	r = bufio.NewReader(strings.NewReader("{{define p `/processed`}}" +
 		"OUTER\n{{ include \"/processed\" + `/hi.txt` }}\nEND"))
 
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", "source", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -97,11 +91,7 @@ func TestIncludeImplicitEvalFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["p"] = "/processed"
 
-	checkParsing(t, otherProcessed, expectedCtx, []string{
-		"",
-		"OUTER\n",
-		"ABCDEF",
-		"\nEND"})
+	checkParsing(t, otherProcessed, expectedCtx, "OUTER\nABCDEF\nEND")
 }
 
 func TestIncludeFileNested(t *testing.T) {
@@ -109,14 +99,14 @@ func TestIncludeFileNested(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A1"))
-	processed1, err := mg.ProcessReader(r, "source/a1.txt", 6, &resolver, time.Now())
+	processed1, err := mg.ProcessReader(r, "source/a1.txt", "source", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("A2\n{{include /a1.txt}}"))
-	processed2, err := mg.ProcessReader(r, "source/processed/a2.txt", 6, &resolver, time.Now())
+	processed2, err := mg.ProcessReader(r, "source/processed/a2.txt", "source", 6, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -124,7 +114,7 @@ func TestIncludeFileNested(t *testing.T) {
 
 	// include relative path
 	r = bufio.NewReader(strings.NewReader("A3\n{{ include a2.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", "source", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -136,10 +126,7 @@ func TestIncludeFileNested(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, otherProcessed, expectedCtx, []string{
-		"A3\n",
-		"A2\nA1",
-		"\nEND"})
+	checkParsing(t, otherProcessed, expectedCtx, "A3\nA2\nA1\nEND")
 }
 
 func TestIncludeUpPath(t *testing.T) {
@@ -147,19 +134,19 @@ func TestIncludeUpPath(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A1{{include .../_msg}}A1"))
-	processed1, err := mg.ProcessReader(r, "source/processed/en/a1.txt", 12, &resolver, time.Now())
+	processed1, err := mg.ProcessReader(r, "source/processed/en/a1.txt", "source", 12, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("A2{{include .../_msg}}A2"))
-	processed2, err := mg.ProcessReader(r, "source/processed/pt/abc/a2.txt", 12, &resolver, time.Now())
+	processed2, err := mg.ProcessReader(r, "source/processed/pt/abc/a2.txt", "source", 12, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("English"))
-	english, err := mg.ProcessReader(r, "source/_msg", 7, &resolver, time.Now())
+	english, err := mg.ProcessReader(r, "source/_msg", "source", 7, &resolver, time.Now())
 	check(err)
 
 	r = bufio.NewReader(strings.NewReader("Portuguese"))
-	portuguese, err := mg.ProcessReader(r, "source/processed/pt/_msg", 7, &resolver, time.Now())
+	portuguese, err := mg.ProcessReader(r, "source/processed/pt/_msg", "source", 7, &resolver, time.Now())
 	check(err)
 
 	files["source/processed/en/a1.txt"] = mg.WebFile{Processed: processed1}
@@ -169,12 +156,6 @@ func TestIncludeUpPath(t *testing.T) {
 
 	expectedCtx := make(map[string]interface{})
 
-	checkParsing(t, processed1, expectedCtx, []string{
-		"A1",
-		"English",
-		"A1"})
-	checkParsing(t, processed2, expectedCtx, []string{
-		"A2",
-		"Portuguese",
-		"A2"})
+	checkParsing(t, processed1, expectedCtx, "A1EnglishA1")
+	checkParsing(t, processed2, expectedCtx, "A2PortugueseA2")
 }

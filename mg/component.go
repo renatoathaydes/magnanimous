@@ -2,7 +2,6 @@ package mg
 
 import (
 	"io"
-	"log"
 )
 
 type Component struct {
@@ -15,18 +14,15 @@ type Component struct {
 
 var _ Content = (*Component)(nil)
 var _ ContentContainer = (*Component)(nil)
+var _ Inclusion = (*Component)(nil)
 
-func (c *Component) AppendContent(content Content) {
-	c.contents = append(c.GetContents(), content)
+type internalComponent struct {
+	UnscopedContent
+	location *Location
+	contents []Content
 }
 
-func (c *Component) GetContents() []Content {
-	if isMd(c.Location.Origin) {
-		return []Content{&HtmlFromMarkdownContent{MarkDownContent: c.contents}}
-	} else {
-		return c.contents
-	}
-}
+var _ Content = (*internalComponent)(nil)
 
 func NewComponentInstruction(arg string, location *Location, original string, resolver FileResolver) Content {
 	return &Component{
@@ -37,42 +33,39 @@ func NewComponentInstruction(arg string, location *Location, original string, re
 	}
 }
 
-func (c *Component) Write(writer io.Writer, stack ContextStack) error {
-	params := magParams{stack: stack, fileResolver: c.resolver, location: c.Location}
-	maybePath := pathOrEval(c.Path, &params)
-	var actualPath string
-	if s, ok := maybePath.(string); ok {
-		actualPath = s
-	} else {
-		log.Printf("WARNING: path expression evaluated to invalid value: %v", maybePath)
-		_, err := writer.Write([]byte(c.Text))
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-		return nil
+func (c *Component) AppendContent(content Content) {
+	c.contents = append(c.contents, content)
+}
+
+func (c *Component) GetPath() string {
+	return c.Path
+}
+
+func (c *Component) GetLocation() *Location {
+	return c.Location
+}
+
+func (c *Component) IsScoped() bool {
+	return true
+}
+
+func (c *Component) Write(writer io.Writer, context Context) ([]Content, error) {
+	componentFile, err := getInclusionByPath(c, c.resolver, context, true)
+	if err != nil {
+		return nil, err
 	}
-	componentFile, ok := params.File(actualPath)
-	if !ok {
-		log.Printf("WARNING: (%s) refers to a non-existent Component: %s", c.Location, actualPath)
-		_, err := writer.Write([]byte(c.Text))
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-	} else {
-		stack = stack.Push(c.Location, true)
-		err := detectCycle(stack, actualPath, componentFile.Processed.Path, c.Location)
-		if err != nil {
-			return err
-		}
-		contents, err := body(c, stack)
-		if err != nil {
-			return err
-		}
-		stack.Top().Set("__contents__", string(contents))
-		err = componentFile.Write(writer, stack)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+
+	resolveContext(c.contents, context)
+
+	context.Set("__contents__", &internalComponent{location: c.Location, contents: c.contents})
+
+	return componentFile.Processed.GetContents(), nil
+}
+
+func (c *internalComponent) GetLocation() *Location {
+	return c.location
+}
+
+func (c *internalComponent) Write(writer io.Writer, context Context) ([]Content, error) {
+	return c.contents, nil
 }

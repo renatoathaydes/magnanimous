@@ -13,6 +13,7 @@ import (
 
 var defaultDateLayouts = []string{"2006-01-02T15:04:05", "2006-01-02T15:04", "2006-01-02"}
 
+// DefaultDateTimeFormat for Magnanimous
 const DefaultDateTimeFormat = "02 Jan 2006, 03:04 PM"
 
 // Expression is a parsed Magnanimous expression.
@@ -23,15 +24,18 @@ type Expression struct {
 }
 
 // DateTime is the result of evaluating a date expression.
+//
+// If [Path] is not empty, then it refers to the last update-time of the file with the given path,
+// otherwise [Time] should not be nil and should be the value of this [DateTime] object.
 type DateTime struct {
-	Time   time.Time
+	Path   *Path
+	Time   *time.Time
 	Format string
 }
 
 // Path is the result of evaluating a path expression.
 type Path struct {
-	Value       string
-	LastUpdated time.Time
+	Value string
 }
 
 // PathProperty refers to a property within a Path.
@@ -44,11 +48,8 @@ type PathProperty struct {
 
 // Context contains the bindings available for an expression.
 type Context interface {
+	// Get the value for a variable with the given name.
 	Get(name string) (interface{}, bool)
-}
-
-type PathFinder interface {
-	Path(path string) (*Path, bool)
 }
 
 // MapContext is a simple implementation of [Context].
@@ -69,7 +70,7 @@ func (m *MapContext) Get(name string) (interface{}, bool) {
 	return v, ok
 }
 
-// Get the value of a property of the file point at by the Path.
+// Get the value of a property of the file pointed at by the Path.
 func (p *Path) Get(name string) (interface{}, bool) {
 	return &PathProperty{Path: p, Name: name}, true
 }
@@ -94,12 +95,12 @@ func Eval(expr string, context Context) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return EvalExpr(e, context)
+	return EvalExpr(&e, context)
 }
 
 // EvalExpr evaluates the given Magnanimous expression, making the context bindings
 //// available to the expression.
-func EvalExpr(e Expression, context Context) (interface{}, error) {
+func EvalExpr(e *Expression, context Context) (interface{}, error) {
 	return eval(e.expr, context)
 }
 
@@ -123,7 +124,7 @@ func eval(e ast.Expr, context Context) (interface{}, error) {
 		return resolveIndexExpr(ex, context)
 	}
 
-	return nil, errors.New(fmt.Sprintf("Unrecognized expression: %s", e))
+	return nil, fmt.Errorf("Unrecognized expression: %s", e)
 }
 
 func parseLiteral(s string) interface{} {
@@ -196,7 +197,7 @@ func resolveBinaryExpr(x ast.Expr, t token.Token, y ast.Expr, ctx Context) (inte
 	case token.LOR:
 		return or(xv, yv)
 	}
-	return nil, errors.New(fmt.Sprintf("unknown operator %s", t))
+	return nil, fmt.Errorf("unknown operator %s", t)
 }
 
 func resolveCompositeLit(cl *ast.CompositeLit, ctx Context) (interface{}, error) {
@@ -224,8 +225,7 @@ func resolveUnary(expr *ast.UnaryExpr, ctx Context) (interface{}, error) {
 	case token.ADD:
 		return plus(v)
 	}
-	return nil, errors.New(fmt.Sprintf("operator %s cannot be used with %v",
-		expr.Op, expr.X))
+	return nil, fmt.Errorf("operator %s cannot be used with %v", expr.Op, expr.X)
 }
 
 func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error) {
@@ -236,7 +236,7 @@ func resolveAccessField(expr *ast.SelectorExpr, ctx Context) (interface{}, error
 	if v, ok := ToContext(rcv, ctx); ok {
 		return eval(expr.Sel, v)
 	}
-	return nil, errors.New(fmt.Sprintf("cannot access properties of object: %v", rcv))
+	return nil, fmt.Errorf("cannot access property of object [%v]: %v", expr.X, rcv)
 }
 
 func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
@@ -249,7 +249,7 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 				case string:
 					return parseDate(d, DefaultDateTimeFormat)
 				case *Path:
-					return &DateTime{Time: d.LastUpdated, Format: DefaultDateTimeFormat}, nil
+					return &DateTime{Path: d, Format: DefaultDateTimeFormat}, nil
 				default:
 					return nil, errors.New("malformed date expression (should be like date[\"2006-01-02T15:04:00\"])")
 				}
@@ -261,20 +261,11 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 			idx, err := eval(expr.Index, ctx)
 			if err == nil {
 				if p, ok := idx.(string); ok {
-					if pf, ok := ctx.(PathFinder); ok {
-						if f, ok := pf.Path(p); ok {
-							return &Path{Value: p, LastUpdated: f.LastUpdated}, nil
-						} else {
-							return nil, fmt.Errorf("path expression refers to non-existing file: %s", p)
-						}
-					} else {
-						return nil, fmt.Errorf("path expression used in location missing context: %s", p)
-					}
+					return &Path{Value: p}, nil
 				}
 				return nil, errors.New("malformed path expression (should be like path[\"to/file.txt\"])")
-			} else {
-				return nil, err
 			}
+			return nil, err
 		}
 		return nil, fmt.Errorf("unsupported index expression (only date[] and path[] supported): %v", rcv)
 	case *ast.IndexExpr:
@@ -289,7 +280,7 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 							case string:
 								return parseDate(d, format)
 							case *Path:
-								return &DateTime{Time: d.LastUpdated, Format: format}, nil
+								return &DateTime{Path: d, Format: format}, nil
 							}
 						}
 					}
@@ -308,15 +299,16 @@ func resolveIndexExpr(expr *ast.IndexExpr, ctx Context) (interface{}, error) {
 
 func parseDate(idx string, format string) (*DateTime, error) {
 	if idx == "now" { // special case
-		return &DateTime{Format: format, Time: time.Now()}, nil
+		now := time.Now()
+		return &DateTime{Format: format, Time: &now}, nil
 	}
 	for _, layout := range defaultDateLayouts {
 		date, err := time.Parse(layout, idx)
 		if err == nil {
-			return &DateTime{Format: format, Time: date}, nil
+			return &DateTime{Format: format, Time: &date}, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("invalid date: %v (valid formats: %v)", idx, defaultDateLayouts))
+	return nil, fmt.Errorf("invalid date: %v (valid formats: %v)", idx, defaultDateLayouts)
 }
 
 // ToContext attempts to convert a variable to a [Context].

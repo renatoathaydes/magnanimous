@@ -2,9 +2,10 @@ package expression
 
 import (
 	"fmt"
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 )
 
 func TestDateExpr(t *testing.T) {
@@ -228,7 +229,7 @@ func checkDate(t *testing.T, dateExpr, expected, format string) {
 		t.Fatalf("Could not parse: %v", err)
 	}
 
-	v, err := expression.EvalExpr(e, nil)
+	v, err := expression.EvalExpr(&e, nil)
 
 	if err != nil {
 		t.Fatalf("Could not evaluate: %v", err)
@@ -240,7 +241,7 @@ func checkDate(t *testing.T, dateExpr, expected, format string) {
 			panic(err)
 		}
 
-		if result.Time != expectedTime {
+		if *result.Time != expectedTime {
 			t.Errorf("Expected '%v' but got '%v'", expectedTime, v)
 		}
 	} else {

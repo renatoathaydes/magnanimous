@@ -2,8 +2,8 @@ package tests
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
 	"math"
 	"os"
@@ -13,20 +13,15 @@ import (
 	"testing"
 	"time"
 	"unicode/utf8"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 var emptyContext = make(map[string]interface{})
 
-func shouldHaveError(t *testing.T, err error, code mg.ErrorCode, messageAlternatives ...string) {
+func shouldHaveError(t *testing.T, err error, messageAlternatives ...string) {
 	if err == nil {
 		t.Fatal("No error occurred!")
-	}
-	merr, ok := err.(*mg.MagnanimousError)
-	if !ok {
-		t.Fatalf("Expected error of type MagnanimousError, but found other type: %v", merr)
-	}
-	if merr.Code != code {
-		t.Errorf("Expected %s but got %s\n", code, merr.Code)
 	}
 	matchFound := false
 	for _, expectedMessage := range messageAlternatives {
@@ -84,7 +79,7 @@ func CreateTempFiles(files map[string]string) (mg.WebFilesMap, string) {
 		_, err = file.Write([]byte(content))
 		check(err)
 		fileReader := bufio.NewReader(strings.NewReader(content))
-		pf, err := mg.ProcessReader(fileReader, name, len(content), nil, time.Now())
+		pf, err := mg.ProcessReader(fileReader, name, "", len(content), nil, time.Now())
 		check(err)
 		filesMap.WebFiles[filepath.Join(dir, name)] = mg.WebFile{
 			Processed:   pf,
@@ -104,27 +99,20 @@ func check(e error) {
 
 func checkParsing(t *testing.T,
 	pf *mg.ProcessedFile,
-	expectedCtx map[string]interface{}, expectedContents []string) {
-
-	contents := pf.GetContents()
-
-	if len(contents) != len(expectedContents) {
-		t.Fatalf("Expected %d content parts but got %d: %v",
-			len(expectedContents), len(contents), contents)
-	}
+	expectedCtx map[string]interface{},
+	expectedContents string) {
 
 	ctx := mg.NewContext()
 	stack := mg.NewContextStack(ctx)
+	wf := mg.WebFile{Processed: pf}
 
-	for i, c := range contents {
-		var result strings.Builder
-		err := c.Write(&result, stack)
-		check(err)
+	var result strings.Builder
+	err := wf.Write(&result, &stack, false)
+	check(err)
 
-		if result.String() != expectedContents[i] {
-			t.Errorf("Unexpected Content[%d]\nExpected: '%s'\nActual  : '%s'",
-				i, expectedContents[i], result.String())
-		}
+	if result.String() != expectedContents {
+		t.Errorf("Unexpected Content\nExpected: '%s'\nActual  : '%s'",
+			expectedContents, result.String())
 	}
 
 	if len(expectedCtx) == 0 {
@@ -132,21 +120,26 @@ func checkParsing(t *testing.T,
 			t.Errorf("Expected empty context.\n"+
 				"Actual Context: %v", ctx)
 		}
-	} else if !isContextEqual(ctx, expectedCtx) {
-		t.Errorf(
-			"Expected Context: %v\n"+
-				"Actual Context: %v", expectedCtx, ctx)
+	} else {
+		checkContextEqual(t, ctx, expectedCtx)
 	}
 }
 
-func isContextEqual(context mg.Context, expectedContents map[string]interface{}) bool {
-	for key, expectedValue := range expectedContents {
+func checkContextEqual(t *testing.T, context mg.Context, expectedCtx map[string]interface{}) {
+	var errorMsg strings.Builder
+	for key, expectedValue := range expectedCtx {
 		actualValue, ok := context.Get(key)
-		if !ok || !reflect.DeepEqual(expectedValue, actualValue) {
-			return false
+		if !ok {
+			errorMsg.WriteString("* context key '%s' is missing\n")
+		}
+		if !reflect.DeepEqual(expectedValue, actualValue) {
+			errorMsg.WriteString(fmt.Sprintf("* context key '%s' has value '%v', expected '%v'\n", key, actualValue, expectedValue))
 		}
 	}
-	return true
+	if errorMsg.Len() > 0 {
+		t.Errorf("Expected Context: %v\n"+
+			"Actual Context: %v\nErrors: %s", expectedCtx, context, errorMsg.String())
+	}
 }
 
 func checkContents(t *testing.T,
@@ -156,11 +149,14 @@ func checkContents(t *testing.T,
 	ctx := mg.NewContext()
 	stack := mg.NewContextStack(ctx)
 
-	content, err := pf.Bytes(stack)
-
+	wf := &mg.WebFile{Name: "test", Processed: pf}
+	var b bytes.Buffer
+	b.Grow(512)
+	err := wf.Write(&b, &stack, false)
 	if err != nil {
 		t.Fatal(err)
 	}
+	content := b.Bytes()
 
 	if string(content) != expectedContent {
 		t.Errorf("Unexpected content. Expected:\n'%s'\nActual:\n'%s'", expectedContent, content)

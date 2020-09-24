@@ -1,9 +1,10 @@
 package expression
 
 import (
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"reflect"
 	"testing"
+
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 )
 
 func TestIntExpr(t *testing.T) {
@@ -13,7 +14,7 @@ func TestIntExpr(t *testing.T) {
 		t.Fatalf("Could not parse: %v", err)
 	}
 
-	v, err := expression.EvalExpr(e, nil)
+	v, err := expression.EvalExpr(&e, nil)
 
 	if err != nil {
 		t.Fatalf("Could not evaluate: %v", err)
@@ -31,7 +32,7 @@ func TestIntAdditionExpr(t *testing.T) {
 		t.Fatalf("Could not parse: %v", err)
 	}
 
-	v, err := expression.EvalExpr(e, nil)
+	v, err := expression.EvalExpr(&e, nil)
 
 	if err != nil {
 		t.Fatalf("Could not evaluate: %v", err)

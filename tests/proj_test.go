@@ -1,12 +1,13 @@
 package tests
 
 import (
-	"github.com/renatoathaydes/magnanimous/mg"
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 )
 
 var proj5Examplelastupdated time.Time
@@ -292,7 +293,7 @@ func TestProj5(t *testing.T) {
 	assertFileContents(t, files, dir, "scopes.txt", "Base URL: /my-website/\n\n"+
 		"/other-website/A\n"+
 		"/other-website/<nil>\n\n"+
-		"File sees /other-website/\n"+
+		"File /folder/example.txt sees /other-website/\n"+
 		"Full path: /other-website/folder/example.txt\n"+
 		"I was last updated on "+exampleFileUpdatedOn+"\n"+
 		"After unset, base URL: /my-website/")
@@ -312,17 +313,19 @@ func TestProj6(t *testing.T) {
 
 	assertFileContents(t, files, dir, "index.html", `<h2>Simple Component Example</h2>
 <div class="wrapper">
-    <p>Hello components</p>
-
+Hello components
 </div><h2>HTML Component with Markdown contents</h2>
 <div class="wrapper">
-    <p>Bar</p>
+<p>Bar</p>
 
 <h3>inner markdown</h3>
 
 <p>Foo</p>
 
-</div>`)
+</div><p>Example HTML:</p>
+<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>HTML with MD<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Foo Bar<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</pre>`)
 
 	assertFileContents(t, files, dir, "example/properties.html", `<div>Component example</div>
 <h1>Component with properties</h1>
@@ -360,7 +363,7 @@ func benchmarkProject(b *testing.B, project string) {
 	for _, webFile := range webFiles.WebFiles {
 		stack := mg.NewContextStack(mg.NewContext())
 		var w strings.Builder
-		err = webFile.Write(&w, stack)
+		err = webFile.Write(&w, &stack, true)
 
 		if err != nil {
 			b.Fatal(err)

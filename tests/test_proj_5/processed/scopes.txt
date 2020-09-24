@@ -2,6 +2,6 @@ Base URL: {{eval baseURL}}
 {{ define baseURL "/other-website/" }}{{define a "A"}}
 {{ include _eval_a_and_b.txt }}
 {{ for file folder }}
-File sees {{ eval file.myBaseURL }}
+File {{eval file}} sees {{ eval file.myBaseURL }}
 {{ end }}{{ include folder/example.txt }}{{ define baseURL nil }}
 After unset, base URL: {{eval baseURL}}

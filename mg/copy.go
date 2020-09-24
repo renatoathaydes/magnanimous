@@ -44,18 +44,23 @@ func Copy(file, basePath string, writable bool) (*WebFile, error) {
 }
 
 type copiedContent struct {
+	UnscopedContent
 	file string
 }
 
-func (c *copiedContent) Write(writer io.Writer, stack ContextStack) error {
+var _ Content = (*copiedContent)(nil)
+
+func (c *copiedContent) GetLocation() *Location {
+	loc := Location{Origin: c.file, Row: 0, Col: 0}
+	return &loc
+}
+
+func (c *copiedContent) Write(writer io.Writer, context Context) ([]Content, error) {
 	source, err := os.Open(c.file)
 	if err != nil {
-		return &MagnanimousError{Code: IOError, message: err.Error()}
+		return nil, err
 	}
 	defer source.Close()
 	_, err = io.Copy(writer, bufio.NewReader(source))
-	if err != nil {
-		return &MagnanimousError{Code: IOError, message: err.Error()}
-	}
-	return nil
+	return nil, err
 }

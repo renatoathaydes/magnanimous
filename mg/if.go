@@ -1,9 +1,10 @@
 package mg
 
 import (
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"io"
 	"log"
+
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 )
 
 type IfContent struct {
@@ -22,7 +23,7 @@ func NewIfInstruction(arg string, location *Location, original string, resolver 
 
 	if err != nil {
 		log.Printf("WARNING: (%s) Malformed if instruction: (%v)", location.String(), err)
-		return unevaluatedExpression(original)
+		return unevaluatedExpression(original, location)
 	}
 
 	return &IfContent{
@@ -33,36 +34,34 @@ func NewIfInstruction(arg string, location *Location, original string, resolver 
 	}
 }
 
-func (ic *IfContent) GetContents() []Content {
-	return ic.contents
-}
-
 func (ic *IfContent) AppendContent(content Content) {
 	ic.contents = append(ic.contents, content)
 }
 
-func (ic *IfContent) Write(writer io.Writer, stack ContextStack) error {
-	res, err := expression.EvalExpr(*ic.condition, &magParams{
-		fileResolver: ic.resolver,
-		stack:        stack,
-		location:     ic.Location,
-	})
+func (ic *IfContent) GetLocation() *Location {
+	return ic.Location
+}
+
+func (ic *IfContent) IsScoped() bool {
+	return true
+}
+
+func (ic *IfContent) Write(writer io.Writer, context Context) ([]Content, error) {
+	res, err := expression.EvalExpr(ic.condition, context)
 	if err != nil {
-		return err
+		log.Printf("ERROR: If condition could not be evaluated: %v", err)
+		return unevaluatedExpressions(ic.Text, ic.Location), nil
 	}
 
 	switch res {
 	case true:
-		stack = stack.Push(nil, true)
-		err = writeContents(ic, writer, stack)
-		if err != nil {
-			return err
-		}
+		return ic.contents, nil
 	case false:
 	case nil:
-		// nothing to write
+		return nil, nil
 	default:
-		log.Printf("WARN: If condition evaluated to non-boolean value, assuming false: %v", res)
+		log.Printf("INFO: If condition evaluated to non-boolean value, assuming false: %v", res)
 	}
-	return nil
+
+	return nil, nil
 }

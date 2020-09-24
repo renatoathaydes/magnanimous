@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/renatoathaydes/magnanimous/mg"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 const (

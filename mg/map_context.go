@@ -18,7 +18,14 @@ func NewContext() Context {
 	return &mapContext{ctx: m}
 }
 
-func newFileContext(file *ProcessedFile) Context {
+func (m *mapContext) ToStack() *ContextStack {
+	stack := NewContextStack(m)
+	return &stack
+}
+
+// newFileContext creates a simple Context that, when evaluated, resolves to a file path.
+// This allows for-loops to evaluate all file paths in a directory.
+func newFileContext(file *ProcessedFile, base Context) Context {
 	var str string
 	if file != nil {
 		path := file.Path
@@ -26,14 +33,16 @@ func newFileContext(file *ProcessedFile) Context {
 			path = changeFileExt(path, file.NewExtension)
 		}
 		// try to figure out a valid link to the file
-		s, err := filepath.Rel("source/processed", path)
+		s, err := filepath.Rel(file.BasePath, path)
 		if err == nil {
 			str = "/" + s
 		} else {
 			str = path
 		}
 	}
-	return &mapContext{ctx: make(map[string]interface{}, 10), str: &str}
+	stack := NewContextStack(base)
+	stack.push(&mapContext{ctx: make(map[string]interface{}, 10), str: &str})
+	return &stack
 }
 
 func (m *mapContext) Get(name string) (interface{}, bool) {

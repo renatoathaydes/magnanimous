@@ -1,11 +1,12 @@
 package tests
 
 import (
-	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 func TestCopy(t *testing.T) {
@@ -28,6 +29,7 @@ func TestCopy(t *testing.T) {
 		t.Errorf("Expected basePath 'b' but was '%s'", result.BasePath)
 	}
 
+	stack := mg.NewContextStack(mg.NewContext())
 	contents := result.Processed.GetContents()
 
 	if len(contents) != 1 {
@@ -35,7 +37,7 @@ func TestCopy(t *testing.T) {
 	}
 
 	w := strings.Builder{}
-	me := contents[0].Write(&w, mg.ContextStack{})
+	me := result.Write(&w, &stack, true)
 
 	if me != nil {
 		t.Fatal(me)

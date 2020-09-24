@@ -2,19 +2,20 @@ package tests
 
 import (
 	"bufio"
-	"github.com/renatoathaydes/magnanimous/mg"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 func TestProcessIncludeMissingCloseBrackets(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("## hello {{ include /example.md "))
-	_, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
+	_, err := mg.ProcessReader(r, "source/processed/hi.md", "source", 11, nil, time.Now())
 
-	shouldHaveError(t, err, mg.ParseError,
+	shouldHaveError(t, err,
 		"(source/processed/hi.md:1:33) instruction started at (1:10) was not properly closed with '}}'")
 }
 
@@ -24,9 +25,9 @@ func TestProcessIncludeMissingCloseBracketsAfterGoodInstructions(t *testing.T) {
 		"hello {{ abc name }}\n" +
 		"something {{ include abc\n" +
 		"footer\n"))
-	_, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
+	_, err := mg.ProcessReader(r, "source/processed/hi.md", "source", 11, nil, time.Now())
 
-	shouldHaveError(t, err, mg.ParseError,
+	shouldHaveError(t, err,
 		"(source/processed/hi.md:7:1) instruction started at (5:11) was not properly closed with '}}'")
 }
 
@@ -35,21 +36,21 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ include /processed/other.txt }}"))
-	processed, err := mg.ProcessReader(r, "/processed/hi.txt", 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "/processed/hi.txt", "", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("{{ include /processed/hi.txt }}"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "/processed/other.txt", "", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
 	}
 
-	files["/processed/hi.txt"] = mg.WebFile{Processed: processed}
-	files["/processed/other.txt"] = mg.WebFile{Processed: otherProcessed}
+	files["/processed/hi.txt"] = mg.WebFile{Name: "hi.txt", Processed: processed}
+	files["/processed/other.txt"] = mg.WebFile{Name: "other.txt", Processed: otherProcessed}
 
 	dir, dirErr := ioutil.TempDir("", "TestInclusionIndirectCycleError")
 
@@ -60,9 +61,9 @@ func TestInclusionIndirectCycleError(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	mag := mg.Magnanimous{}
-	magErr := mag.WriteTo(dir, *resolver.Files)
+	err = mag.WriteTo(dir, *resolver.Files)
 
-	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
+	shouldHaveError(t, err, "Cycle detected! Inclusion of "+
 		"/processed/other.txt at /processed/hi.txt:1:5 "+
 		"comes back into itself via [/processed/other.txt:1:1 -> /processed/hi.txt:1:5]",
 		"Cycle detected! Inclusion of "+
@@ -75,7 +76,7 @@ func TestInclusionSelfCycleError(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ include hi.txt }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +95,7 @@ func TestInclusionSelfCycleError(t *testing.T) {
 	mag := mg.Magnanimous{}
 	magErr := mag.WriteTo(dir, *resolver.Files)
 
-	shouldHaveError(t, magErr, mg.InclusionCycleError, "Cycle detected! Inclusion of "+
+	shouldHaveError(t, magErr, "Cycle detected! Inclusion of "+
 		"hi.txt at source/processed/hi.txt:1:5 "+
 		"comes back into itself via [source/processed/hi.txt:1:5]")
 }

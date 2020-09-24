@@ -2,20 +2,21 @@ package tests
 
 import (
 	"bufio"
-	"github.com/renatoathaydes/magnanimous/mg"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
 )
 
 func TestForArray(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Loop Sample:\n" +
 		"{{ for v [1,2,3, 42] }}\n" +
-		"Number {{ eval v }}\n" +
+		"Number {{ eval v }}\\\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -23,10 +24,10 @@ func TestForArray(t *testing.T) {
 
 	checkContents(t, processed,
 		"Loop Sample:\n\n"+
-			"Number 1\n\n"+
-			"Number 2\n\n"+
-			"Number 3\n\n"+
-			"Number 42\n")
+			"Number 1\n"+
+			"Number 2\n"+
+			"Number 3\n"+
+			"Number 42")
 }
 
 func TestForDefineArray(t *testing.T) {
@@ -35,7 +36,7 @@ func TestForDefineArray(t *testing.T) {
 		"{{for v eval a}}" +
 		"Number {{ eval v }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,7 +57,7 @@ func TestForNestedArray(t *testing.T) {
 		"Numbers {{eval i}} {{eval j}}\n" +
 		"{{ end }}" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -75,7 +76,7 @@ func TestForArrayWithExpressions(t *testing.T) {
 		"{{ for x [1 + 1, 2 + 2] }}\n" +
 		"X is {{ eval x }}" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +93,7 @@ func TestForArraySorted(t *testing.T) {
 		"{{ for x ( sort ) [10, 2, 4, 1, 2, 5] }}" +
 		"{{ eval x }} " +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -108,7 +109,7 @@ func TestForArraySortedBy(t *testing.T) {
 		"{{ for x (sortBy _) [10, 2, 4, 1, 2, 5] }}" +
 		"{{ eval x }} " +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -124,7 +125,7 @@ func TestForArrayReverse(t *testing.T) {
 		"{{ for x ( reverse ) [10, 2, 4, 1, 2, 5] }}" +
 		"{{ eval x }} " +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -140,7 +141,7 @@ func TestForArraySortReverse(t *testing.T) {
 		"{{ for x ( sort reverse ) [10, 2, 4, 1, 2, 5] }}" +
 		"{{ eval x }} " +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +157,7 @@ func TestForArrayLimit(t *testing.T) {
 		"{{ for v (limit 3) [ 1 , 2, 3, 4 , 5 , 6 ] }}\n" +
 		"Number {{ eval v }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -174,7 +175,7 @@ func TestForArraySortByReverseLimit(t *testing.T) {
 		"{{ for x ( sortBy _ reverse limit 4 ) [10, 2, 4, 1, 2, 5] }}" +
 		"{{ eval x }} " +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -190,7 +191,7 @@ func TestForArrayInMarkDown(t *testing.T) {
 		"{{ for section [ \"Home\", \"About\" ] }}\n" +
 			"## {{ eval section }}\nSomething something{{ end }}\n" +
 			"END"))
-	processed, err := mg.ProcessReader(r, "source/processed/array.md", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/array.md", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -219,7 +220,7 @@ func TestForFiles(t *testing.T) {
 		"{{ for path /processed/examples }}\n" +
 		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -247,7 +248,7 @@ func TestForFilesScope(t *testing.T) {
 		"  title: {{ eval title }}\n" +
 		"{{ end }}\n" +
 		"Title is {{ eval title }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -277,7 +278,7 @@ func TestForFilesWithUnwritableFiles(t *testing.T) {
 		"{{ for path /processed/examples }}\n" +
 		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -309,7 +310,7 @@ func TestForFilesReverse(t *testing.T) {
 		"{{ for path ( reverse ) /processed/ }}\n" +
 		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -346,7 +347,7 @@ func TestForFilesLimit(t *testing.T) {
 		"{{ for path ( limit 5 ) /processed/ }}\n" +
 		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -377,7 +378,7 @@ func TestForFilesLimitTooMany(t *testing.T) {
 		"{{ for path ( limit 56 ) /processed/ }}\n" +
 		"Title {{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -408,7 +409,7 @@ func TestForFilesSortBy(t *testing.T) {
 		"{{ for path (sortBy title) /processed/examples }}\n" +
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -441,7 +442,7 @@ func TestForFilesSortByReverse(t *testing.T) {
 		"{{ for path (sortBy title reverse) /processed/examples }}\n" +
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -474,7 +475,7 @@ func TestForFilesReverseSortBy(t *testing.T) {
 		"{{ for path (reverse   sortBy title) /processed/examples }}\n" +
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -507,7 +508,7 @@ func TestForFilesLimitSortByReverse(t *testing.T) {
 		"{{ for path ( limit 3 sortBy title reverse ) /processed/examples }}\n" +
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -538,7 +539,7 @@ func TestForFilesEval(t *testing.T) {
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
 
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -570,7 +571,7 @@ func TestForFilesEvalSortBy(t *testing.T) {
 		"{{ eval path.title }}\n" +
 		"{{ end }}"))
 
-	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)

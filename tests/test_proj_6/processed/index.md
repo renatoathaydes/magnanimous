@@ -1,7 +1,7 @@
 ## Simple Component Example
 
 {{ component /processed/components/_div_wrapper.html }}\
-Hello components\
+{{ define content "Hello components" }}
 {{ end }}
 
 ## HTML Component with Markdown contents
@@ -14,3 +14,9 @@ Bar
 
 Foo
 {{ end }}
+
+Example HTML:
+
+```html
+{{ include _html_in.md }}
+```

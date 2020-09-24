@@ -3,62 +3,61 @@ package mg
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"strings"
+	"time"
 )
 
-func (f *ProcessedFile) GetContents() []Content {
-	return f.contents
+// ProcessedFile is the result of parsing a source file.
+type ProcessedFile struct {
+	contents     []Content
+	NewExtension string
+	BasePath     string
+	Path         string
+	LastUpdated  time.Time
 }
+
+var _ ContentContainer = (*ProcessedFile)(nil)
 
 func (f *ProcessedFile) AppendContent(content Content) {
 	f.contents = append(f.contents, content)
 }
 
-// ResolveContext evaluates all of the [DefineContent] instructions at the top-level scope
-// of the [ProcessedFile].
-func (f *ProcessedFile) ResolveContext(stack ContextStack) Context {
-	ctx := newFileContext(f)
-	stack = stack.PushContext(ctx)
-	for _, c := range f.expandedContents() {
-		if content, ok := c.(*DefineContent); ok {
-			v, ok := content.Eval(stack)
-			if ok {
-				ctx.Set(content.Name, v)
-			}
-		}
-	}
-	return ctx
+func (f *ProcessedFile) GetLocation() *Location {
+	loc := Location{Origin: f.Path, Row: 0, Col: 0}
+	return &loc
 }
 
-// Bytes returns the bytes of the processed file.
-func (f *ProcessedFile) Bytes(stack ContextStack) ([]byte, error) {
-	return body(f, stack)
-}
-
-func (f *ProcessedFile) expandedContents() []Content {
-	// expand contents in case this is markdown
-	if c, ok := unwrapMarkdownContent(f); ok {
-		return c
-	}
+func (f *ProcessedFile) GetContents() []Content {
 	return f.contents
 }
 
-func body(c ContentContainer, stack ContextStack) ([]byte, error) {
-	return asBytes(c.GetContents(), stack)
+// ResolveContext evaluates all of the [Definition]s at the top-level scope
+// of the [ProcessedFile].
+//
+// If [inPlace] is true, the definitions are set into the given context, which is also returned.
+// Otherwise, a new context is created and all variables are set into it, then this new context is returned.
+func (f *ProcessedFile) ResolveContext(context Context, inPlace bool) Context {
+	var ctx Context
+	if inPlace {
+		ctx = context
+	} else {
+		ctx = newFileContext(f, context)
+	}
+	resolveContext(f.GetContents(), ctx)
+	return ctx
 }
 
-func asBytes(c []Content, stack ContextStack) ([]byte, error) {
-	var b bytes.Buffer
-	b.Grow(512)
-	for _, c := range c {
-		if c != nil {
-			err := c.Write(&b, stack)
+func resolveContext(contents []Content, context Context) {
+	var buffer bytes.Buffer
+	for _, c := range contents {
+		if def, ok := c.(Definition); ok {
+			_, err := def.Write(&buffer, context)
 			if err != nil {
-				return nil, err
+				log.Printf("ERROR: (%s) eval failure [%s]: %s", def.GetLocation().String(), def.GetName(), err.Error())
 			}
 		}
 	}
-	return b.Bytes(), nil
 }
 
 func (f *ProcessedFile) String() string {

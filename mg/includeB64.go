@@ -1,10 +1,10 @@
 package mg
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io"
-	"log"
 )
 
 type IncludeB64Instruction struct {
@@ -14,6 +14,9 @@ type IncludeB64Instruction struct {
 	Resolver FileResolver
 }
 
+var _ Inclusion = (*IncludeB64Instruction)(nil)
+var _ Content = (*IncludeB64Instruction)(nil)
+
 func NewIncludeB64Instruction(arg string, location *Location, original string, resolver FileResolver) *IncludeB64Instruction {
 	return &IncludeB64Instruction{Text: original, Path: arg, Origin: location, Resolver: resolver}
 }
@@ -22,48 +25,35 @@ func (inc *IncludeB64Instruction) String() string {
 	return fmt.Sprintf("IncludeB64Instruction{%s, %v, %v}", inc.Path, inc.Origin, inc.Resolver)
 }
 
-func (inc *IncludeB64Instruction) Write(writer io.Writer, stack ContextStack) error {
-	params := magParams{stack: stack, location: inc.Origin, fileResolver: inc.Resolver}
-	maybePath := pathOrEval(inc.Path, &params)
-	var actualPath string
-	if s, ok := maybePath.(string); ok {
-		actualPath = s
-	} else {
-		log.Printf("WARNING: path expression evaluated to invalid value: %v", maybePath)
-		_, err := writer.Write([]byte(inc.Text))
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-		return nil
-	}
-	webFile, ok := params.File(actualPath)
-	if !ok {
-		log.Printf("WARNING: (%s) include non-existent resource: %s", inc.Origin.String(), actualPath)
-		_, err := writer.Write([]byte(inc.Text))
-		if err != nil {
-			return &MagnanimousError{Code: IOError, message: err.Error()}
-		}
-	} else {
-		stack = stack.Push(inc.Origin, false)
-		err := detectCycle(stack, actualPath, webFile.Processed.Path, inc.Origin)
-		if err != nil {
-			return err
-		}
-		err = writeb64(webFile, writer, stack)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (inc *IncludeB64Instruction) GetPath() string {
+	return inc.Path
 }
 
-func writeb64(webFile *WebFile, writer io.Writer, stack ContextStack) error {
-	bytes, err := asBytes(webFile.Processed.GetContents(), stack)
+func (inc *IncludeB64Instruction) GetLocation() *Location {
+	return inc.Origin
+}
+
+func (inc *IncludeB64Instruction) IsScoped() bool {
+	return true
+}
+
+func (inc *IncludeB64Instruction) Write(writer io.Writer, context Context) ([]Content, error) {
+	webFile, err := getInclusionByPath(inc, inc.Resolver, context, true)
+	if err != nil {
+		return nil, err
+	}
+	return nil, writeb64(webFile, writer, context)
+}
+
+func writeb64(webFile *WebFile, writer io.Writer, context Context) error {
+	var b bytes.Buffer
+	b.Grow(512)
+	err := webFile.Write(&b, context.ToStack(), false)
 	if err != nil {
 		return err
 	}
 	encoder := base64.NewEncoder(base64.StdEncoding, writer)
 	defer encoder.Close()
-	_, err = encoder.Write(bytes)
+	_, err = encoder.Write(b.Bytes())
 	return err
 }

@@ -48,15 +48,15 @@ begin:
 		includeContent = len(strings.TrimSpace(content)) > 0
 	}
 	if includeContent {
-		state.append(&StringContent{Text: content})
+		loc := Location{Origin: state.file, Row: state.row, Col: state.col}
+		state.append(NewStringContent(content, &loc))
 	}
 	if !eof {
 		err = parseInstruction(state, resolver)
 		if err != nil {
 			return err
-		} else {
-			goto begin
 		}
+		goto begin
 	}
 	return nil
 }
@@ -96,11 +96,11 @@ func appendInstructionContent(state *parserState, text string, location *Locatio
 			wasDropped := state.dropStackItem()
 			if !wasDropped {
 				log.Printf("WARNING: (%s) %s", location, "end instruction does not match any open scope")
-				state.append(unevaluatedExpression(text))
+				state.append(unevaluatedExpression(text, location))
 			}
 		} else {
 			log.Printf("WARNING: (%s) Instruction missing argument: %s", location.String(), text)
-			state.append(unevaluatedExpression(text))
+			state.append(unevaluatedExpression(text, location))
 		}
 	case 2:
 		content := createInstruction(parts[0], parts[1], location, text, resolver)
@@ -134,7 +134,7 @@ func createInstruction(name, arg string, location *Location,
 	}
 
 	log.Printf("WARNING: (%s) Unknown instruction: '%s'", location.String(), name)
-	return unevaluatedExpression(original)
+	return unevaluatedExpression(original, location)
 }
 
 func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {

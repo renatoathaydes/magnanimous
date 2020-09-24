@@ -2,7 +2,6 @@ package mg
 
 import (
 	"io"
-	"time"
 )
 
 // Magnanimous is the entry point of the magnanimous library.
@@ -37,14 +36,6 @@ type Location struct {
 	Col    uint32
 }
 
-// ContextStack is a stack of InclusionChainItems.
-//
-// Used to keep state when writing nested Content.
-type ContextStack struct {
-	locations []Location
-	contexts  []Context
-}
-
 // FileResolver defines how Magnanimous finds source files.
 type FileResolver interface {
 	// FilesIn return the files in a certain directory, or an error if something goes wrong.
@@ -60,47 +51,85 @@ type FileResolver interface {
 	Get(path string) (*WebFile, bool)
 }
 
-// ContentContainer is a collection of Content.
+// ContentContainer is a mutable collection of Content.
 //
-// Content implementations that have nested Content must implement this interface.
+// Content implementations that have nested Content should implement this interface if they receive their
+// nested contents during parsing.
 type ContentContainer interface {
-	GetContents() []Content
+
+	// AppendContent adds nested content to this container.
 	AppendContent(content Content)
+}
+
+// Definition is a Content that defines a new value within its context.
+type Definition interface {
+	Content
+
+	// GetName returns the name of this definition.
+	GetName() string
+
+	// Eval evaluates this definition, inserting its name into the given context.
+	//
+	// Returns the evaluated definition's value and true if the evaluation succeeds, or
+	// an undefined object and false otherwise.
+	//
+	// Eval does not insert the definition into the given Context, the caller is expected to do that.
+	Eval(context Context) (interface{}, bool)
 }
 
 // Content is a processed unit of a source file.
 //
 // Implementations of Content define how Magnanimous instructions behave.
-// A Content may contain nested Content parts, in which case it implements ContentContainer.
+//
+// If a Content returns other Contents when its [Write] method is called, the returned contents
+// are written immediately, in a new scope if [IsScoped] returns true.
 type Content interface {
+	// GetLocation() returns content's original location.
+	GetLocation() *Location
+
+	// IsScoped returns true if this Content starts a new scope, false otherwise.
+	IsScoped() bool
+
 	// Write contents using the given writer.
 	//
 	// The stack contains context in which local data can be stored.
-	// Each implementation of Content that starts a new scope must push a new item onto the stack.
-	Write(writer io.Writer, stack ContextStack) error
+	//
+	// Write should return Contents in cases where its evaluation results in yet more Contents
+	// (e.g. the `include` instruction should return the included contents).
+	Write(writer io.Writer, context Context) ([]Content, error)
 }
 
-// CanResolvePath indicates a Content that is capable of resolving the path of a file based on its own Location
-// using a FileResolver.
-type CanResolvePath interface {
-	Location() *Location
-	FileResolver() FileResolver
+// UnscopedContent is a base struct for unscoped Contents.
+type UnscopedContent struct{}
+
+// IsScoped returns false (see [Content]).
+func (UnscopedContent) IsScoped() bool {
+	return false
+}
+
+// Inclusion is a reference to another file by path.
+type Inclusion interface {
+	// GetLocation() returns content's original location.
+	GetLocation() *Location
+
+	// Path of the included content
+	GetPath() string
 }
 
 // Context represents the current context of a Content being written.
 type Context interface {
+	// Get the value with the given name.
 	Get(name string) (interface{}, bool)
+
+	// Set the value for the given name.
 	Set(name string, value interface{})
+
+	// Remove the value with the given name.
 	Remove(name string) interface{}
+
+	// IsEmpty returns whether this context contains no values.
 	IsEmpty() bool
-}
 
-// ProcessedFile is the result of parsing a source file.
-type ProcessedFile struct {
-	contents     []Content
-	NewExtension string
-	Path         string
-	LastUpdated  time.Time
+	// ToStack converts this Context to a stack.
+	ToStack() *ContextStack
 }
-
-var _ ContentContainer = (*ProcessedFile)(nil)

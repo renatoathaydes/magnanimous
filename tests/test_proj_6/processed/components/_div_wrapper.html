@@ -1,3 +1,4 @@
 <div class="wrapper">
-    {{ eval __contents__ }}
+{{ if content != null }}{{ eval content }}{{ end }}\
+{{ if content == null }}{{ eval __contents__ }}{{ end }}
 </div>

@@ -2,55 +2,56 @@ package tests
 
 import (
 	"bufio"
-	"github.com/renatoathaydes/magnanimous/mg"
-	"github.com/renatoathaydes/magnanimous/mg/expression"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/renatoathaydes/magnanimous/mg"
+	"github.com/renatoathaydes/magnanimous/mg/expression"
 )
 
 func TestEvalString(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Hello {{ eval \"Joe\" }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"Hello ", "Joe"})
+	checkParsing(t, processed, emptyContext, "Hello Joe")
 }
 
 func TestEvalArray(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Numbers: {{ eval [ 1, 2, 3, 4 ] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"Numbers: ", "[1 2 3 4]"})
+	checkParsing(t, processed, emptyContext, "Numbers: [1 2 3 4]")
 }
 
 func TestEvalDate(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Time: {{ eval date[\"2017-11-23T22:12:21\"] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"Time: ", "23 Nov 2017, 10:12 PM"})
+	checkParsing(t, processed, emptyContext, "Time: 23 Nov 2017, 10:12 PM")
 }
 
 func TestEvalDateCustom(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("Time: {{ eval date[\"2017-11-23T22:12:21\"][\"15:04:05 on 02 January 2006\"] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"Time: ", "22:12:21 on 23 November 2017"})
+	checkParsing(t, processed, emptyContext, "Time: 22:12:21 on 23 November 2017")
 }
 
 func TestEvalDateOfFileUpdate(t *testing.T) {
@@ -63,43 +64,43 @@ func TestEvalDateOfFileUpdate(t *testing.T) {
 
 	r := bufio.NewReader(strings.NewReader("File updated on " +
 		"{{define examplePath path[\"other.file\"]}}{{ eval date[examplePath][\"15:04:05 on 02 January 2006\"] }}"))
-	processed, err := mg.ProcessReader(r, "", 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "a.txt", "source", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expectedCtx := make(map[string]interface{})
-	expectedCtx["examplePath"] = &expression.Path{Value: "other.file", LastUpdated: update}
+	expectedCtx["examplePath"] = &expression.Path{Value: "other.file"}
 
-	checkParsing(t, processed, expectedCtx, []string{"File updated on ", "", "08:30:00 on 19 December 1992"})
+	checkParsing(t, processed, expectedCtx, "File updated on 08:30:00 on 19 December 1992")
 }
 
 func TestEvalArithmetic(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("2 + 2 * 5 == {{ eval 2 + 2 * 5 }}"))
-	processed, err := mg.ProcessReader(r, "", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"2 + 2 * 5 == ", "12"})
+	checkParsing(t, processed, emptyContext, "2 + 2 * 5 == 12")
 }
 
 func TestEvalNonExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.html", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.html", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	checkParsing(t, processed, emptyContext, []string{"{{ eval 2 * a }}"})
+	checkParsing(t, processed, emptyContext, "{{ eval 2 * a }}")
 }
 
 func TestEvalWithExistingParameter(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval 2 * a }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -111,12 +112,12 @@ func TestEvalWithExistingParameter(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed, expectedCtx, []string{"<p>6</p>\n"})
+	checkParsing(t, processed, expectedCtx, "<p>6</p>\n")
 }
 
 func TestEvalWithOrExprParameterExists(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ define a 3 }}{{ eval a || 100 }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -128,12 +129,12 @@ func TestEvalWithOrExprParameterExists(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed, expectedCtx, []string{"<p>3</p>\n"})
+	checkParsing(t, processed, expectedCtx, "<p>3</p>\n")
 }
 
 func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
 	r := bufio.NewReader(strings.NewReader("{{ eval a || 100 }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.md", 11, nil, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.md", "source", 11, nil, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
@@ -144,7 +145,7 @@ func TestEvalWithOrExprParameterDoesNotExist(t *testing.T) {
 	files := mg.WebFilesMap{WebFiles: make(map[string]mg.WebFile, 1)}
 	files.WebFiles["source/processed/hi.md"] = mg.WebFile{Processed: processed}
 
-	checkParsing(t, processed, expectedCtx, []string{"<p>100</p>\n"})
+	checkParsing(t, processed, expectedCtx, "<p>100</p>\n")
 }
 
 func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
@@ -152,14 +153,14 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	resolver := mg.DefaultFileResolver{BasePath: "source", Files: &mg.WebFilesMap{WebFiles: files}}
 
 	r := bufio.NewReader(strings.NewReader("A = {{ eval 2 * hello }}"))
-	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", 11, &resolver, time.Now())
+	processed, err := mg.ProcessReader(r, "source/processed/hi.txt", "source", 11, &resolver, time.Now())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r = bufio.NewReader(strings.NewReader("OUTER\n{{ define hello 7 }}{{ include /processed/hi.txt }}\nEND"))
-	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", 11, &resolver, time.Now())
+	otherProcessed, otherErr := mg.ProcessReader(r, "source/processed/other.txt", "source", 11, &resolver, time.Now())
 
 	if otherErr != nil {
 		t.Fatal(otherErr)
@@ -171,9 +172,5 @@ func TestEvalWithExistingParameterFromAnotherFile(t *testing.T) {
 	expectedCtx := make(map[string]interface{})
 	expectedCtx["hello"] = float64(7)
 
-	checkParsing(t, otherProcessed, expectedCtx, []string{
-		"OUTER\n",
-		"",
-		"A = 14",
-		"\nEND"})
+	checkParsing(t, otherProcessed, expectedCtx, "OUTER\nA = 14\nEND")
 }

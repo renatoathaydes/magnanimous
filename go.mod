@@ -10,5 +10,5 @@ require (
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/vwochnik/gost v0.0.0-20180414143050-a57c79093880 // indirect
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+	golang.org/x/net v0.0.0-20200923182212-328152dc79b1 // indirect
 )
