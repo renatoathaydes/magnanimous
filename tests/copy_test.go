@@ -37,7 +37,7 @@ func TestCopy(t *testing.T) {
 	}
 
 	w := strings.Builder{}
-	me := result.Write(&w, &stack, true)
+	me := result.Write(&w, &stack, true, false)
 
 	if me != nil {
 		t.Fatal(me)

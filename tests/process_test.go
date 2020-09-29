@@ -21,7 +21,7 @@ func TestMarkdownEngineAlwaysMakesTheSameThing(t *testing.T) {
 	writeContentToString := func() string {
 		stack := mg.NewContextStack(mg.NewContext())
 		var w strings.Builder
-		err := wf.Write(&w, &stack, false)
+		err := wf.Write(&w, &stack, false, false)
 		check(err)
 		return w.String()
 	}

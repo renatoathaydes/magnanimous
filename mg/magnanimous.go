@@ -160,10 +160,10 @@ func writeFile(file, targetFile string, wf WebFile, stack *ContextStack) error {
 	defer f.Close()
 	w := bufio.NewWriter(f)
 	defer w.Flush()
-	return wf.Write(w, stack, true)
+	return wf.Write(w, stack, true, false)
 }
 
-func (wf *WebFile) Write(writer io.Writer, stack *ContextStack, useScope bool) error {
+func (wf *WebFile) Write(writer io.Writer, stack *ContextStack, useScope, writePlain bool) error {
 	if useScope {
 		pushResult := stack.Push(wf.GetLocation(), true)
 		defer stack.Pop(pushResult)
@@ -172,9 +172,9 @@ func (wf *WebFile) Write(writer io.Writer, stack *ContextStack, useScope bool) e
 	inMd := isMd(wf.Processed.GetLocation().Origin)
 	var buffer bytes.Buffer
 	buffer.Grow(512)
-	inMd, err := writeContents(wf.Processed.GetContents(), writer, &buffer, stack, inMd)
+	inMd, err := writeContents(wf.Processed.GetContents(), writer, &buffer, stack, inMd, writePlain)
 	if err == nil {
-		if inMd {
+		if inMd && !writePlain {
 			err = flushMdAsHtml(&buffer, writer)
 		} else {
 			err = flush(&buffer, writer)
@@ -188,10 +188,11 @@ func (wf *WebFile) GetLocation() *Location {
 	return &Location{Origin: origin, Row: 0, Col: 0}
 }
 
-func writeContents(contents []Content, writer io.Writer, buffer *bytes.Buffer, stack *ContextStack, inMd bool) (stillInMd bool, err error) {
+func writeContents(contents []Content, writer io.Writer, buffer *bytes.Buffer, stack *ContextStack,
+	inMd, writePlain bool) (stillInMd bool, err error) {
 	stillInMd = inMd
 	for _, content := range contents {
-		stillInMd, err = writeContent(content, writer, buffer, stack, stillInMd)
+		stillInMd, err = writeContent(content, writer, buffer, stack, stillInMd, writePlain)
 		if err != nil {
 			return
 		}
@@ -199,14 +200,15 @@ func writeContents(contents []Content, writer io.Writer, buffer *bytes.Buffer, s
 	return
 }
 
-func writeContent(c Content, writer io.Writer, buffer *bytes.Buffer, stack *ContextStack, inMd bool) (stillInMd bool, err error) {
+func writeContent(c Content, writer io.Writer, buffer *bytes.Buffer, stack *ContextStack,
+	inMd, writePlain bool) (stillInMd bool, err error) {
 	isScoped := c.IsScoped()
 	stillInMd = isMd(c.GetLocation().Origin)
-	// flush the buffer only in case the content switched format from/to md.
-	if inMd && !stillInMd {
-		err = flushMdAsHtml(buffer, writer)
-	} else if !inMd && stillInMd {
+	// flush the buffer only in case we're writing plain content, or the content switched format from/to md.
+	if writePlain || (!inMd && stillInMd) {
 		err = flush(buffer, writer)
+	} else if inMd && !stillInMd {
+		err = flushMdAsHtml(buffer, writer)
 	}
 	if err != nil {
 		return
@@ -217,7 +219,7 @@ func writeContent(c Content, writer io.Writer, buffer *bytes.Buffer, stack *Cont
 
 	next, err := c.Write(buffer, stack)
 	if err == nil && len(next) > 0 {
-		stillInMd, err = writeContents(next, writer, buffer, stack, stillInMd)
+		stillInMd, err = writeContents(next, writer, buffer, stack, stillInMd, writePlain)
 	}
 	return
 }

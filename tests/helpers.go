@@ -107,7 +107,7 @@ func checkParsing(t *testing.T,
 	wf := mg.WebFile{Processed: pf}
 
 	var result strings.Builder
-	err := wf.Write(&result, &stack, false)
+	err := wf.Write(&result, &stack, false, false)
 	check(err)
 
 	if result.String() != expectedContents {
@@ -152,7 +152,7 @@ func checkContents(t *testing.T,
 	wf := &mg.WebFile{Name: "test", Processed: pf}
 	var b bytes.Buffer
 	b.Grow(512)
-	err := wf.Write(&b, &stack, false)
+	err := wf.Write(&b, &stack, false, false)
 	if err != nil {
 		t.Fatal(err)
 	}
