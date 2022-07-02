@@ -117,6 +117,8 @@ func createInstruction(name, arg string, location *Location,
 		return NewIncludeInstruction(arg, location, original, resolver)
 	case "includeB64":
 		return NewIncludeB64Instruction(arg, location, original, resolver)
+	case "includeRaw":
+		return NewIncludeRawInstruction(arg, location, original, resolver)
 	case "define":
 		return NewDefineInstruction(arg, location, original, resolver)
 	case "eval":

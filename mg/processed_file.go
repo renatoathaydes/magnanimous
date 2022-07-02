@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -30,6 +31,17 @@ func (f *ProcessedFile) GetLocation() *Location {
 
 func (f *ProcessedFile) GetContents() []Content {
 	return f.contents
+}
+
+// GetRawContents re-reads this file without any processing, returning
+// the contents as a single string.
+func (f *ProcessedFile) GetRawContents() (*string, error) {
+	c, err := os.ReadFile(f.Path)
+	if err != nil {
+		return nil, err
+	}
+	str := string(c)
+	return &str, nil
 }
 
 // ResolveContext evaluates all of the [Definition]s at the top-level scope

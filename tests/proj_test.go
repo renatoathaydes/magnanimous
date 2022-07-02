@@ -335,6 +335,23 @@ Number: 23</p>
 `)
 }
 
+func TestProj7(t *testing.T) {
+	dir := runMg(t, "test_proj_7")
+	defer os.RemoveAll(dir)
+
+	files, err := readAll(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(files) != 2 {
+		t.Fatalf("Expected 2 output files, but got: %v", files)
+	}
+
+	assertFileContents(t, files, dir, "index.html", "<p>Hello</p>\n\n"+
+		"<h2>Header</h2>\n\n<p>{{ eval &ldquo;must not evaluate this in includeRaw&rdquo; }}</p>\n\n<p>END</p>\n")
+	assertFileContents(t, files, dir, "other.html", "<h2>Header</h2>\n\n<p>must not evaluate this in includeRaw</p>\n")
+}
+
 // Initial results:
 // 789098 ns/op
 // 801477 ns/op
