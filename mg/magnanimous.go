@@ -200,10 +200,16 @@ func writeContents(contents []Content, writer io.Writer, buffer *bytes.Buffer, s
 	return
 }
 
+func forceMarkdown(stack *ContextStack) bool {
+	value, forceMd := stack.Get("_forceMarkdown")
+	return forceMd && value != nil
+}
+
 func writeContent(c Content, writer io.Writer, buffer *bytes.Buffer, stack *ContextStack,
 	inMd, writePlain bool) (stillInMd bool, err error) {
+	forceMd := forceMarkdown(stack)
 	isScoped := c.IsScoped()
-	stillInMd = isMd(c.GetLocation().Origin)
+	stillInMd = forceMd || isMd(c.GetLocation().Origin)
 	// flush the buffer only in case we're writing plain content, or the content switched format from/to md.
 	if writePlain || (!inMd && stillInMd) {
 		err = flush(buffer, writer)
@@ -219,7 +225,7 @@ func writeContent(c Content, writer io.Writer, buffer *bytes.Buffer, stack *Cont
 
 	next, err := c.Write(buffer, stack)
 	if err == nil && len(next) > 0 {
-		stillInMd, err = writeContents(next, writer, buffer, stack, stillInMd, writePlain)
+		stillInMd, err = writeContents(next, writer, buffer, stack, stillInMd || forceMd, writePlain)
 	}
 	return
 }

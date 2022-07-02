@@ -348,7 +348,10 @@ func TestProj7(t *testing.T) {
 	}
 
 	assertFileContents(t, files, dir, "index.html", "<p>Hello</p>\n\n"+
-		"<h2>Header</h2>\n\n<p>{{ eval &ldquo;must not evaluate this in includeRaw&rdquo; }}</p>\n\n<p>END</p>\n")
+		"<h2>Header</h2>\n\n<p>{{ eval &ldquo;must not evaluate this in includeRaw&rdquo; }}</p>\n"+
+		"<pre tabindex=\"0\" style=\"background-color:#fff;\"><code><span style=\"display:flex;\"><span><span style=\"color:#888\">&lt;</span><span style=\"color:#2838b0\">h4</span><span style=\"color:#888\"></span><span style=\"color:#888\">&gt;</span>Force markdown so this gets color highlighted in markdown<span style=\"color:#888\">&lt;</span><span style=\"color:#888\">/</span><span style=\"color:#2838b0\">h4</span><span style=\"color:#888\">&gt;</span>\n"+
+		"</span></span><span style=\"display:flex;\"><span>\n</span></span></code></pre>"+
+		"\n<p>END</p>\n")
 	assertFileContents(t, files, dir, "other.html", "<h2>Header</h2>\n\n<p>must not evaluate this in includeRaw</p>\n")
 }
 

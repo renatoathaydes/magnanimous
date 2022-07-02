@@ -88,6 +88,7 @@ func (c *ContextStack) Size() int {
 	return len(c.contexts)
 }
 
+// Get a variable in the current context.
 func (c *ContextStack) Get(name string) (interface{}, bool) {
 	for i := 0; i < c.Size(); i++ {
 		ctx := c.GetContextAt(i)

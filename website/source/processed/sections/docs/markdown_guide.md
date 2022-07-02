@@ -182,7 +182,39 @@ should look like in your own website!
 The code highlighting is done by [Chroma](https://github.com/alecthomas/chroma).
 
 You can find which [languages](https://github.com/alecthomas/chroma#supported-languages) are supported in their
-documentation.                   
+documentation.
 
+### Forcing files with a different extension to be treated as markdown
+
+You can force files with other extensions to be treated as Markdown (and consequently, get converted to HTML) by defining a variable named
+`_forceMarkdown` with a non-nil value.
+
+Unlike with an actual `.md` file, however, Magnanimous will not change the file extension to HTML.
+
+For example, if you have a file called `hello.txt` which for whatever reason actually contains markdown, you can tell Magnanimous
+to convert the file to HTML by adding this at the top of the file:
+
+```markdown
+{{ define _forceMarkdown 1 }}
+```
+
+This is most useful when including content from non-markdown files into markdown.
+Just define this variable before including some other file and the other
+file will be treated as if it were a `.md` file.
+
+Re-define the variable as `null` to turn this off:
+
+```
+# Inside hello.txt
+
+{{ define _forceMarkdown 1 }}
+
+{{ doc this file will be converted from MD to HTML }}
+{{ include other.txt }}
+
+{{ define _forceMarkdown null }}
+{{ doc this one will not! }}
+{{ include yet-another.txt }}
+```
 
 {{ include _docs_footer.html }}

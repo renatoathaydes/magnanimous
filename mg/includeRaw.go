@@ -42,6 +42,6 @@ func (inc *IncludeRawInstruction) Write(writer io.Writer, context Context) ([]Co
 	if err != nil {
 		return nil, err
 	}
-	content := New(*str, webFile.GetLocation())
+	content := NewStringContent(*str, webFile.GetLocation())
 	return []Content{content}, nil
 }
