@@ -2,13 +2,9 @@ module github.com/renatoathaydes/magnanimous
 
 go 1.15
 
+replace github.com/Depado/bfchroma/v2 => github.com/renatoathaydes/bfchroma/v2 v2.0.0-20220702095306-e9909870d30b
+
 require (
-	github.com/Depado/bfchroma v1.3.0
-	github.com/m3ng9i/ran v0.1.5 // indirect
-	github.com/russross/blackfriday/v2 v2.0.1
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/vwochnik/gost v0.0.0-20180414143050-a57c79093880 // indirect
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
-	golang.org/x/net v0.0.0-20200923182212-328152dc79b1 // indirect
+	github.com/Depado/bfchroma/v2 v2.0.0-00010101000000-000000000000
+	github.com/russross/blackfriday/v2 v2.1.0
 )
