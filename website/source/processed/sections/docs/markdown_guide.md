@@ -195,7 +195,7 @@ For example, if you have a file called `hello.txt` which for whatever reason act
 to convert the file to HTML by adding this at the top of the file:
 
 ```markdown
-{{ define _forceMarkdown 1 }}
+\{{ define _forceMarkdown 1 }}
 ```
 
 This is most useful when including content from non-markdown files into markdown.
@@ -204,17 +204,19 @@ file will be treated as if it were a `.md` file.
 
 Re-define the variable as `null` to turn this off:
 
+````markdown
+# Inside hello.md
+
+\{{ define _forceMarkdown 1 }}
+
+```html
+\{{ doc this file will be converted from MD to HTML }}
+\{{ include other.txt }}
 ```
-# Inside hello.txt
 
-{{ define _forceMarkdown 1 }}
-
-{{ doc this file will be converted from MD to HTML }}
-{{ include other.txt }}
-
-{{ define _forceMarkdown null }}
-{{ doc this one will not! }}
-{{ include yet-another.txt }}
-```
+\{{ define _forceMarkdown null }}
+\{{ doc this one will not! }}
+\{{ include yet-another.txt }}
+````
 
 {{ include _docs_footer.html }}
