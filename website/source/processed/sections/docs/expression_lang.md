@@ -27,6 +27,7 @@ Here's a list of all Magnanimous instructions:
 * [`eval`](#eval)             - evaluates an [expression](#expressions) and inserts the result into the current position.
 * [`include`](#include)       - includes contents of another file into the current position.
 * [`includeB64`](#includeB64) - includes base64-encoded contents of file into the current position.
+* [`includeRaw`](#includeRaw) - includes the raw contents (no processing) of file into the current position.
 * [`component`](#component)   - includes a [Component](components.html) into the current position.
 * [`slot`](#slot)             - defines a variable whose content is the body of the instruction.
 * [`if`](#if)                 - conditionally includes some content into the current position.
@@ -194,6 +195,24 @@ Example:
 <!-- include a gif file encoded as a data URL -->
 <img src="data:image/gif;base64,\{{ includeB64 path/to/file.gif }}">
 ```
+
+See the [include](#include) documentation for more information about paths that may be used.
+
+{{ component /processed/components/_linked_header.html }}\
+{{ define id "includeRaw" }}{{ define tag "h3" }}\
+{{ end }}
+
+#### Syntax:
+
+```
+\{{ includeRaw <path> }}
+```
+
+_where:_
+
+* `path` is a [path](paths.html) to another file.
+
+The `includeRaw` statement is used to include the raw (unprocessed) contents of a file into another file.
 
 See the [include](#include) documentation for more information about paths that may be used.
 
