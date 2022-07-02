@@ -39,9 +39,9 @@ to the action!</p>
 will probably be present in all of your pages, including the main CSS styles, header and footer etc.</p>
 
 <p>First of all, we need a root directory for our project:</p>
-<pre style="background-color:#fff">$ mkdir my-website
-$ cd my-website
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ mkdir my-website
+</span></span><span style="display:flex;"><span>$ cd my-website
+</span></span></code></pre>
 <p>Magnanimous expects all of your content to be put into the <code>source</code> directory.</p>
 
 <p>Within that, there should be a <code>processed</code> directory for files that Magnanimous should process, and a <code>static</code>
@@ -53,72 +53,72 @@ conditions, define and use variables to avoid repetition, and many other cool th
 
 <p>But continuing with the website skeleton: we&rsquo;ll also definitely need some CSS to make the website look great&hellip;
 let&rsquo;s create a <code>css</code> directory under <code>static</code> to store the stylesheets:</p>
-<pre style="background-color:#fff">$ mkdir -p source/static/css
-$ mkdir -p source/processed
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ mkdir -p source/static/css
+</span></span><span style="display:flex;"><span>$ mkdir -p source/processed
+</span></span></code></pre>
 <p>To keep with the minimalistic nature of Magnanimous, let&rsquo;s use a minimalistic CSS framework,
 <a href="https://milligram.io">Milligram</a>, which will make it easy for us to create a good looking website at the cost of
 adding a 2kb gzipped CSS file to our pages, which is about as cheap as it can get!</p>
 
 <p>To get the Milligram CSS file, you can either download it from its <a href="https://cdnjs.com/libraries/milligram">CDN</a> or
 install with NPM:</p>
-<pre style="background-color:#fff">$ npm install milligram
-$ cp node_modules/milligram/dist/milligram.min.css source/static/css
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ npm install milligram
+</span></span><span style="display:flex;"><span>$ cp node_modules/milligram/dist/milligram.min.css source/static/css
+</span></span></code></pre>
 <p>Great! We&rsquo;ve got our first website file (and we didn&rsquo;t have to write anything!)&hellip; now we need some HTML fragments
 (incomplete pieces of HTML that will be used by other files to create complete HTML files).</p>
 
 <p>Create a HTML header at <code>source/processed/_header.html</code> with the following contents:</p>
-<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/_header.html</div><p>Now, create a footer:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">footer</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;footer&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is the website footer<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Check out the <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;https://renatoathaydes.github.io/magnanimous&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span> website.<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">footer</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/_footer.html</div><p>This is the last piece we needed to create full HTML pages! Notice how the header and footer fit together, so we
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/_header.html</div><p>Now, create a footer:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">footer</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;footer&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is the website footer<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Check out the <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;https://renatoathaydes.github.io/magnanimous&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span> website.<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">footer</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/_footer.html</div><p>This is the last piece we needed to create full HTML pages! Notice how the header and footer fit together, so we
 should <code>include</code> them both in all our HTML and Markdown pages.</p>
 
 <h3>1.2. Create the Home page (index.html)</h3>
 
 <p>We&rsquo;re ready to create the <code>index.html</code> page now!</p>
-<pre style="background-color:#fff">{{ include _header.html }}
-<span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Creating great Websites<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Isn&#39;t this a good looking page?!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-{{ include _footer.html }}
-</pre><div class="file-box">source/processed/index.html</div><p>Done!</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include _header.html }}
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Creating great Websites<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Isn&#39;t this a good looking page?!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ include _footer.html }}
+</span></span></code></pre><div class="file-box">source/processed/index.html</div><p>Done!</p>
 
 <p><a href="https://github.com/renatoathaydes/magnanimous-tutorial/commit/ed8032fd372de2998aadf3627d17186c7a0d8eeb">GitHub Commit</a></p>
 
 <h3>1.3. Build the website</h3>
 
 <p>Just run Magnanimous:</p>
-<pre style="background-color:#fff">$ magnanimous
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous
+</span></span></code></pre>
 <p>It will print something like this:</p>
-<pre style="background-color:#fff">2019/03/09 20:22:14 No global context file defined.
-2019/03/09 20:22:14 Creating file target/index.html from source/processed/index.html
-2019/03/09 20:22:14 Creating file target/css/milligram.min.css from source/static/css/milligram.min.css
-2019/03/09 20:22:14 Magnanimous generated website in 1.766838ms
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>2019/03/09 20:22:14 No global context file defined.
+</span></span><span style="display:flex;"><span>2019/03/09 20:22:14 Creating file target/index.html from source/processed/index.html
+</span></span><span style="display:flex;"><span>2019/03/09 20:22:14 Creating file target/css/milligram.min.css from source/static/css/milligram.min.css
+</span></span><span style="display:flex;"><span>2019/03/09 20:22:14 Magnanimous generated website in 1.766838ms
+</span></span></code></pre>
 <blockquote>
 <p>Don&rsquo;t worry about the <code>No global context file defined</code> message for now&hellip; we&rsquo;ll see later how to use a global
   context to support internationalization and deploying the website to different server root paths.</p>
@@ -165,21 +165,21 @@ much easier to write.</p>
 <p>The directory maps directly to the page URL, so files inside <code>source/processed/sections/</code> will be served under the
   <code>sections/</code> URL path (e.g. <code>http://www.example.com/sections/home.html</code>).</p>
 </blockquote>
-<pre style="background-color:#fff">{{ include /processed/_header.html }}
-<span style="color:#444">## About
-</span><span style="color:#444"></span>
-This website demonstrates some [<span style="color:#2838b0">Magnanimous</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) features.
-
-{{ include /processed/_footer.html }}
-</pre><div class="file-box">source/processed/sections/about.md</div><div style="height: 1em;"></div><pre style="background-color:#fff">{{ include /processed/_header.html }}
-<span style="color:#444">## Contact Us
-</span><span style="color:#444"></span>
-Do not hesitate to contact us!
-
-[<span style="color:#2838b0">Click here</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) to visit our website.
-
-{{ include /processed/_footer.html }}
-</pre><div class="file-box">source/processed/sections/contact.md</div><p>After running <code>magnanimous</code> again, you can visit the new pages directly on their URL:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include /processed/_header.html }}
+</span></span><span style="display:flex;"><span><span style="color:#444">## About
+</span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
+</span></span><span style="display:flex;"><span>This website demonstrates some [<span style="color:#2838b0">Magnanimous</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) features.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ include /processed/_footer.html }}
+</span></span></code></pre><div class="file-box">source/processed/sections/about.md</div><div style="height: 1em;"></div><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include /processed/_header.html }}
+</span></span><span style="display:flex;"><span><span style="color:#444">## Contact Us
+</span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
+</span></span><span style="display:flex;"><span>Do not hesitate to contact us!
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#2838b0">Click here</span>](<span style="color:#388038">https://renatoathaydes.github.io/magnanimous/</span>) to visit our website.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ include /processed/_footer.html }}
+</span></span></code></pre><div class="file-box">source/processed/sections/contact.md</div><p>After running <code>magnanimous</code> again, you can visit the new pages directly on their URL:</p>
 
 <ul>
 <li><a href="http://localhost:8080/sections/about.html">http://localhost:8080/sections/about.html</a>.</li>
@@ -197,10 +197,10 @@ it much easier: the <a href="expression_lang.html#for">for</a> instruction lets 
 directory automatically.</p>
 
 <p>The <code>for</code> instruction we need to add to the header looks like this:</p>
-<pre style="background-color:#fff">{{ for section /processed/sections/ }}\
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-{{ end }}\
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span></code></pre>
 <blockquote>
 <p>The <code>\</code> at the end of the instruction lines escapes the new line in the resulting file, so there won&rsquo;t be lots of
   empty lines in it.</p>
@@ -211,29 +211,29 @@ Each file is then assigned to a variable named <code>section</code>.</p>
 
 <p>Next, we create HTML links by calling <code>eval section</code> both in the <code>href</code> and the actual text shown to the users. We&rsquo;ll
 improve this later&hellip; but for now, here&rsquo;s what the <code>processed/_header.html</code> file should look like at this point:</p>
-<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">nav</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;navigation&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-        {{ for section /processed/sections/ }}\
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-        {{ end }}\
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/_header.html</div><div style="height: 1em;"></div><p>With the new page header, the new <code>About</code> page now looks like this:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">nav</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;navigation&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        {{ end }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/_header.html</div><div style="height: 1em;"></div><p>With the new page header, the new <code>About</code> page now looks like this:</p>
 
 <iframe src="demo/demo-website-part-2.html"
     title="Demo Website V1" width="90%" height="360"></iframe>
@@ -247,49 +247,49 @@ the name of the sections. That&rsquo;s because Magnanimous doesn&rsquo;t know wh
 
 <p>But we can tell it! On each section page, we can define a variable called <code>name</code> which can then be used by the header
 to display the section name, rather than its path:</p>
-<pre style="background-color:#fff">{{ define name &#34;About&#34; }}
-
-<span style="color:#444">## About
-</span><span style="color:#444"></span>
-...
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;About&#34; }}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#444">## About
+</span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre>
 <p>Now, the header can refer to the <code>name</code> variable on each file (notice we write <code>eval section.name</code> instead of just
 <code>eval section</code> for the link&rsquo;s text):</p>
-<pre style="background-color:#fff">{{ for section /processed/sections/ }}\
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-{{ end }}\
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span></code></pre>
 <p>This feature allows us to create summaries of files very easily&hellip; for example, you could put your blog posts under the
 <code>processed/blog</code> directory, and add a few definitions on top of each file, like this:</p>
-<pre style="background-color:#fff">{{ define name &#34;My first blog post&#34; }}\
-{{ define date &#34;2019-03-10&#34; }}\
-{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\
-
-<span style="color:#444">## My first blog post
-</span><span style="color:#444"></span>
-<span style="color:#444">### Abstract
-</span><span style="color:#444"></span>
-{{ eval abstract }}\
-
-...
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first blog post&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2019-03-10&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#444">## My first blog post
+</span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
+</span></span><span style="display:flex;"><span><span style="color:#444">### Abstract
+</span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
+</span></span><span style="display:flex;"><span>{{ eval abstract }}\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre>
 <p>On the blog summary page, you could then list your blog posts:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Most recent blog posts:<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">ul</span><span style="color:#888"></span><span style="color:#888">&gt;</span> 
-{{ for blog_post /processed/blog }}\
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">li</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval blog_post }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.date  }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.abstract }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">li</span><span style="color:#888">&gt;</span>    
-{{ end }}\
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">ul</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Most recent blog posts:<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">ul</span><span style="color:#888"></span><span style="color:#888">&gt;</span> 
+</span></span><span style="display:flex;"><span>{{ for blog_post /processed/blog }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">li</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval blog_post }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.date  }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.abstract }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">li</span><span style="color:#888">&gt;</span>    
+</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">ul</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <p>The <a href="expression_lang.html#for"><code>for</code></a> instructions supports sorting and limits:</p>
-<pre style="background-color:#fff">{{ for blog_post (sortBy date reverse limit 10) }}\
-...
-{{ end }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for blog_post (sortBy date reverse limit 10) }}\
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>{{ end }}
+</span></span></code></pre>
 <p><a href="https://github.com/renatoathaydes/magnanimous-tutorial/commit/ab3003ce72267ee2e7c6de1a6185785e22a4de66">GitHub Commit</a></p>
 
 <h3>2.3 Customizing included content</h3>
@@ -302,9 +302,9 @@ disorientating for users.</p>
 page.</p>
 
 <p>To do that, we&rsquo;ll use the <a href="expression_lang.html#if"><code>if</code></a> instruction, which works like this:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> 
-   <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> 
+</span></span><span style="display:flex;"><span>   <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <blockquote>
 <p>Notice the use of <code>`</code> (back-ticks) inside the class String to avoid confusion with the surrounding
   double-quotes. Magnanimous allows both back-ticks and double-quotes as String de-markers.</p>
@@ -315,35 +315,35 @@ page.</p>
 
 <p>We haven&rsquo;t defined the name of the Home page yet&hellip; to make this work, we need to add this line to the top of the
 <code>index.html</code> file (it must be defined before the header is included):</p>
-<pre style="background-color:#fff">{{ define name &#34;Home&#34; }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;Home&#34; }}
+</span></span></code></pre>
 <p>Next, we add similar <code>if</code>s for the section pages (which already have names!), so that now the HTML header will
 look like this:</p>
-<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">nav</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;navigation&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> 
-            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-        {{ for section /processed/sections/ }}\
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> 
-            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-        {{ end }}\
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Magnanimous Tutorial Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">header</span> <span style="color:#388038">id</span><span style="color:#666">=</span><span style="color:#b83838">&#34;home&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;header&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">nav</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;navigation&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        {{ end }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Demo Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;description&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A Magnanimous demo website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">header</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <p>The navigation buttons will now look highlighted only on the page they refer to:</p>
 
 <iframe src="demo/demo-website-part-2-3-home.html"
@@ -354,15 +354,15 @@ look like this:</p>
 <h3>2.4 The global context</h3>
 
 <p>When you run <code>magnanimous</code>, you&rsquo;ll see the following message:</p>
-<pre style="background-color:#fff">2019/03/10 18:49:34 No global context file defined.
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>2019/03/10 18:49:34 No global context file defined.
+</span></span></code></pre>
 <p>This means you have not yet defined a global context file. The global context file is just a processed file which
 you can use to define global variables that can be used anywhere.</p>
 
 <p>By default, the global context file is located at <code>source/processed/_global_context</code>, but you can set it to another
 file by using the <code>-globalctx</code> option (the path must be relative to <code>source/processed</code>:</p>
-<pre style="background-color:#fff">$ magnanimous -globalctx _local_global_context
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous -globalctx _local_global_context
+</span></span></code></pre>
 <p>This may seem like a bad idea, but it&rsquo;s extremely useful to solve problems like internationalization and making links
 that work on different environments. In the next couple of sections we&rsquo;ll see how we can do that.</p>
 
@@ -374,8 +374,8 @@ that work on different environments. In the next couple of sections we&rsquo;ll 
 
 <p>For example, if you deploy your website to <a href="https://pages.github.com/">GitHub Pages</a>
 (as we&rsquo;re going to do soon!), the URL to your website will look like this:</p>
-<pre style="background-color:#fff">https://username.github.io/projectname/
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>https://username.github.io/projectname/
+</span></span></code></pre>
 <blockquote>
 <p>This website itself, by the way, is hosted on Github!!
   <a href="https://renatoathaydes.github.io/magnanimous/">https://renatoathaydes.github.io/magnanimous/</a>.</p>
@@ -392,12 +392,12 @@ on where you deploy it to.</p>
 project name on GitHub is <code>magnanimous-tutorial</code>.</p>
 
 <p>Then, we could define the following 2 global context files:</p>
-<pre style="background-color:#fff">Global context for local deployment: the website will be under the web server&#39;s root path
-{{ define basePath &#34;&#34; }}
-</pre><div class="file-box">source/processed/_global_context</div><p>And:</p>
-<pre style="background-color:#fff">GitHub Pages context file
-{{ define basePath &#34;/magnanimous-tutorial&#34; }}
-</pre><div class="file-box">source/processed/_github_global_context</div><p>Now, we need to change every <strong>link</strong> in the website to take into consideration the <code>basePath</code> variable.</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>Global context for local deployment: the website will be under the web server&#39;s root path
+</span></span><span style="display:flex;"><span>{{ define basePath &#34;&#34; }}
+</span></span></code></pre><div class="file-box">source/processed/_global_context</div><p>And:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>GitHub Pages context file
+</span></span><span style="display:flex;"><span>{{ define basePath &#34;/magnanimous-tutorial&#34; }}
+</span></span></code></pre><div class="file-box">source/processed/_github_global_context</div><p>Now, we need to change every <strong>link</strong> in the website to take into consideration the <code>basePath</code> variable.</p>
 
 <p>There&rsquo;s a whole chapter on <a href="paths.html">Paths and Links</a> as it&rsquo;s easy to confuse the two. But suffice it to say that
 links are things you want the browser to resolve, and paths are things you want Magnanimous to resolve.</p>
@@ -410,18 +410,18 @@ but things like links to stylesheets require it.</p>
 <ul>
 <li>stylesheet import:</li>
 </ul>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{eval basePath}}/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">link</span> <span style="color:#388038">rel</span><span style="color:#666">=</span><span style="color:#b83838">&#34;stylesheet&#34;</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{eval basePath}}/css/milligram.min.css&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <ul>
 <li>section links:</li>
 </ul>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{eval basePath}}/index.html&#34;</span> 
-    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-{{ for section /processed/sections/ }}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + section }}&#34;</span> 
-    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-{{ end }}\
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{eval basePath}}/index.html&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + section }}&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span></code></pre>
 <p>And that&rsquo;s it!</p>
 
 <p><a href="https://github.com/renatoathaydes/magnanimous-tutorial/commit/1550af30a6da9f09c1e8b09c3f7d4a7cb45ea12b">GitHub Commit</a></p>
@@ -432,22 +432,22 @@ but things like links to stylesheets require it.</p>
 
 <ul>
 <li><p>to deploy locally, you just do as you&rsquo;ve been doing so far:</p>
-<pre style="background-color:#fff">$ magnanimous
-</pre></li>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous
+</span></span></code></pre></li>
 
 <li><p>to build it with the Github project name as the base path, for publication on GitHub Pages:</p>
-<pre style="background-color:#fff">$ magnanimous -globalctx _github_global_context
-</pre></li>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous -globalctx _github_global_context
+</span></span></code></pre></li>
 </ul>
 
 <p>Reading the output, you can make sure Magnanimous picked up the right global context file:</p>
-<pre style="background-color:#fff">2019/03/10 20:23:44 Using global context file: source/processed/_github_global_context
-2019/03/10 20:23:44 Creating file target/sections/about.html from source/processed/sections/about.md
-2019/03/10 20:23:44 Creating file target/sections/contact.html from source/processed/sections/contact.md
-2019/03/10 20:23:44 Creating file target/css/milligram.min.css from source/static/css/milligram.min.css
-2019/03/10 20:23:44 Creating file target/index.html from source/processed/index.html
-2019/03/10 20:23:44 Magnanimous generated website in 5.581399ms
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>2019/03/10 20:23:44 Using global context file: source/processed/_github_global_context
+</span></span><span style="display:flex;"><span>2019/03/10 20:23:44 Creating file target/sections/about.html from source/processed/sections/about.md
+</span></span><span style="display:flex;"><span>2019/03/10 20:23:44 Creating file target/sections/contact.html from source/processed/sections/contact.md
+</span></span><span style="display:flex;"><span>2019/03/10 20:23:44 Creating file target/css/milligram.min.css from source/static/css/milligram.min.css
+</span></span><span style="display:flex;"><span>2019/03/10 20:23:44 Creating file target/index.html from source/processed/index.html
+</span></span><span style="display:flex;"><span>2019/03/10 20:23:44 Magnanimous generated website in 5.581399ms
+</span></span></code></pre>
 <p>We are now almost ready to publish the website on GitHub Pages.</p>
 
 <p>Just one last thing: GitHub Pages lets you use the master branch as the deployment branch, but you want only
@@ -455,8 +455,8 @@ the files in the <code>target</code> directory to be deployed&hellip; luckily th
 your website, but the directory must be called <code>docs</code> for some reason!</p>
 
 <p>So just make sure to move the files there when you want to deploy:</p>
-<pre style="background-color:#fff">$ mv target docs
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ mv target docs
+</span></span></code></pre>
 <p>And then <code>git push</code>! Your website should now be available online!</p>
 
 <p><a href="https://renatoathaydes.github.io/magnanimous-tutorial/">Here&rsquo;s the one</a> we&rsquo;ve created in this Tutorial!</p>

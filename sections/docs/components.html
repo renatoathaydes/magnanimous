@@ -37,9 +37,9 @@ customizable content (so you wouldn&rsquo;t want them served by the server by th
 <p>As an example, let&rsquo;s say we want to create a component to represent a simple <em>warning</em> box.</p>
 
 <p>It could look like this:</p>
-<pre style="background-color:#fff">{{ doc This component takes its contents and displays it in a warning box }}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval __contents__ }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/components/_warning.html</div><blockquote>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ doc This component takes its contents and displays it in a warning box }}\
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval __contents__ }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/components/_warning.html</div><blockquote>
 <p>Notice that <code>__contents__</code> is a special variable that holds the contents of the component when it&rsquo;s used
   (i.e. the content wrapped between {{ component path }} and {{ end }} as we&rsquo;ll see below).</p>
 </blockquote>
@@ -47,23 +47,23 @@ customizable content (so you wouldn&rsquo;t want them served by the server by th
 <p>That&rsquo;s it!</p>
 
 <p>You could then use this component in other processed files like this:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-
-{{ component /processed/components/_warning.html }}
-    This is a warning message!
-{{ end }}
-
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ component /processed/components/_warning.html }}
+</span></span><span style="display:flex;"><span>    This is a warning message!
+</span></span><span style="display:flex;"><span>{{ end }}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <p>Which should render like this:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    This is a warning message!
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div style="height: 1em;"></div>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Some content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    This is a warning message!
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>More content<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div style="height: 1em;"></div>
 <h2 id="customizing-components-with-variables" class="link-header-component">
 <a href="#customizing-components-with-variables"><img src="/magnanimous/images/link.svg"></a>
 <span>Customizing components with variables</span>
@@ -74,24 +74,24 @@ component (i.e. not visible in the surrounding scope).</p>
 
 <p>Let&rsquo;s look at an example to clarify what that means. This component expects 2 variables (<code>my_variable</code> and <code>other_var</code>)
 to be set for customizing it:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval my_variable }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval other_var }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/components/_var_example.html</div><p>When using it, we need to provide values for both variables, which we can do both from outside and from inside the
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval my_variable }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval other_var }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/components/_var_example.html</div><p>When using it, we need to provide values for both variables, which we can do both from outside and from inside the
 component:</p>
-<pre style="background-color:#fff">{{ define my_variable &#34;This is available in the component&#39;s scope&#34; }}\
-
-{{ component /processed/components/_var_example.html }}
-    {{ define other_var &#34;This also!&#34; }}\
-{{ end }}
-</pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
-<pre style="background-color:#fff">
-<span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is available in the component&#39;s scope<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This also!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define my_variable &#34;This is available in the component&#39;s scope&#34; }}\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ component /processed/components/_var_example.html }}
+</span></span><span style="display:flex;"><span>    {{ define other_var &#34;This also!&#34; }}\
+</span></span><span style="display:flex;"><span>{{ end }}
+</span></span></code></pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is available in the component&#39;s scope<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">span</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This also!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">span</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
 <h2 id="customizing-components-with-slots" class="link-header-component">
 <a href="#customizing-components-with-slots"><img src="/magnanimous/images/link.svg"></a>
 <span>Customizing components with slots</span>
@@ -106,39 +106,39 @@ of the component can be provided by slots defined elsewhere.</p>
 
 <p>For example, we can create a component that places its contents in 3 areas: top, middle and bottom
 (where both top and bottom are optional):</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval top || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval middle }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval bottom || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/components/_slots_example.html</div><p>To use this component is pretty easy:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Hello world<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-{{ component /processed/components/_slots_example.html }}
-    {{ slot top }}
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-    {{ end }}
-    {{ slot middle }}
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-    {{ end }}
-    {{ slot bottom }}
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-    {{ end }}
-{{ end }}
-</pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval top || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval middle }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval bottom || &#34;&#34; }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/components/_slots_example.html</div><p>To use this component is pretty easy:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Hello world<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ component /processed/components/_slots_example.html }}
+</span></span><span style="display:flex;"><span>    {{ slot top }}
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    {{ end }}
+</span></span><span style="display:flex;"><span>    {{ slot middle }}
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    {{ end }}
+</span></span><span style="display:flex;"><span>    {{ slot bottom }}
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    {{ end }}
+</span></span><span style="display:flex;"><span>{{ end }}
+</span></span></code></pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;top&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the top<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;middle&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes in the middle<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;bottom&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This goes at the bottom<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">target/example.html</div><div style="height: 1em;"></div>
 <h2 id="advanced-example" class="link-header-component">
 <a href="#advanced-example"><img src="/magnanimous/images/link.svg"></a>
 <span>A more advanced example</span>
@@ -158,76 +158,76 @@ of the component can be provided by slots defined elsewhere.</p>
 </ul>
 
 <p>To make things more concrete, here&rsquo;s what the files could look like:</p>
-<pre style="background-color:#fff">{{ define name &#34;My first post&#34; }}\
-{{ define path &#34;/processed/posts/first_post.html&#34; }}\
-{{ define date &#34;2018-04-05&#34; }}\
-
-<span style="color:#666"># My first post
-</span><span style="color:#666"></span>
-etc...
-</pre><div class="file-box">source/processed/posts/first_post.md</div><pre style="background-color:#fff">{{ define name &#34;My second post&#34; }}\
-{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\
-{{ define date &#34;2018-06-07&#34; }}\
-
-<span style="color:#666"># My second post
-</span><span style="color:#666"></span>
-etc...
-</pre><div class="file-box">source/processed/posts/second_post.md</div><p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
-<pre style="background-color:#fff">{{ doc
-    Arguments:
-      * dataDirectory - path to a directory containing files with the following properties:
-          * name
-          * path
-          * date
-}}\
-<span style="color:#888">&lt;</span><span style="color:#2838b0">table</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data-table-component&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">thead</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Date<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Name<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">thead</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">tbody</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    {{ for post (sortBy date) eval dataDirectory }}\
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval post.path }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
-    {{ end }}\
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/components/_data_table.html</div><p>Finally, we can add the component to our index page (and any other pages we want!):</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-{{ component /processed/components/_data_table.html }}\
-    {{ define dataDirectory &#34;/processed/posts&#34; }}\
-{{ end }}\
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/index.html</div><p>And we&rsquo;re done!</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first post&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define path &#34;/processed/posts/first_post.html&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2018-04-05&#34; }}\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#666"># My first post
+</span></span></span><span style="display:flex;"><span><span style="color:#666"></span>
+</span></span><span style="display:flex;"><span>etc...
+</span></span></code></pre><div class="file-box">source/processed/posts/first_post.md</div><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My second post&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2018-06-07&#34; }}\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#666"># My second post
+</span></span></span><span style="display:flex;"><span><span style="color:#666"></span>
+</span></span><span style="display:flex;"><span>etc...
+</span></span></code></pre><div class="file-box">source/processed/posts/second_post.md</div><p>Now, we can define a simple HTML component that will put the posts&rsquo; metadata in a HTML table:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ doc
+</span></span><span style="display:flex;"><span>    Arguments:
+</span></span><span style="display:flex;"><span>      * dataDirectory - path to a directory containing files with the following properties:
+</span></span><span style="display:flex;"><span>          * name
+</span></span><span style="display:flex;"><span>          * path
+</span></span><span style="display:flex;"><span>          * date
+</span></span><span style="display:flex;"><span>}}\
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">table</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data-table-component&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">thead</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Date<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Name<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">thead</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tbody</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    {{ for post (sortBy date) eval dataDirectory }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval post.path }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    {{ end }}\
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/components/_data_table.html</div><p>Finally, we can add the component to our index page (and any other pages we want!):</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>{{ component /processed/components/_data_table.html }}\
+</span></span><span style="display:flex;"><span>    {{ define dataDirectory &#34;/processed/posts&#34; }}\
+</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/index.html</div><p>And we&rsquo;re done!</p>
 
 <p>Here&rsquo;s what the result should look like:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">table</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data-table-component&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">thead</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Date<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Name<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">thead</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">tbody</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>2018-04-05<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/processed/posts/first_post.html&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My first post<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>2018-06-07<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/processed/posts/second_post.html&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My second post<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">target/index.html</div><p>Now, go on and create your own awesome components!</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">table</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data-table-component&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">thead</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Date<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Name<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">thead</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tbody</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>2018-04-05<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/processed/posts/first_post.html&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My first post<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>2018-06-07<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/processed/posts/second_post.html&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My second post<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">target/index.html</div><p>Now, go on and create your own awesome components!</p>
 </div>
 <div class="footer">
     <div>

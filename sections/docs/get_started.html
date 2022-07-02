@@ -29,8 +29,8 @@
 <p>You can download the appropriate executable for your OS from <a href="https://github.com/renatoathaydes/magnanimous/releases">the Releases Page</a>.</p>
 
 <p>If you have Go installed, just run:</p>
-<pre style="background-color:#fff">go get -u github.com/renatoathaydes/magnanimous
-</pre><div style="height: 1em;"></div>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>go get -u github.com/renatoathaydes/magnanimous
+</span></span></code></pre><div style="height: 1em;"></div>
 <h2 id="magnanimous-directories" class="link-header-component">
 <a href="#magnanimous-directories"><img src="/magnanimous/images/link.svg"></a>
 <span>Magnanimous directories</span>
@@ -73,54 +73,54 @@ But they are useful to create <a href="components.html">Components</a>, or <em>f
 <code>_header.html</code> and <code>_footer.html</code> fragments to generate a final <code>target/index.html</code> file.</p>
 
 <p>The contents of <code>source/processed/index.md</code> could look like this:</p>
-<pre style="background-color:#fff">{{ define title &#34;My Website&#34; }}
-{{ include _header.html }}
-<span style="color:#666"># Main content
-</span><span style="color:#666"></span>
-This is a markdown file that will be converted to a full HTML file by Magnanimous!
-
-{{ include _footer.html }} 
-</pre><div class="file-box">source/processed/index.md</div><p>The fragments for the HTML header and footer, which you probably will want to include in most MD files:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define title &#34;My Website&#34; }}
+</span></span><span style="display:flex;"><span>{{ include _header.html }}
+</span></span><span style="display:flex;"><span><span style="color:#666"># Main content
+</span></span></span><span style="display:flex;"><span><span style="color:#666"></span>
+</span></span><span style="display:flex;"><span>This is a markdown file that will be converted to a full HTML file by Magnanimous!
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ include _footer.html }} 
+</span></span></code></pre><div class="file-box">source/processed/index.md</div><p>The fragments for the HTML header and footer, which you probably will want to include in most MD files:</p>
 
 <blockquote>
 <p>Notice the use of the <code>title</code> variable in this fragment to determine what to show in the browser&rsquo;s title bar.
   This implies that any file including this fragment must first define a value for the <code>title</code> variable, as we
   did above with <code>{{ define title &quot;My Website&quot; }}</code>.</p>
 </blockquote>
-<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/_header.html</div><pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">source/processed/_footer.html</div><p>And finally, the result in <code>target/index.html</code>:</p>
-<pre style="background-color:#fff"><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-
-<span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is my website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
-
-<span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>How awesome is it?!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
-</pre><div class="file-box">target/index.html</div><h2>Building the website</h2>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/_header.html</div><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">source/processed/_footer.html</div><p>And finally, the result in <code>target/index.html</code>:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#289870">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">meta</span> <span style="color:#388038">charset</span><span style="color:#666">=</span><span style="color:#b83838">&#34;utf-8&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My Website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h1</span><span style="color:#888"></span><span style="color:#888">&gt;</span>This is my website<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h1</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>How awesome is it?!<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
+</span></span></code></pre><div class="file-box">target/index.html</div><h2>Building the website</h2>
 
 <p>After creating a few source files, from inside the root directory (<code>my-website/</code>, in the above example), just run the
 Magnanimous executable from the command line:</p>
-<pre style="background-color:#fff">$ magnanimous
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous
+</span></span></code></pre>
 <p>You can also run <code>magnanimous</code> from other directories, in which case you just need to give the website&rsquo;s directory
 as an argument:</p>
-<pre style="background-color:#fff">$ magnanimous path/to/my-website
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ magnanimous path/to/my-website
+</span></span></code></pre>
 <p>This will create a static website in the <code>path/to/my-website/target/</code> directory.</p>
 
 <h2>Testing the website</h2>
@@ -137,14 +137,14 @@ the website looks like.</p>
 </blockquote>
 
 <h4>Python HTTP Server</h4>
-<pre style="background-color:#fff">$ cd target &amp;&amp; python -m SimpleHTTPServer 8080
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ cd target &amp;&amp; python -m SimpleHTTPServer 8080
+</span></span></code></pre>
 <p>Docs: <a href="https://docs.python.org/2/library/simplehttpserver.html">https://docs.python.org/2/library/simplehttpserver.html</a></p>
 
 <h4>NodeJS HTTP Server</h4>
-<pre style="background-color:#fff">$ npm install -g http-server
-$ http-server target
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ npm install -g http-server
+</span></span><span style="display:flex;"><span>$ http-server target
+</span></span></code></pre>
 <p>Docs: <a href="https://www.npmjs.com/package/http-server">https://www.npmjs.com/package/http-server</a></p>
 
 <h4>Java HTTP Server</h4>
@@ -152,15 +152,15 @@ $ http-server target
 <blockquote>
 <p>Disclaimer: I&rsquo;m the author of RawHTTP.</p>
 </blockquote>
-<pre style="background-color:#fff">$ curl https://jcenter.bintray.com/com/athaydes/rawhttp/rawhttp-cli/1.0/rawhttp-cli-1.0-all.jar -o rawhttp.jar
-$ java -jar ./rawhttp.jar serve .
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ curl https://jcenter.bintray.com/com/athaydes/rawhttp/rawhttp-cli/1.0/rawhttp-cli-1.0-all.jar -o rawhttp.jar
+</span></span><span style="display:flex;"><span>$ java -jar ./rawhttp.jar serve .
+</span></span></code></pre>
 <p>Docs: <a href="https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/">https://renatoathaydes.github.io/rawhttp/rawhttp-modules/cli/</a></p>
 
 <h4>Go HTTP Server</h4>
-<pre style="background-color:#fff">$ go get github.com/vwochnik/gost
-$ gost target
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>$ go get github.com/vwochnik/gost
+</span></span><span style="display:flex;"><span>$ gost target
+</span></span></code></pre>
 <p>Docs: <a href="https://github.com/vwochnik/gost">https://github.com/vwochnik/gost</a></p>
 
 <hr/>

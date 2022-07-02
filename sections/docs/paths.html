@@ -54,16 +54,16 @@ the <code>for</code> instruction.</p>
 <a href="get_started.html#magnanimous-directories"><code>source/</code></a> directory.</p>
 
 <p>Example:</p>
-<pre style="background-color:#fff">{{ include /processed/_header.html }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include /processed/_header.html }}
+</span></span></code></pre>
 <h3>Relative paths</h3>
 
 <p><strong>Relative paths</strong>, unlike absolute paths, do not start with a <code>/</code> and are resolved by the location of the file they
 are declared in.</p>
 
 <p>Example:</p>
-<pre style="background-color:#fff">{{ include _header.html }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include _header.html }}
+</span></span></code></pre>
 <p>If the above inclusion is done from the file <code>/processed/components/_comp1.html</code>, then the path, <code>_header.html</code>, will point to the file at <code>/processed/components/_header.html</code>.</p>
 
 <p>If the inclusion is from <code>/processed/_comp2.html</code>, then it points to <code>/processed/_header.html</code>.</p>
@@ -79,30 +79,30 @@ being ignored.</p>
 or any parent directory <strong>up to</strong> the <code>source</code> directory.</p>
 
 <p>Example:</p>
-<pre style="background-color:#fff">{{ include .../_messages }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include .../_messages }}
+</span></span></code></pre>
 <p><em>Up paths</em> are special in that the file they point to depends on the context. They are commonly used to allow overriding which file should be used, which is useful for things like internationalization.</p>
 
 <p>For example, given this file structure:</p>
-<pre style="background-color:#fff">source
-└── processed
-    ├── _header.html
-    ├── index.html
-    ├── _messages
-    └── pt
-    |   ├── _messages
-    |   └── index.html
-    └── sv
-        └── index.html
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>source
+</span></span><span style="display:flex;"><span>└── processed
+</span></span><span style="display:flex;"><span>    ├── _header.html
+</span></span><span style="display:flex;"><span>    ├── index.html
+</span></span><span style="display:flex;"><span>    ├── _messages
+</span></span><span style="display:flex;"><span>    └── pt
+</span></span><span style="display:flex;"><span>    |   ├── _messages
+</span></span><span style="display:flex;"><span>    |   └── index.html
+</span></span><span style="display:flex;"><span>    └── sv
+</span></span><span style="display:flex;"><span>        └── index.html
+</span></span></code></pre>
 <p>Assuming <code>source/processed/_header.html</code> has the following contents:</p>
-<pre style="background-color:#fff">{{ include .../_messages }}
-<span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
-<span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include .../_messages }}
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">head</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">title</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval title }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">title</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">head</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <blockquote>
 <p>Notice that the header file uses an <em>up path</em>, <code>.../_messages</code>.</p>
 </blockquote>
@@ -123,36 +123,36 @@ or explicitly with <code>eval &lt;expr&gt;</code>.</p>
 
 <p>For example, the paths in these <a href="expression_lang.html#include">include</a> instructions all evaluate to
 <code>/hello/world/file.html</code>:</p>
-<pre style="background-color:#fff">{{ include /hello/world/file.html }}
-{{ include &#34;/hello&#34; + &#34;/world&#34; + &#34;/file.html&#34; }}
-
-{{ define dir &#34;/hello/world/&#34; }}
-{{ include eval dir + &#34;file.html }}
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ include /hello/world/file.html }}
+</span></span><span style="display:flex;"><span>{{ include &#34;/hello&#34; + &#34;/world&#34; + &#34;/file.html&#34; }}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{ define dir &#34;/hello/world/&#34; }}
+</span></span><span style="display:flex;"><span>{{ include eval dir + &#34;file.html }}
+</span></span></code></pre>
 <h3>Path variables</h3>
 
 <p>Even though most of the time, paths are declared as simple expressions or unquoted strings, it is possible to
 explicitly declare a path as follows:</p>
-<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define my_path path<span style="color:#888">[</span><span style="color:#b83838">&#34;/processed/example/file.txt&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">{</span><span style="color:#888">{</span> define my_path path<span style="color:#888">[</span><span style="color:#b83838">&#34;/processed/example/file.txt&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</span></span></code></pre>
 <p>This is useful to read the top-level variables defined by another file.
 For example, suppose the file at <code>/processed/example/file.txt</code> contained the following definition:</p>
-<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define astronaut <span style="color:#b83838">&#34;Neil Armstrong&#34;</span> <span style="color:#888">}</span><span style="color:#888">}</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">{</span><span style="color:#888">{</span> define astronaut <span style="color:#b83838">&#34;Neil Armstrong&#34;</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</span></span></code></pre>
 <p>Then, given <code>my_path</code> defined above, we can evaluate this definition in another file:</p>
-<pre style="background-color:#fff">The first astronaut to step on the Moon was <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> my_path<span style="color:#888">.</span>astronaut <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>The first astronaut to step on the Moon was <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> my_path<span style="color:#888">.</span>astronaut <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</span></span></code></pre>
 <p>It is even possible to refer to the current file:</p>
-<pre style="background-color:#fff">This file is at <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>This file is at <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</span></span></code></pre>
 <p>Path variables can also be used with <a href="expression_lang.html#expressions">date expressions</a>:</p>
-<pre style="background-color:#fff"><span style="color:#888">{</span><span style="color:#888">{</span> define <span style="color:#2838b0">this</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
-This file <span style="color:#b83838">`</span><span style="color:#b83838">{{eval this}}</span><span style="color:#b83838">`</span> was last updated on <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> date<span style="color:#888">[</span><span style="color:#2838b0">this</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">{</span><span style="color:#888">{</span> define <span style="color:#2838b0">this</span> path<span style="color:#888">[</span><span style="color:#b83838">&#34;.&#34;</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span>
+</span></span><span style="display:flex;"><span>This file <span style="color:#b83838">`</span><span style="color:#b83838">{{eval this}}</span><span style="color:#b83838">`</span> was last updated on <span style="color:#888">{</span><span style="color:#888">{</span> <span style="color:#388038">eval</span> date<span style="color:#888">[</span><span style="color:#2838b0">this</span><span style="color:#888">]</span> <span style="color:#888">}</span><span style="color:#888">}</span><span style="color:#888">.</span>
+</span></span></code></pre>
 <p>Here&rsquo;s how the above code sample renders on this document itself!</p>
 
 <blockquote>
-<p>This file <code>website/source/processed/sections/docs/paths.md</code> was last updated on 07 Sep 2020, 08:39 PM.</p>
+<p>This file <code>website/source/processed/sections/docs/paths.md</code> was last updated on 02 Jul 2022, 11:20 AM.</p>
 </blockquote>
 
 <h3>When are paths resolved?</h3>
@@ -179,11 +179,11 @@ is warranted.</p>
 <p>Example:</p>
 
 <h4>Markdown</h4>
-<pre style="background-color:#fff">My favourite site is [<span style="color:#2838b0">Wikipedia</span>](<span style="color:#388038">https://www.wikipedia.org/</span>).
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>My favourite site is [<span style="color:#2838b0">Wikipedia</span>](<span style="color:#388038">https://www.wikipedia.org/</span>).
+</span></span></code></pre>
 <h4>HTML</h4>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My favourite site is <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;https://www.wikipedia.org/&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Wikipedia<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>.<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">p</span><span style="color:#888"></span><span style="color:#888">&gt;</span>My favourite site is <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;https://www.wikipedia.org/&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Wikipedia<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>.<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">p</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <p>The big difference between links and paths is simple: links are only ever used at runtime,
 while paths are used by Magnanimous at compile time to resolve <a href="/magnanimous/sections/docs/expression_lang.html">Magnanimous instructions</a>.</p>
 
@@ -214,13 +214,13 @@ should actually point to <code>/my-project/blog/post.html</code>.</p>
 
 <p>A good way to approach this is to define a <code>basePath</code> variable in the <code>/processed/_global_context</code> file, as in this
 example:</p>
-<pre style="background-color:#fff">{{ define basePath &#34;/my-project/&#34; }}
-</pre><div class="file-box">source/processed/_global_context</div><p>Now, from any other processed file, a link can be safely created as follows:</p>
-<pre style="background-color:#fff"><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + `blog/post.html` }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A link<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</pre>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define basePath &#34;/my-project/&#34; }}
+</span></span></code></pre><div class="file-box">source/processed/_global_context</div><p>Now, from any other processed file, a link can be safely created as follows:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + `blog/post.html` }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>A link<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
+</span></span></code></pre>
 <p>Or, in markdown:</p>
-<pre style="background-color:#fff">[<span style="color:#2838b0">A link</span>](<span style="color:#388038">{{ eval basePath + &#34;blog/post.html&#34; }}</span>)
-</pre></div>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>[<span style="color:#2838b0">A link</span>](<span style="color:#388038">{{ eval basePath + &#34;blog/post.html&#34; }}</span>)
+</span></span></code></pre></div>
 <div class="footer">
     <div>
         <small>
