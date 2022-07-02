@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/Depado/bfchroma"
+	"github.com/Depado/bfchroma/v2"
 	"github.com/russross/blackfriday/v2"
 )
 
