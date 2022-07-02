@@ -152,8 +152,8 @@ Example:
 ```
 
 > When a markdown file includes a non-markdown file, the included contents are not treated as markdown.
-> If you want that to hapen, you can define a variable called `_forceMarkdown` with a non-nil value.
-> For example, `{{ define _forceMarkdown 1 }}`.
+> If you want that to hapen, you can define a variable called `_forceMarkdown` with a non-null value.
+> For example, `\{{ define _forceMarkdown 1 }}`.
 
 Notice that paths can be [expressions](#expressions) if starting with `"` or <code>\`</code>,
 or explicitly with `eval <expr>`:
