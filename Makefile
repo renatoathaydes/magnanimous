@@ -55,7 +55,10 @@ release-windows:
 release-darwin:
 	env GOOS=darwin env GOARCH=amd64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-amd64
 
-release: test release-linux release-windows release-darwin
+release-darwin-arm:
+	env GOOS=darwin env GOARCH=arm64 go build -ldflags "-s -w" -o releases/magnanimous-darwin-arm64
+
+release: test release-linux release-windows release-darwin release-darwin-arm
 
 # clean build artifacts, i.e. everything that is not source code.
 # Does not remove the installed binary.

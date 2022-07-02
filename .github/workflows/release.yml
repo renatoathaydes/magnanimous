@@ -24,8 +24,8 @@ jobs:
           release_name: ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Mac Asset
-        id: upload-mac-asset 
+      - name: Upload Mac AMD64 Asset
+        id: upload-mac-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -33,6 +33,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./releases/magnanimous-darwin-amd64
           asset_name: magnanimous-darwin-amd64
+          asset_content_type: application/octet-stream
+      - name: Upload Mac ARM64 Asset
+        id: upload-mac-arm-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/magnanimous-darwin-arm64
+          asset_name: magnanimous-darwin-arm64
           asset_content_type: application/octet-stream
       - name: Upload Linux AMD64 Asset
         id: upload-linux-amd64-asset
