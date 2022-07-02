@@ -42,6 +42,10 @@ blockquote {
     color: #777;
 }
 
+pre > code {
+    background-color: white;
+}
+
 code {
     padding: 0.2em;
     border-radius: 0.3em;
