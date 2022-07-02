@@ -360,8 +360,8 @@ Example:
 
 ```html
 \{{ for item (sortBy date reverse limit 10) /path/to/directory }}
-<div>Date: \{{ eval date }}</div>
-<div>Post name: \{{ eval name }}</div>
+<div>Date: \{{ eval item.date }}</div>
+<div>Post name: \{{ eval item.name }}</div>
 \{{ end }}
 ```
 
@@ -374,8 +374,8 @@ If you need to pass in an expression, or just a variable instead of a hardcoded 
 
 <!-- Somewhere else in the file -->
 \{{ for item eval postDirectories }}
-<div>Date: \{{ eval date }}</div>
-<div>Post name: \{{ eval name }}</div>
+<div>Date: \{{ eval item.date }}</div>
+<div>Post name: \{{ eval item.name }}</div>
 \{{ end }}
 ```
 
@@ -631,7 +631,7 @@ the following [for](#for) instruction to display the `section_name` of each file
 
 ```
 \{{ for section my-sections/ }}\\
-  The name of the section is \{{ eval section_name }}!
+  The name of the section is \{{ eval section.section_name }}!
 \{{ end }}\\
 ```
 
