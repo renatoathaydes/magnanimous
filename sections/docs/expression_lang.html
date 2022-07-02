@@ -147,8 +147,8 @@ content:</p>
 </span></span></code></pre>
 <blockquote>
 <p>When a markdown file includes a non-markdown file, the included contents are not treated as markdown.
-If you want that to hapen, you can define a variable called <code>_forceMarkdown</code> with a non-nil value.
-For example, &ldquo;.</p>
+If you want that to hapen, you can define a variable called <code>_forceMarkdown</code> with a non-null value.
+For example, <code>{{ define _forceMarkdown 1 }}</code>.</p>
 </blockquote>
 
 <p>Notice that paths can be <a href="#expressions">expressions</a> if starting with <code>&quot;</code> or <code>`</code>,
@@ -169,13 +169,11 @@ up the source tree from the current file being written).</p>
 <p>Up-path example: <code>.../_header.html</code></p>
 
 <p>See <a href="paths.html">Paths and Links</a> for more details.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="includeB64" class="link-header-component">
 <a href="#includeB64"><img src="/magnanimous/images/link.svg"></a>
 <span>includeB64</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ includeB64 &lt;path&gt; }}
 </span></span></code></pre>
@@ -192,13 +190,11 @@ up the source tree from the current file being written).</p>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">img</span> <span style="color:#388038">src</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data:image/gif;base64,{{ includeB64 path/to/file.gif }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span></code></pre>
 <p>See the <a href="#include">include</a> documentation for more information about paths that may be used.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="includeRaw" class="link-header-component">
 <a href="#includeRaw"><img src="/magnanimous/images/link.svg"></a>
 <span>includeRaw</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ includeRaw &lt;path&gt; }}
 </span></span></code></pre>
@@ -211,13 +207,11 @@ up the source tree from the current file being written).</p>
 <p>The <code>includeRaw</code> statement is used to include the raw (unprocessed) contents of a file into another file.</p>
 
 <p>See the <a href="#include">include</a> documentation for more information about paths that may be used.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="component" class="link-header-component">
 <a href="#component"><img src="/magnanimous/images/link.svg"></a>
 <span>component</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ component &lt;path&gt; }}
 </span></span><span style="display:flex;"><span>&lt;content&gt;
@@ -250,13 +244,11 @@ component (typically using <code>slot</code>s).</p>
 </span></span><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre>
 <p>See <a href="components.html">Components</a> for more details about using components.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="slot" class="link-header-component">
 <a href="#slot"><img src="/magnanimous/images/link.svg"></a>
 <span>slot</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ slot &lt;slot-name&gt; }}
 </span></span><span style="display:flex;"><span>&lt;content&gt;
@@ -277,13 +269,11 @@ being inserted into the processed document.</p>
 
 <p>Slots are commonly used together with <a href="components.html">Components</a> (but may also be used on their own), so they are
 explained in more detail in the <a href="components.html">Components</a> page.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="if" class="link-header-component">
 <a href="#if"><img src="/magnanimous/images/link.svg"></a>
 <span>if</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ if &lt;expression&gt; }}
 </span></span><span style="display:flex;"><span>&lt;content&gt;
@@ -300,13 +290,11 @@ explained in more detail in the <a href="components.html">Components</a> page.</
 
 <p>For example, you may want to include a certain CSS class on an element only if it&rsquo;s the currently active element:</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ if currentPage == page }}active{{ end }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
-</span></span></code></pre>
-<p><div style="height: 1em;"></div>
+</span></span></code></pre><div style="height: 1em;"></div>
 <h3 id="for" class="link-header-component">
 <a href="#for"><img src="/magnanimous/images/link.svg"></a>
 <span>for</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for &lt;variable-name&gt; [ (&lt;for-instruction&gt;...) ] &lt;iterable&gt; }}
 </span></span><span style="display:flex;"><span>&lt;content&gt;
@@ -320,13 +308,11 @@ explained in more detail in the <a href="components.html">Components</a> page.</
 <li><code>iterable</code> is an <a href="#iterables">iterable</a>.</li>
 <li><code>content</code> is some content to be repeatedly included in the document, once for each item.</li>
 </ul>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h4 id="for-instructions" class="link-header-component">
 <a href="#for-instructions"><img src="/magnanimous/images/link.svg"></a>
 <span>for sub-instructions</span>
-</h4></p>
-
+</h4>
 <ul>
 <li><code>sort</code>            - sort the elements alphabetically.</li>
 <li><code>sortBy &lt;field&gt;</code>  - sort the file items by the value of some property.</li>
@@ -361,13 +347,11 @@ If you need to pass in an expression, or just a variable instead of a hardcoded 
 </span></span><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre>
 <p>See <a href="#iterables">Iterables</a> for details about what iterable types can be used with the <code>for</code> instruction.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="doc" class="link-header-component">
 <a href="#doc"><img src="/magnanimous/images/link.svg"></a>
 <span>doc</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ doc &lt;text&gt; }}
 </span></span></code></pre>
@@ -382,13 +366,11 @@ documents.</p>
 
 <p>You can use it to make clear what some complex parts of your templates work, or document the variables expected to
 be set for a <a href="components.html">Component</a>, for example.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="end" class="link-header-component">
 <a href="#end"><img src="/magnanimous/images/link.svg"></a>
 <span>end</span>
-</h3></p>
-
+</h3>
 <h4>Syntax:</h4>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre>
@@ -408,15 +390,12 @@ be set for a <a href="components.html">Component</a>, for example.</p>
 </ul>
 
 <p>Each <code>end</code> instruction always matches the nearest unclosed scoped instruction.</p>
-
-<p><div style="height: 1em;"></div><hr></p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div><hr>
+<div style="height: 1em;"></div>
 <h2 id="expressions" class="link-header-component">
 <a href="#expressions"><img src="/magnanimous/images/link.svg"></a>
 <span>Expressions</span>
-</h2></p>
-
+</h2>
 <p>Magnanimous expressions use a syntax that&rsquo;s similar to C-like languages, including Java, JavaScript and Go.</p>
 
 <p>For example, the following are all valid expressions:</p>
@@ -452,13 +431,11 @@ be set for a <a href="components.html">Component</a>, for example.</p>
 <a href="#define">define</a> instruction.</p>
 
 <p>The names of the variables must be valid <em>identifiers</em>, as we&rsquo;ll see below.</p>
-
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h3 id="identifiers" class="link-header-component">
 <a href="#identifiers"><img src="/magnanimous/images/link.svg"></a>
 <span>Identifiers</span>
-</h3></p>
-
+</h3>
 <p><em>Identifiers</em> are used to name variables declared with the <a href="#define">define</a> instruction.</p>
 
 <p>They must start with a letter or <code>_</code>, but may contain any of the following characters:</p>
@@ -475,13 +452,11 @@ be set for a <a href="components.html">Component</a>, for example.</p>
 </span></span><span style="display:flex;"><span>_first_character
 </span></span><span style="display:flex;"><span>abs123
 </span></span><span style="display:flex;"><span>CONSTANT_1
-</span></span></code></pre>
-<p><div style="height: 1em;"></div>
+</span></span></code></pre><div style="height: 1em;"></div>
 <h3 id="operators" class="link-header-component">
 <a href="#operators"><img src="/magnanimous/images/link.svg"></a>
 <span>Operators</span>
-</h3></p>
-
+</h3>
 <p>As shown above, expressions may comprise identifiers, numbers, Strings and also operators.</p>
 
 <p>The following operators are supported:</p>
@@ -582,12 +557,11 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 </tr>
 </tbody>
 </table>
-<p><div style="height: 1em;"></div>
+<div style="height: 1em;"></div>
 <h2 id="iterables" class="link-header-component">
 <a href="#iterables"><img src="/magnanimous/images/link.svg"></a>
 <span>Iterables</span>
-</h2></p>
-
+</h2>
 <p>Iterables are collections of values which can be used with the <a href="#for">for</a> instruction.</p>
 
 <p>They can be of two types:</p>
@@ -629,8 +603,7 @@ the following <a href="#for">for</a> instruction to display the <code>section_na
 </span></span><span style="display:flex;"><span>{{ end }}\
 </span></span></code></pre>
 <p>See <a href="paths.html">Paths and Links</a> for more details about paths.</p>
-
-<p></div>
+</div>
 <div class="footer">
     <div>
         <small>
@@ -639,4 +612,4 @@ the following <a href="#for">for</a> instruction to display the <code>section_na
     </div>
 </div>
 </body>
-</html></p>
+</html>
