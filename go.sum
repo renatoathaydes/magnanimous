@@ -1,3 +1,5 @@
+github.com/Depado/bfchroma/v2 v2.0.0 h1:IRpN9BPkNwEpR6w1ectIcNWOuhDSLx+8f1pn83fzxx8=
+github.com/Depado/bfchroma/v2 v2.0.0/go.mod h1:wFwW/Pw8Tnd0irzgO9Zxtxgzp3aPS8qBWlyadxujxmw=
 github.com/alecthomas/chroma/v2 v2.2.0 h1:Aten8jfQwUqEdadVFFjNyjx7HTexhKP0XuqBG67mRDY=
 github.com/alecthomas/chroma/v2 v2.2.0/go.mod h1:vf4zrexSH54oEjJ7EdB65tGNHmH3pGZmVkgTP5RHvAs=
 github.com/alecthomas/repr v0.0.0-20220113201626-b1b626ac65ae h1:zzGwJfFlFGD94CyyYwCJeSuD32Gj9GTaSi5y9hoVzdY=
@@ -9,8 +11,6 @@ github.com/dlclark/regexp2 v1.4.0 h1:F1rxgk7p4uKjwIQxBs9oAXe5CqrXlCduYEJvrF4u93E
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/renatoathaydes/bfchroma/v2 v2.0.0-20220702095306-e9909870d30b h1:V8m2r91bMYVH5vTekh1aTA7o/21jAi96RvV3633ByIA=
-github.com/renatoathaydes/bfchroma/v2 v2.0.0-20220702095306-e9909870d30b/go.mod h1:CKMpIRfUmt03VvYTirouSnC142Pi77tKG20TZT3wZNE=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
