@@ -343,6 +343,7 @@ _where:_
 * `sortBy <field>`  - sort the file items by the value of some property.
 * `reverse`         - reverse the order of the items.
 * `limit <max>`     - limit the number of items to include.
+* `groupBy <field>` - group iteration by a field (only works for files).
 
 The `for` instruction allows some content to be repeated for each item of an [iterable](#iterables).
 
@@ -365,8 +366,24 @@ Example:
 \{{ end }}
 ```
 
+The `groupBy` sub-instruction can only be used by itself and allows iterating over file groups. Each group has the following fields:
+
+* `group` - the value of the field used for grouping.
+* `values` - the files that were group under the same group.
+
+Example:
+
+```html
+\{{ for all (groupBy category) /path/to/directory }}
+## Group: {{ eval all.group }}
+  \{{ for item (sortBy date reverse limit 10) eval all.values }}
+  <div>Date: \{{ eval item.date }}</div>
+  \{{ end }}
+\{{ end }}
+```
+
 Notice that the path is not normally given as an [expression](#expressions), but as simple text
-(notice that the path is not wrapped into double-quotes).
+(also, the path is not wrapped into double-quotes).
 If you need to pass in an expression, or just a variable instead of a hardcoded path, you must call `eval` first:
 
 ```html
