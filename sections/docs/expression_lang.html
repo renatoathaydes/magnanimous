@@ -112,8 +112,8 @@ content:</p>
 
 <p>For example, you could define a number of variables beforehand, to be used later in several other places
 (so you could change them in only one place if you ever changed your mind about their values):</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define title &#34;OurWebsite&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define visitorsPerMonth 10000 }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define title &#34;OurWebsite&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define visitorsPerMonth 10000 }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>The best website in the world, {{ eval title }}, has an average number of
 </span></span><span style="display:flex;"><span>{{ eval visitorsPerMonth / 30 }} visitors per day!
@@ -121,8 +121,8 @@ content:</p>
 </span></span><span style="display:flex;"><span>Many people love {{ eval title }} because it is so great!  
 </span></span></code></pre>
 <blockquote>
-<p>You may have noticed that instructions often end with a <code>\</code> character. That&rsquo;s to avoid a new-line
-  character being inserted where the instructions were in the source file, as the <code>\</code> can escape new lines.</p>
+<p>You may have noticed that instructions often end with a <code>\\ character. That's to avoid a new-line
+  character being inserted where the instructions were in the source file, as the</code>\ can escape new lines.</p>
 </blockquote>
 <div style="height: 1em;"></div>
 <h3 id="include" class="link-header-component">
@@ -151,7 +151,7 @@ If you want that to hapen, you can define a variable called <code>_forceMarkdown
 For example, <code>{{ define _forceMarkdown 1 }}</code>.</p>
 </blockquote>
 
-<p>Notice that paths can be <a href="#expressions">expressions</a> if starting with <code>&quot;</code> or <code>`</code>,
+<p>Notice that paths can be <a href="#expressions">expressions</a> if starting with <code>&quot;</code> or <code>\</code>,
 or explicitly with <code>eval &lt;expr&gt;</code>:</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888;font-style:italic">&lt;!--</span><span style="color:#888;font-style:italic"> Include expression path </span><span style="color:#888;font-style:italic">--&gt;</span>
 </span></span><span style="display:flex;"><span>{{ include &#34;other/&#34; + fileName }}
@@ -318,6 +318,7 @@ explained in more detail in the <a href="components.html">Components</a> page.</
 <li><code>sortBy &lt;field&gt;</code>  - sort the file items by the value of some property.</li>
 <li><code>reverse</code>         - reverse the order of the items.</li>
 <li><code>limit &lt;max&gt;</code>     - limit the number of items to include.</li>
+<li><code>groupBy &lt;field&gt;</code> - group iteration by a field (only works for files).</li>
 </ul>
 
 <p>The <code>for</code> instruction allows some content to be repeated for each item of an <a href="#iterables">iterable</a>.</p>
@@ -335,8 +336,23 @@ explained in more detail in the <a href="components.html">Components</a> page.</
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post name: {{ eval item.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre>
+<p>The <code>groupBy</code> sub-instruction can only be used by itself and allows iterating over file groups. Each group has the following fields:</p>
+
+<ul>
+<li><code>group</code> - the value of the field used for grouping.</li>
+<li><code>values</code> - the files that were group under the same group.</li>
+</ul>
+
+<p>Example:</p>
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for all (groupBy category) /path/to/directory }}
+</span></span><span style="display:flex;"><span>## Group: {{ eval all.group }}
+</span></span><span style="display:flex;"><span>  {{ for item (sortBy date reverse limit 10) eval all.values }}
+</span></span><span style="display:flex;"><span>  <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Date: {{ eval item.date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
+</span></span><span style="display:flex;"><span>  {{ end }}
+</span></span><span style="display:flex;"><span>{{ end }}
+</span></span></code></pre>
 <p>Notice that the path is not normally given as an <a href="#expressions">expression</a>, but as simple text
-(notice that the path is not wrapped into double-quotes).
+(also, the path is not wrapped into double-quotes).
 If you need to pass in an expression, or just a variable instead of a hardcoded path, you must call <code>eval</code> first:</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define postDirectories &#34;/path/to/directory&#34; }}
 </span></span><span style="display:flex;"><span>
@@ -598,9 +614,9 @@ layout-by-example (this is copied from the <a href="https://golang.org/pkg/time/
 </span></span></code></pre>
 <p>If each file <a href="#define">defines</a> a variable named <code>section_name</code>, for example, then a summary file could contain
 the following <a href="#for">for</a> instruction to display the <code>section_name</code> of each file:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section my-sections/ }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section my-sections/ }}\\
 </span></span><span style="display:flex;"><span>  The name of the section is {{ eval section.section_name }}!
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span></code></pre>
 <p>See <a href="paths.html">Paths and Links</a> for more details about paths.</p>
 </div>

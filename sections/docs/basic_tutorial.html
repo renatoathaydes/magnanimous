@@ -197,12 +197,12 @@ it much easier: the <a href="expression_lang.html#for">for</a> instruction lets 
 directory automatically.</p>
 
 <p>The <code>for</code> instruction we need to add to the header looks like this:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span></code></pre>
 <blockquote>
-<p>The <code>\</code> at the end of the instruction lines escapes the new line in the resulting file, so there won&rsquo;t be lots of
+<p>The `\ at the end of the instruction lines escapes the new line in the resulting file, so there won&rsquo;t be lots of
   empty lines in it.</p>
 </blockquote>
 
@@ -223,9 +223,9 @@ improve this later&hellip; but for now, here&rsquo;s what the <code>processed/_h
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">nav</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;navigation&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\\
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>        {{ end }}\
+</span></span><span style="display:flex;"><span>        {{ end }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -255,38 +255,38 @@ to display the section name, rather than its path:</p>
 </span></span></code></pre>
 <p>Now, the header can refer to the <code>name</code> variable on each file (notice we write <code>eval section.name</code> instead of just
 <code>eval section</code> for the link&rsquo;s text):</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for section /processed/sections/ }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span></code></pre>
 <p>This feature allows us to create summaries of files very easily&hellip; for example, you could put your blog posts under the
 <code>processed/blog</code> directory, and add a few definitions on top of each file, like this:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first blog post&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define date &#34;2019-03-10&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first blog post&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2019-03-10&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define abstract &#34;A short discussion about what I want to write about on my blog&#34; }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#444">## My first blog post
 </span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
 </span></span><span style="display:flex;"><span><span style="color:#444">### Abstract
 </span></span></span><span style="display:flex;"><span><span style="color:#444"></span>
-</span></span><span style="display:flex;"><span>{{ eval abstract }}\
+</span></span><span style="display:flex;"><span>{{ eval abstract }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>...
 </span></span></code></pre>
 <p>On the blog summary page, you could then list your blog posts:</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Most recent blog posts:<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">ul</span><span style="color:#888"></span><span style="color:#888">&gt;</span> 
-</span></span><span style="display:flex;"><span>{{ for blog_post /processed/blog }}\
+</span></span><span style="display:flex;"><span>{{ for blog_post /processed/blog }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">li</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">h3</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval blog_post }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h3</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.date  }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">div</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval blog_post.abstract }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">li</span><span style="color:#888">&gt;</span>    
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">ul</span><span style="color:#888">&gt;</span>
 </span></span></code></pre>
 <p>The <a href="expression_lang.html#for"><code>for</code></a> instructions supports sorting and limits:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for blog_post (sortBy date reverse limit 10) }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ for blog_post (sortBy date reverse limit 10) }}\\
 </span></span><span style="display:flex;"><span>...
 </span></span><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre>
@@ -332,10 +332,10 @@ look like this:</p>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;/index.html&#34;</span> 
 </span></span><span style="display:flex;"><span>            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>        {{ for section /processed/sections/ }}\\
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval section }}&#34;</span> 
 </span></span><span style="display:flex;"><span>            <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>        {{ end }}\
+</span></span><span style="display:flex;"><span>        {{ end }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">section</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">nav</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">section</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;container&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
@@ -417,10 +417,10 @@ but things like links to stylesheets require it.</p>
 </ul>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{eval basePath}}/index.html&#34;</span> 
 </span></span><span style="display:flex;"><span>    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != `Home`}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Home<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>{{ for section /processed/sections/ }}\
+</span></span><span style="display:flex;"><span>{{ for section /processed/sections/ }}\\
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval basePath + section }}&#34;</span> 
 </span></span><span style="display:flex;"><span>    <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;button{{if name != section.name}} button-outline{{end}}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval section.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span></code></pre>
 <p>And that&rsquo;s it!</p>
 

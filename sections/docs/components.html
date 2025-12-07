@@ -37,7 +37,7 @@ customizable content (so you wouldn&rsquo;t want them served by the server by th
 <p>As an example, let&rsquo;s say we want to create a component to represent a simple <em>warning</em> box.</p>
 
 <p>It could look like this:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ doc This component takes its contents and displays it in a warning box }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ doc This component takes its contents and displays it in a warning box }}\\
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">div</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;warning&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval __contents__ }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </span></span></code></pre><div class="file-box">source/processed/components/_warning.html</div><blockquote>
 <p>Notice that <code>__contents__</code> is a special variable that holds the contents of the component when it&rsquo;s used
@@ -80,10 +80,10 @@ to be set for customizing it:</p>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">div</span><span style="color:#888">&gt;</span>
 </span></span></code></pre><div class="file-box">source/processed/components/_var_example.html</div><p>When using it, we need to provide values for both variables, which we can do both from outside and from inside the
 component:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define my_variable &#34;This is available in the component&#39;s scope&#34; }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define my_variable &#34;This is available in the component&#39;s scope&#34; }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>{{ component /processed/components/_var_example.html }}
-</span></span><span style="display:flex;"><span>    {{ define other_var &#34;This also!&#34; }}\
+</span></span><span style="display:flex;"><span>    {{ define other_var &#34;This also!&#34; }}\\
 </span></span><span style="display:flex;"><span>{{ end }}
 </span></span></code></pre><div class="file-box">source/processed/example.html</div><p>Result:</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>
@@ -158,16 +158,16 @@ of the component can be provided by slots defined elsewhere.</p>
 </ul>
 
 <p>To make things more concrete, here&rsquo;s what the files could look like:</p>
-<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first post&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define path &#34;/processed/posts/first_post.html&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define date &#34;2018-04-05&#34; }}\
+<pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My first post&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define path &#34;/processed/posts/first_post.html&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2018-04-05&#34; }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#666"># My first post
 </span></span></span><span style="display:flex;"><span><span style="color:#666"></span>
 </span></span><span style="display:flex;"><span>etc...
-</span></span></code></pre><div class="file-box">source/processed/posts/first_post.md</div><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My second post&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\
-</span></span><span style="display:flex;"><span>{{ define date &#34;2018-06-07&#34; }}\
+</span></span></code></pre><div class="file-box">source/processed/posts/first_post.md</div><pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span>{{ define name &#34;My second post&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define path baseURL + &#34;/processed/posts/second_post.html&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ define date &#34;2018-06-07&#34; }}\\
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#666"># My second post
 </span></span></span><span style="display:flex;"><span><span style="color:#666"></span>
@@ -179,28 +179,28 @@ of the component can be provided by slots defined elsewhere.</p>
 </span></span><span style="display:flex;"><span>          * name
 </span></span><span style="display:flex;"><span>          * path
 </span></span><span style="display:flex;"><span>          * date
-</span></span><span style="display:flex;"><span>}}\
+</span></span><span style="display:flex;"><span>}}\\
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">table</span> <span style="color:#388038">class</span><span style="color:#666">=</span><span style="color:#b83838">&#34;data-table-component&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">thead</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Date<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">th</span><span style="color:#888"></span><span style="color:#888">&gt;</span>Post Name<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">th</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">thead</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tbody</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>    {{ for post (sortBy date) eval dataDirectory }}\
+</span></span><span style="display:flex;"><span>    {{ for post (sortBy date) eval dataDirectory }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#2838b0">tr</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.date }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#888">&lt;</span><span style="color:#2838b0">td</span><span style="color:#888"></span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#2838b0">a</span> <span style="color:#388038">href</span><span style="color:#666">=</span><span style="color:#b83838">&#34;{{ eval post.path }}&#34;</span><span style="color:#888"></span><span style="color:#888">&gt;</span>{{ eval post.name }}<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">a</span><span style="color:#888">&gt;</span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">td</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tr</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>    {{ end }}\
+</span></span><span style="display:flex;"><span>    {{ end }}\\
 </span></span><span style="display:flex;"><span>    <span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">tbody</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">table</span><span style="color:#888">&gt;</span>
 </span></span></code></pre><div class="file-box">source/processed/components/_data_table.html</div><p>Finally, we can add the component to our index page (and any other pages we want!):</p>
 <pre tabindex="0" style="background-color:#fff;"><code><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">html</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">body</span><span style="color:#888"></span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#2838b0">h2</span><span style="color:#888"></span><span style="color:#888">&gt;</span>These are my posts<span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">h2</span><span style="color:#888">&gt;</span>
-</span></span><span style="display:flex;"><span>{{ component /processed/components/_data_table.html }}\
-</span></span><span style="display:flex;"><span>    {{ define dataDirectory &#34;/processed/posts&#34; }}\
-</span></span><span style="display:flex;"><span>{{ end }}\
+</span></span><span style="display:flex;"><span>{{ component /processed/components/_data_table.html }}\\
+</span></span><span style="display:flex;"><span>    {{ define dataDirectory &#34;/processed/posts&#34; }}\\
+</span></span><span style="display:flex;"><span>{{ end }}\\
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">body</span><span style="color:#888">&gt;</span>
 </span></span><span style="display:flex;"><span><span style="color:#888">&lt;</span><span style="color:#888">/</span><span style="color:#2838b0">html</span><span style="color:#888">&gt;</span>
 </span></span></code></pre><div class="file-box">source/processed/index.html</div><p>And we&rsquo;re done!</p>
