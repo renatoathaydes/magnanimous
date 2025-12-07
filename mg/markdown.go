@@ -16,20 +16,6 @@ func SetCodeStyle(style string) {
 	mdStyle = bfchroma.Style(style)
 }
 
-func isInMd(stack ContextStack) bool {
-	s := stack.locations
-	len := len(s)
-	if len > 0 {
-		currentIsMd := isMd(s[len-1].Origin)
-		if len < 2 || !currentIsMd {
-			return currentIsMd
-		}
-		// if MD is included from non-MD, we say we're not in MD
-		return isMd(s[len-2].Origin)
-	}
-	return false
-}
-
 func flushMdAsHtml(buffer *bytes.Buffer, writer io.Writer) error {
 	defer buffer.Reset()
 	mdBytes := buffer.Bytes()
