@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -31,8 +30,8 @@ func shouldHaveError(t *testing.T, err error, messageAlternatives ...string) {
 		}
 	}
 	if !matchFound {
-		t.Errorf("Unexpected error message. Expected one of:\n" +
-			strings.Join(messageAlternatives, "\n    OR\n") + "\n    BUT got:\n" + err.Error())
+		t.Errorf("Unexpected error message. Expected one of:\n%s\n    BUT got:\n%s",
+			strings.Join(messageAlternatives, "\n    OR\n"), err.Error())
 	}
 }
 
@@ -61,11 +60,11 @@ func shortDiff(actual, expected string) string {
 			return fmt.Sprintf("actual longer than expected, max_index=%d", aIdx)
 		}
 	}
-	return fmt.Sprintf("No differences found")
+	return "No differences found"
 }
 
 func CreateTempFiles(files map[string]string) (mg.WebFilesMap, string) {
-	dir, err := ioutil.TempDir("", "for_test")
+	dir, err := os.MkdirTemp("", "for_test")
 	check(err)
 	fmt.Printf("Temp dir at %s\n", dir)
 
@@ -170,7 +169,7 @@ func runMg(t *testing.T, project string) string {
 		t.Fatal(err)
 	}
 
-	dir, err := ioutil.TempDir("", project)
+	dir, err := os.MkdirTemp("", project)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +191,7 @@ func assertFileContents(t *testing.T, files []string, baseDir, file, expectedCon
 		}
 	}
 	if targetFile != nil {
-		c, err := ioutil.ReadFile(filepath.Join(baseDir, *targetFile))
+		c, err := os.ReadFile(filepath.Join(baseDir, *targetFile))
 		if err == nil {
 			verifyEqual(0, t, string(c), expectedContent)
 		} else {
