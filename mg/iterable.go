@@ -1,6 +1,7 @@
 package mg
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"sort"
@@ -16,8 +17,25 @@ type webFileWithContext struct {
 }
 
 type iterable struct {
-	files []webFileWithContext
-	items []interface{}
+	files  []webFileWithContext
+	items  []interface{}
+	groups []GroupByItem
+}
+
+type GroupByItem struct {
+	group  string
+	values []webFileWithContext
+}
+
+// Get implements mg.expression.Context.
+func (g GroupByItem) Get(name string) (interface{}, bool) {
+	if name == "group" {
+		return g.group, true
+	}
+	if name == "values" {
+		return g.values, true
+	}
+	return nil, false
 }
 
 type iterationContent struct {
@@ -29,14 +47,20 @@ type iterationContent struct {
 }
 
 var _ Content = (*iterationContent)(nil)
+var _ expression.Context = (*GroupByItem)(nil)
 
 type forLoopSubInstruction struct {
 	sortBy  *sortBySubInstruction
 	reverse *reverseSubInstruction
 	limit   *limitSubInstruction
+	groupBy *groupBySubInstruction
 }
 
 type sortBySubInstruction struct {
+	field string
+}
+
+type groupBySubInstruction struct {
 	field string
 }
 
@@ -92,7 +116,7 @@ func parseIterable(arg string, location *Location, resolver FileResolver) (*pars
 		subInstructions: subInstructions}, nil
 }
 
-func (e *arrayIterable) getItems(context Context) []interface{} {
+func (e *arrayIterable) getItems(_ Context) []interface{} {
 	array := e.array
 	for _, subInstruction := range e.subInstructions {
 		if sortBy := subInstruction.sortBy; sortBy != nil {
@@ -112,10 +136,10 @@ func (e *arrayIterable) getItems(context Context) []interface{} {
 	return array
 }
 
-func (e *directoryIterable) getItems(context Context) ([]webFileWithContext, error) {
+func (e *directoryIterable) getItems(context Context) ([]webFileWithContext, []GroupByItem, error) {
 	webFilesCtx, err := e.filesWithContext(context)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// start by sorting by name if there's no sub-instructions or if the first sub-instruction is not sortBy
@@ -125,6 +149,23 @@ func (e *directoryIterable) getItems(context Context) ([]webFileWithContext, err
 		sort.Slice(webFilesCtx, func(i, j int) bool {
 			return webFilesCtx[i].file.Name < webFilesCtx[j].file.Name
 		})
+	}
+
+	var groupBy *groupBySubInstruction
+	for _, subInstruction := range e.subInstructions {
+		if subInstruction.groupBy != nil {
+			groupBy = subInstruction.groupBy
+			break
+		}
+	}
+
+	if groupBy != nil {
+		if len(e.subInstructions) > 1 {
+			log.Printf("WARN: using 'groupBy' in for-loop with other sub-instructions is not supported, " +
+				"will ignore everything else")
+		}
+		groupedItems := groupByArray(webFilesCtx, groupBy.field)
+		return nil, groupedItems, nil
 	}
 
 	for _, subInstruction := range e.subInstructions {
@@ -146,7 +187,7 @@ func (e *directoryIterable) getItems(context Context) ([]webFileWithContext, err
 		}
 	}
 
-	return webFilesCtx, nil
+	return webFilesCtx, nil, nil
 }
 
 func (e *directoryIterable) filesWithContext(context Context) ([]webFileWithContext, error) {
@@ -167,8 +208,9 @@ func (e *directoryIterable) filesWithContext(context Context) ([]webFileWithCont
 
 func parseForLoopSubInstructions(text string) []forLoopSubInstruction {
 	parts := strings.Fields(text)
-	result := make([]forLoopSubInstruction, len(parts), len(parts))
+	result := make([]forLoopSubInstruction, len(parts))
 	resultIdx := 0
+TopLevelForLoop:
 	for i := 0; i < len(parts); i++ {
 		switch p := parts[i]; p {
 		case "sort":
@@ -181,7 +223,7 @@ func parseForLoopSubInstructions(text string) []forLoopSubInstruction {
 				resultIdx++
 			} else {
 				log.Printf("WARN: missing argument for 'sortBy' in for-loop sub-instruction")
-				return result
+				break TopLevelForLoop
 			}
 		case "limit":
 			if i < len(parts)-1 {
@@ -196,16 +238,26 @@ func parseForLoopSubInstructions(text string) []forLoopSubInstruction {
 				i++
 			} else {
 				log.Printf("WARN: missing argument for 'limit' in for-loop sub-instruction")
-				return result
+				break TopLevelForLoop
 			}
 		case "reverse":
 			result[resultIdx].reverse = &reverseSubInstruction{}
 			resultIdx++
+		case "groupBy":
+			if i < len(parts)-1 {
+				result[resultIdx].groupBy = &groupBySubInstruction{field: parts[i+1]}
+				i++
+				resultIdx++
+			} else {
+				log.Printf("WARN: missing argument for 'groupBy' in for-loop sub-instruction")
+				break TopLevelForLoop
+			}
 		default:
 			log.Printf("Unrecognized for-loop sub-instruction: " + p)
+			break TopLevelForLoop
 		}
 	}
-	return result
+	return result[:resultIdx]
 }
 
 func sortArray(array []interface{}, instruction *sortBySubInstruction) {
@@ -221,6 +273,36 @@ func sortArray(array []interface{}, instruction *sortBySubInstruction) {
 		}
 		return res.(bool)
 	})
+}
+
+func groupByArray(webFiles []webFileWithContext, groupField string) (result []GroupByItem) {
+	// build a map from string to webFileWithContext array first:
+	groups := make(map[string][]webFileWithContext)
+	var groupsInOrder []string
+	if len(webFiles) == 0 {
+		log.Printf("WARNING: no files found gor groupBy '%s'", groupField)
+	}
+	for i := 0; i < len(webFiles); i++ {
+		wf := webFiles[i]
+		fv, ok := wf.context.Get(groupField)
+		if ok {
+			key := fmt.Sprint(fv)
+			_, ok := groups[key]
+			if !ok {
+				groupsInOrder = append(groupsInOrder, key)
+			}
+			groups[key] = append(groups[key], wf)
+		} else {
+			log.Printf("WARN: ignoring file in groupBy %s - file %s does not define such property",
+				groupField, webFiles[i].file.Name)
+		}
+	}
+	// now we can populate the result
+	for _, group := range groupsInOrder {
+		item := GroupByItem{group: group, values: groups[group]}
+		result = append(result, item)
+	}
+	return
 }
 
 func sortFiles(webFiles []webFileWithContext, sortField string) {

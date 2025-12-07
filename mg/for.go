@@ -62,8 +62,13 @@ func (f *ForLoop) Write(writer io.Writer, context Context) ([]Content, error) {
 		}
 	} else if iterable.items != nil {
 		items = iterable.items
+	} else if iterable.groups != nil {
+		for _, item := range iterable.groups {
+			items = append(items, item)
+		}
 	} else {
-		return nil, fmt.Errorf("ForLoop iterable without files or items")
+		return nil, fmt.Errorf("ForLoop iterable without files, groups or items: %s",
+			strings.TrimSpace(f.Text))
 	}
 
 	var result []Content
@@ -87,15 +92,25 @@ func (f *ForLoop) resolveIterable(context Context) (iterable iterable, ok bool) 
 	case string:
 		dirIter := directoryIterable{path: a, location: gIter.location, resolver: gIter.resolver,
 			subInstructions: gIter.subInstructions}
-		files, err := dirIter.getItems(context)
+		files, groupedBy, err := dirIter.getItems(context)
 		if err != nil {
 			log.Printf("WARNING: (%s) for-loop expression error getting files to iterate over: %s", f.Location.String(), err.Error())
 			return iterable, false
 		}
-		iterable.files = files
+		if groupedBy != nil {
+			iterable.groups = groupedBy
+		} else if files != nil {
+			iterable.files = files
+		}
 	case []interface{}:
 		itemsIter := arrayIterable{array: a, location: gIter.location, subInstructions: gIter.subInstructions}
 		iterable.items = itemsIter.getItems(context)
+	case []webFileWithContext:
+		array := make([]interface{}, len(a))
+		for i, item := range a {
+			array[i] = item.context
+		}
+		iterable.items = array
 	default:
 		log.Printf("WARNING: (%s) invalid for-loop expression, cannot iterate over: %v", f.Location.String(), arg)
 		return iterable, false

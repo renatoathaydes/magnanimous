@@ -583,3 +583,46 @@ func TestForFilesEvalSortBy(t *testing.T) {
 			"Other file\n\n"+
 			"Some file\n")
 }
+
+func TestForFilesGroupBy(t *testing.T) {
+
+	// create a bunch of files for testing
+	files, dir := CreateTempFiles(map[string]string{
+		"processed/examples/f1.txt": "{{define title \"A\"}}{{define cat \"first\"}}",
+		"processed/examples/f2.txt": "{{define title \"B\"}}{{define cat \"second\"}}",
+		"processed/examples/f3.txt": "{{define title \"C\"}}{{define cat \"second\"}}",
+		"processed/examples/f4.txt": "{{define title \"D\"}}{{define cat \"first\"}}",
+		"processed/examples/f5.txt": "{{define title \"E\"}}{{define cat \"third\"}}",
+	})
+	defer os.RemoveAll(dir)
+
+	resolver := mg.DefaultFileResolver{BasePath: dir, Files: &files}
+
+	r := bufio.NewReader(strings.NewReader(
+		"{{ for all (groupBy cat) /processed/examples }}" +
+			"## {{ eval all.group }}" +
+			"{{ for path (sortBy title) eval all.values }}\n" +
+			"{{ eval path.title }}\n" +
+			"{{ end }}" +
+			"-- end {{ eval all.group }} --\n" +
+			"{{ end }}"))
+
+	processed, err := mg.ProcessReader(r, filepath.Join(dir, "processed/hi.txt"), dir, 11, &resolver, time.Now())
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkContents(t, processed,
+		"## first\n"+
+			"A\n\n"+
+			"D\n"+
+			"-- end first --\n"+
+			"## second\n"+
+			"B\n\n"+
+			"C\n"+
+			"-- end second --\n"+
+			"## third\n"+
+			"E\n"+
+			"-- end third --\n")
+}
