@@ -158,7 +158,7 @@ func TestProcessDoNotIgnoreEscapedEscapedNewLine(t *testing.T) {
 	}
 
 	checkParsing(t, processed, emptyContext,
-		"hello Joe\\\n, how are you\\\n, good?")
+		"hello Joe\\\\\n, how are you\\\\\n, good?")
 }
 
 func TestProcessIgnoreEscapedWindowsNewLine(t *testing.T) {

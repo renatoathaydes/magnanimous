@@ -191,7 +191,7 @@ func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {
 		}
 
 		switch r {
-		case specialRune, '\\':
+		case specialRune:
 			// don't treat specially, just let it be written
 			_, err = builder.WriteRune(r)
 			state.col++
@@ -204,8 +204,8 @@ func parseUntilDoubleRunes(specialRune rune, state *parserState) (bool, error) {
 		case '\r':
 			return onEscapedReturn()
 		}
-		_, err = builder.WriteRune('\\')
-		return &r, err
+		_, err = builder.WriteString("\\\\")
+		return nil, err
 	}
 
 	for {
